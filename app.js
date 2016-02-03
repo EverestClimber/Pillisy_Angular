@@ -29,6 +29,7 @@ var logger           = new (winston.Logger)({
                         exitOnError: false
                     });  
 
+
 // configuration =================
 var root = __dirname + '/public';
 app.use(express.static(root));
