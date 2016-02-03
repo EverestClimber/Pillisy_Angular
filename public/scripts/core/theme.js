@@ -1,0 +1,23 @@
+angular
+  .module('theme', [
+    'ngCookies',
+    'ngResource',
+    'ngSanitize',
+    'ngRoute',
+    'ngAnimate',
+    'as.sortable',
+    'easypiechart',
+    'NgSwitchery',
+    'sun.scrollable',
+    'ui.bootstrap',
+    'ui.select',
+    'theme.core.templates',
+    'theme.core.template_overrides',
+    'theme.core.panels',
+    'theme.core.directives',
+    'MainController',
+    'theme.core.navigation_controller',
+    'theme.core.notifications_controller',
+    'theme.core.messages_controller',
+    'staff_signup'
+  ]);

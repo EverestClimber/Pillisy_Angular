@@ -1,0 +1,18 @@
+{
+  "name": "skylo",
+  "main": [
+    "vendor/styles/skylo.css",
+    "vendor/scripts/skylo.js"
+  ],
+  "homepage": "https://github.com/colintoh/skylo",
+  "_release": "f843e82a9f",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "f843e82a9f20e1a040176c5c598cc5039430c34c"
+  },
+  "_source": "git://github.com/colintoh/skylo.git",
+  "_target": "*",
+  "_originalSource": "skylo",
+  "_direct": true
+}

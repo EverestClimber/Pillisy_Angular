@@ -1,0 +1,98 @@
+<div id="page-heading" ng-controller="groupController">
+    <ol class="breadcrumb">
+        <li><a href="/">My Groups</a></li>
+        <li class="active">Group</li>
+    </ol>
+
+	<h1>Group name: {{ groupName }} <br> Group Id: {{ groupExtName }}</h1>  
+</div>
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-lg-12" style="position: relative;">
+			<tabset panel-tabs="true" panel-class="panel-default" style="position: relative;"> 
+				<tab heading="Patients">
+					<div class="container-fluid" ng-controller="groupPatientsController">
+					    <div class="row">
+					      <div class="col-md-12">
+					            <panel panel-class="panel-primary" data-heading="Patients medication adherence data">
+					                <panel-controls>
+					                    <panel-control-collapse></panel-control-collapse>
+					                    <button class="button-icon" ng-click="refreshPatients()"><i class="glyphicon glyphicon-refresh"></i></button>
+					                </panel-controls>
+
+					                <div class="input-icon right mb10">
+					                    <i class="fa fa-search"></i>
+					                    <input type="text" ng-model="filterOptions.filterText" class="form-control" placeholder="Search Filter">
+					                </div>
+
+					                <div style="height: 500px;" ng-grid="gridOptions"></div>
+
+					            </panel>
+
+					        </div>
+					    </div>
+					</div> 
+				</tab>
+
+				<!--<tab heading="Metrics">
+					<div class="container-fluid" ng-controller="TilesController">
+						<tabset panel-tabs="true" heading="Metrics" panel-class="panel-info">
+								<div class="row">
+									<div class="col-md-3" ng-repeat="item in largeTiles">
+										<tile-large data="item"></tile-large>
+									</div>
+								</div>
+						</tabset>
+					</div> 
+				</tab>
+
+				<tab heading="Charts">
+					<div class="container-fluid" ng-controller="TilesController">
+						<tabset panel-tabs="true" heading="Charts" panel-class="panel-info">
+								<div class="row">
+									<div class="col-md-3" ng-repeat="item in largeTiles">
+										<tile-large data="item"></tile-large>
+									</div>
+								</div>
+						</tabset>
+					</div> 
+				</tab>-->
+				
+				<tab heading="Members">
+					<div class="container-fluid" ng-controller="groupMembersController">
+					    <div class="row">
+					      <div class="col-md-12">
+					      
+					            <panel panel-class="panel-primary" data-heading="Members of your organzation with access to this group">
+					                <panel-controls>
+					                    <panel-control-collapse></panel-control-collapse>
+					                    <button class="button-icon" ng-click="refreshMembers()"><i class="glyphicon glyphicon-refresh"></i></button> 
+					                </panel-controls>
+							        <div class="input-icon right mb10">
+					                    <i class="fa fa-search"></i>
+					                    <input type="text" ng-model="filterOptions.filterText" class="form-control" placeholder="Search Filter">
+					                </div>
+
+					                <div style="height: 500px;" ng-grid="gridOptions"></div>
+					            </panel>
+
+					        </div>
+					    </div>
+					</div> 
+
+				</tab>
+
+				<tab ng-show="isAdmin" heading="Manage"> 
+					<p>Manage will be viewable only to the group managers. Will need to figure out what to put here. Probably the ability to invite or remove different group members.</p>
+
+			</tabset>
+			<div style="position:absolute;top:20px;right: 60px;">
+				<panel-controls>
+					<a href="/group/invitepatient" stye="text-align: right;"><i class="glyphicon glyphicon-plus"></i> INVITE EXISTING PATIENT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+					<a href="/group/addpatient" stye="text-align: right;"><i class="glyphicon glyphicon-plus"></i> ADD NEW PATIENT</a>
+				</panel-controls>
+			</div>
+		</div>
+	</div>
+</div> <!-- container-fluid -->

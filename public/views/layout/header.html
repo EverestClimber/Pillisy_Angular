@@ -1,0 +1,63 @@
+<header
+	id="topnav"
+	class="navbar ng-hide"
+	ng-class="{'navbar-fixed-top': getLayoutOption('fixedHeader'), 'navbar-static-top': !getLayoutOption('fixedHeader')}"
+	role="banner"
+	ng-show="!layoutLoading"
+	ng-cloak>
+	<a ng-show="isLoggedIn" id="leftmenu-trigger" ng-click="toggleLeftBar()"></a>
+
+	<div class="navbar-header pull-left">
+		<a class="navbar-brand" href="/"></a>
+	</div>
+
+	<div class="nav navbar-nav pull-right toolbar">
+		<li class="dropdown" ng-show="!isLoggedIn">
+			<a href="/auth/signup" style="font-size: 14px">
+				<i class="fa fa-sign-up"></i> Register
+			</a>
+	  	</li>
+	</div>
+
+	<ul class="nav navbar-nav pull-right toolbar">
+	  	<li class="dropdown" ng-show="!isLoggedIn">
+			<a href="/auth/login" style="font-size: 14px">
+				<i class="fa fa-sign-in"></i> Sign in
+			</a>
+	  	</li>
+
+	  	<li class="dropdown" ng-show="isLoggedIn" dropdown>
+	  		<!-- src="assets/demo/avatar/tennet.png" -->
+			<a href class="dropdown-toggle username" dropdown-toggle>
+				<img ng-src="{{ getUser() ? getUser().profileUrl : '' }}" alt="{{ getUser() ? getUser().profileAlt : '' }}"  />
+			</a>
+			
+			<ul class="dropdown-menu animated userinfo arrow">
+				<li class="userlinks">
+					<ul class="dropdown-menu">
+			  		<li>
+			  			<a href="javascript:void(0)" style="cursor: default;">{{ isLoggedIn ? getLoggedInUserFullName() : "" }}
+			  				<i class="pull-right glyphicon"></i>
+			  			</a>
+			  		</li>
+			  	<li class="divider"></li>
+			  	<li>
+			  		<a href="/profile/edit">Edit Profile 
+			  			<i class="pull-right glyphicon glyphicon-pencil"></i>
+			  		</a>
+			  	</li>
+			  	<!--<li><a href="#">Account <i class="pull-right glyphicon glyphicon-user"></i></a></li>-->
+			  	<!--<<li><a href="#/settings">Settings <i class="pull-right glyphicon glyphicon-cog"></i></a></li>--> <!-- enable this only for somebody who is logged in as an admin-->
+			  	<li class="divider"></li>
+			  	<li>
+			  		<a href="" class="text-right" ng-click="logOut()">Sign Out
+			  		</a>
+			  	</li>
+			</ul>
+		</li>
+	</ul>
+
+	<li class="visible-xs-block">
+		<a href="#" ng-click="toggleSearchBar($event)"><i class="glyphicon glyphicon-search"></i></a>
+	</li>
+</header>

@@ -1,0 +1,42 @@
+<div ng-controller="GroupPatientMedTestController">
+    <div id="page-heading">
+        <ol class="breadcrumb">
+            <li><a href="/">My Groups</a></li>
+            <li><a href="/group/data">{{ groupName }}</a></li>
+            <li><a href="/group/patient/data">{{ patientName }}</a></li>
+            <li class="active">Med History</li>
+        </ol>
+
+        <div>
+        	<h1>Patient: {{ patientName }} <br>Med: {{ medName }} </h1>
+        </div>
+        
+    </div>
+	<div class="container-fluid">
+		<div class="row">
+		
+			<div class="col-lg-12">
+				<tabset panel-tabs="true" panel-class="panel-default">
+
+					<tab heading="History">
+						<div class="panel panel-danger calendar">
+				            <div class="panel-heading">
+				                <h2>Med Calendar</h2>
+				            </div>
+				            <div class="panel-body">
+				                <div data-full-calendar="{ events: demoEvents }" ng-model="demoEvents"></div>
+				            </div>
+				        </div>
+
+					</tab>
+
+					<tab heading="Logs">
+						
+					</tab>
+
+				</tabset>
+
+			</div>
+		</div>
+	</div> <!-- container-fluid -->
+</div>

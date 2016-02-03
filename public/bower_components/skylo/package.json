@@ -1,0 +1,32 @@
+{
+  "author": "Colin Toh",
+  "name": "skylo",
+  "description": "A Twitter Bootstrap extension to add progress loader at the top of the page.",
+  "version": "0.4.0",
+  "homepage": "http://skylo.s3-website-ap-southeast-1.amazonaws.com/#/home",
+  "repository": {
+    "type": "git",
+    "url": "skylo"
+  },
+  "engines": {
+    "node": "~0.6.10 || 0.8 || 0.9"
+  },
+  "scripts": {
+    "start": "brunch watch --server",
+    "test": "brunch test"
+  },
+  "dependencies": {
+    "javascript-brunch": ">= 1.0 < 1.5",
+    "stylus-brunch": "1.5.1",
+    "css-brunch": ">= 1.0 < 1.5",
+    "ember-precompiler-brunch": "1.5.1",
+    "uglify-js-brunch": ">= 1.0 < 1.5",
+    "clean-css-brunch": ">= 1.0 < 1.5",
+    "jshint-brunch": "1.6.0",
+    "auto-reload-brunch": "<=1.5",
+    "grunt": "~0.4.1",
+    "grunt-s3": "~0.2.0-alpha.2",
+    "grunt-exec": "~0.4.2"
+  },
+  "devDependencies": {}
+}

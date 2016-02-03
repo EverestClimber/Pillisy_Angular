@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Skylo: The Sky Loader</title>
+    <link href='http://fonts.googleapis.com/css?family=Sonsie+One' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="stylesheets/app.css">
+    <script>
+	  window.brunch = window.brunch || {};
+	  window.brunch['auto-reload'] = {enabled: true};
+	</script>
+    <script src="javascripts/vendor.js"></script>
+    <script src="javascripts/app.js"></script>
+    <script>require('initialize');</script>
+</head>
+<body>
+    <!-- ApplicationView -->
+    <script>
+
+
+        $(function(){
+            $('#demo').on('click',function(){
+                $.skylo('start');
+
+                setTimeout(function(){
+                    $.skylo('set',50);
+                },1000);
+
+                setTimeout(function(){
+                    $.skylo('end');
+                },1500);
+            });
+
+
+            $('#start').on('click',function(){
+                $.skylo('start');
+            });
+
+            $('#end').on('click',function(){
+                $.skylo('end');
+            });
+
+            $('#set').on('click',function(){
+                $.skylo('show',function(){
+                    $.skylo('set',50);
+                });
+            });
+
+            $('#get').on('click',function(){
+                alert($.skylo('get')+'%');
+            });
+
+            $('#inch').on('click',function(){
+                $.skylo('show',function(){
+                    $.skylo('inch',10);
+                });
+            });
+
+
+        })
+    </script>
+
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35589544-7']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+
+<div ng-controller="addPatientMedController">
+	<div id="page-heading">
+	    <ol class="breadcrumb">
+	        <li><a href="/">My Groups</a></li>
+	        <li><a href="/group/data">{{ group.name }}</a></li>
+	        <li><a href="/group/patient/data">{{ patient.name }}</a></li>
+	        <li class="active">Add patient medication</li>
+	    </ol>
+
+		<h1>Add a new drug for {{ patient.name }} </h1>  
+	</div>
+
+	<div class="container-fluid">
+		<panel panel-class="panel" data-heading="Drug details">
+			<div class="col-md-6">
+			<!--<div class="col-sm-4"> -->
+				<div>
+					<form name="createpatient" ng-submit="submit(drug)" class="form-horizontal" style="margin-bottom: 0px !important;">
+						<div class="form-group">
+							<div class="col-sm-12">
+								<span>*Drug Name</span>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<angucomplete-alt
+									  	id="name"
+									  	minlength="3"
+									  	ng-model="drug.name"
+									  	placeholder="Drug name"
+									  	pause="400"
+									  	selected-object="drug.name"
+									  	remote-url=" {{ drug_search_url }} "
+									  	remote-url-data-field="data"
+									  	title-field="pillsyName"
+									  	description-field="description"
+									  	input-class="form-control form-control-small"
+									  	match-class="highlight"/>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-md-12"> 
+								<span>*Drug Quantity</span>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<input type="number" name="quantity" ng-model="drug.quantity" class="form-control" id="quantity" placeholder="Drug quantity" step="1" min="1" max="1000"  ng-pattern="integerval" ng-init="drug.quantity=1" required />
+								</div>
+								<span ng-show="createpatient.quantity.$invalid">Invalid entry</span>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<span>*Start Date</span>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<input ui-date="{ dateFormat: 'yy-mm-dd' }" name="start_date" ng-model="drug.start_date" class="form-control" id="start_date" placeholder="Start date (YYYY-MM-DD)" required />
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<span>*Number of pills per dose</span>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<input type="number" name="pills_dose" ng-model="drug.pills_dose" class="form-control" id="pills_dose" placeholder="Pills per dose" step="1" min="1" max="100"  ng-pattern="integerval" ng-init="drug.pills_dose=1" required />
+								</div>
+								<span ng-show="createpatient.pills_dose.$invalid">Invalid entry</span>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<span>*Number of doses per day</span>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<input type="number" name="doses_day" ng-model="drug.doses_day" class="form-control" id="doses_day" placeholder="Doses per day" step="1" min="1" max="100"  ng-pattern="integerval" ng-init="drug.pills_dose=1" required />
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<span>*Dose reminder time </span>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<input type="text" name="reminder_time" ng-model="drug.reminder_time" class="form-control" id="reminder_time" placeholder="Reminder time" data-time-format="h:mm a" data-autoclose="1" bs-timepicker required />
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<span>*Number of days of therapy</span>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<input type="number" name="days_therapy" ng-model="drug.days_therapy" class="form-control" id="days_therapy" placeholder="Days of therapy" step="1" min="1" max="100"  ng-pattern="integerval" ng-init="drug.days_therapy=1"  required />
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<span>*Therapy end date</span>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<input ui-date="{ dateFormat: 'yy-mm-dd' }" name="end_date" ng-model="drug.end_date" class="form-control" id="end_date" placeholder="Start date (YYYY-MM-DD)" required />
+								</div>
+							</div>
+						</div>
+						<!--<p><br>
+							<div>
+								<span>
+									<b>PILLSY HARDWARE INFORMATION</b>
+								</span>
+							</div>
+						</p>-->
+						<div class="form-group">
+							<div class="col-sm-12">
+								<span>*PillsyCap identifier</span>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-medkit"></i></span>
+									<input type="text" name="pillsyCapId" ng-model="drug.pillsyCapId" class="form-control" id="pillsyCapId" placeholder="PillsyCap identifier AA:BB:CC:DD:EE:FF" required />
+								</div>
+							</div>
+						</div>
+						<!--<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-medkit"></i></span>
+									<input type="text" name="pillsyHubId" ng-model="drug.pillsyHubId" class="form-control" id="pillsyHubId" placeholder="PillsyHub identifier AA:BB:CC:DD:EE:FF"/>
+								</div>
+							</div>
+						</div>-->
+
+						<div class="panel-footer">
+					<div class="pull-right">
+						<a href="/group/patient/data" class="btn btn-default">Cancel</a>
+						<button type="submit" data-ng-disabled="progress.active()" class="btn btn-primary">Add Drug</button>
+					</div>
+				</div>
+				<br>
+
+					</form>
+				</div>
+				
+			</div>
+		</panel>
+	</div>
+</div>

@@ -1,0 +1,12 @@
+[Unit]
+Description=Pillsy Enterprise WebApp daemon
+
+[Service]
+Type=forking
+ExecStart=/home/devops/projects/Pillsy/PillsyEnterpriseWebApp/scripts/startup.sh
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+
+

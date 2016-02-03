@@ -1,0 +1,51 @@
+
+<div ng-controller="createPatientController">
+	<div id="page-heading">
+	    <ol class="breadcrumb">
+	        <li><a href="/">My Groups</a></li>
+	        <li><a href="/group/data">{{ groupName }}</a></li>
+	        <li class="active">Invite patient</li>
+	    </ol>
+
+		<h1>Invite patient</h1>  
+	</div>
+
+	<div class="container-fluid">
+		<panel panel-class="panel" data-heading="Search for an existing patient">
+			<div class="col-sm-4">
+				<div>
+					Please enter an email and/or phone number to search for an existing Pillsy user to invite to this group. <br><br>
+					<form name="createpatient" ng-submit="searchPatient(user)" class="form-horizontal" style="margin-bottom: 0px !important;">
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
+									<input type="email" name="email" ng-model="user.email" class="form-control" id="email" placeholder="Email" required />
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-mobile-phone"></i></span>
+									<input type="tel" name="phone" ng-model="user.phone" class="form-control" id="phone" placeholder="Phone" />
+								</div>
+							</div>
+						</div>
+
+						<div class="panel-footer">
+					<div class="pull-right">
+						<a href="/group/data" class="btn btn-default">Cancel</a>
+						<button type="submit" data-ng-disabled="progress.active()" class="btn btn-primary">Search</button>
+					</div>
+				</div>
+				<br>
+
+					</form>
+				</div>
+				
+			</div>
+		</panel>
+	</div>
+</div>

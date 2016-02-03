@@ -1,0 +1,1 @@
+web: supervisor bin/www
