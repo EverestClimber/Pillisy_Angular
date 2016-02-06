@@ -34,16 +34,6 @@
                                 </div>
                             </div>
                         </div> 
-
-                        <!--<div class="panel panel-danger calendar">
-                            <div class="panel-heading">
-                                <h2>Med Calendar bbbbb</h2>
-                            </div>
-                            <div class="panel-body">
-                                <div data-full-calendar="{ events: demoEvents }" ng-model="demoEvents"></div>
-                            </div>
-                        </div>-->
-
                     </tab>
 
                     <tab heading="Pill Count">
@@ -51,16 +41,19 @@
                     </tab>
 
                     <tab heading="Schedule">
-                        <div class="container-fluid">
+                        <div class="container-fluid" ng-controller="groupPatientDrugScheduleController">
                             <div class="row">
                               <div class="col-md-12">
                                     <panel panel-class="panel-primary" data-heading="">
                                         <panel-controls>
                                             <panel-control-collapse></panel-control-collapse>
-                                            <button class="button-icon" ng-click="refreshPatients()"><i class="glyphicon glyphicon-refresh"></i></button>
+                                            <panel-control-refresh type="circular" is-loading="loadingSchedule" ng-click="refreshSchedule()"></panel-control-refresh>
+                                            <div style="position:absolute;top:8px;right:80px;">
+                                                <input date-range-picker id="scheduleRange" class="form-control date-picker pull-right" type="text" ng-model="datePicker.date" options="{ranges: ranges, locale: {format: 'MM/DD/YYYY'} }" readonly/>
+                                            </div>
                                         </panel-controls>
 
-                                        <div style="height: 500px;" ng-grid="gridOptions"></div>
+                                        <div class="gridStyle" style="height: 500px;" ng-grid="gridOptions"></div>
                                     </panel>
                                 </div>
                             </div>
@@ -74,10 +67,13 @@
                                     <panel panel-class="panel-primary" data-heading="">
                                         <panel-controls>
                                             <panel-control-collapse></panel-control-collapse>
-                                            <button class="button-icon" ng-click="refreshLogs()"><i class="glyphicon glyphicon-refresh"></i></button>
+                                            <panel-control-refresh type="circular" is-loading="loadingLogs" ng-click="refreshLogs()"></panel-control-refresh>
+                                            <div style="position:absolute;top:8px;right:80px;">
+                                                <input date-range-picker id="logsRange" class="form-control date-picker pull-right" type="text" ng-model="logsDatePicker.date" options="{ranges: logRanges, locale: {format: 'MM/DD/YYYY'} }" readonly/>
+                                            </div>
                                         </panel-controls>
 
-                                        <div style="height: 500px;" ng-grid="gridOptions"></div>
+                                        <div class="gridStyle" style="height: 500px;" ng-grid="gridOptions"></div>
                                     </panel>
                                 </div>
                             </div>

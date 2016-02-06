@@ -31,8 +31,12 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         }
     };
 
+    $scope.refreshGroups = function(){
+        $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+    };
+
     $scope.getPagedDataAsync = function(pageSize, page, searchText) {
-        $scope.progress = true;
+        $scope.loadingGroups = true;
 
         setTimeout(function() {
             var userId = user.id;
@@ -45,7 +49,7 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         	    console.log('groupsController - apiService.get - api to call is: '+api);
 
         		apiService.get(api).then(function(result){
-	              	$scope.progress = false;
+	              	$scope.loadingGroups = false;
 
 	              	if (result){
 	                	if (result.msg == 'success'){
@@ -62,7 +66,10 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
                                     "avg":          group.avg,
                                     "last_3_days":  group.last_3_days,
                                     "patients":     group.patients,
-                                    "members": 		group.members
+                                    "members": 		group.members,
+                                    "label":        group.name,
+                                    "url":          '/group/data',
+                                    "type":         'group'
                                 };
 
                                 largeLoad.push(obj);
@@ -153,8 +160,8 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         console.log('groupsController - openGroupDetails - ');
 
         var group = rowItem.entity;
+        
         if (stateService.setActiveGroup(group)){
-            $rootScope.active_group = group;
             $location.path('/group/data');
         }
     };
@@ -192,8 +199,7 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         console.log('groupsController - groupdescription: '+ $scope.group.description);
         console.log('groupsController - grouptype: '+ $scope.selected_type);
 
-        // Trigger validation flag.
-        $scope.submitted = true;
+        $scope.loadingGroups = true;
 
         // If form is invalid, return and let AngularJS show validation errors.
         if (!$scope.group.name){
@@ -221,7 +227,7 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
 
             $scope.progress = true;  
             apiService.post(api,$scope.group).then(function(result){
-                $scope.progress = false;
+                $scope.loadingGroups = false;
 
                 if (result){
                     if (result.msg == 'success'){

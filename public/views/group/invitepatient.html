@@ -13,7 +13,7 @@
 	<div class="container-fluid">
 		<panel panel-class="panel" data-heading="Search for an existing patient">
 			<div class="col-sm-4">
-				<div>
+				<div ng-show="invite_patient_entry_form_visible">
 					Please enter an email and/or phone number to search for an existing Pillsy user to invite to this group. <br><br>
 					<form name="createpatient" ng-submit="searchPatient(user)" class="form-horizontal" style="margin-bottom: 0px !important;">
 						<div class="form-group">
@@ -35,16 +35,37 @@
 						</div>
 
 						<div class="panel-footer">
-					<div class="pull-right">
-						<a href="/group/data" class="btn btn-default">Cancel</a>
-						<button type="submit" data-ng-disabled="progress.active()" class="btn btn-primary">Search</button>
-					</div>
-				</div>
-				<br>
-
+							<div class="pull-right">
+								<a href="/group/data" class="btn btn-default">Cancel</a>
+								<button type="submit" data-ng-disabled="progress.active()" class="btn btn-primary">Search</button>
+							</div>
+						</div>
+						<br>
 					</form>
 				</div>
-				
+
+				<div ng-show="invite_patient_confirmation_visible">
+					An invitation has been sent to the patient via SMS. You will have access to their medication information when they approve your invitation.<br><br>
+					<form name="createpatient" class="form-horizontal" style="margin-bottom: 0px !important;">
+						<div class="panel-footer">
+							<div class="pull-right">
+								<a href="/group/data" class="btn btn-default">OK</a>
+							</div>
+						</div>
+					</form>
+				</div>
+
+				<div ng-show="invite_patient_not_found_visible">
+					This patient you are searching for does not exist on the Pillsy platform. Try searching again with a valid phone number and email, or create a new patient.<br><br>
+					<form name="createpatient" class="form-horizontal" style="margin-bottom: 0px !important;">
+						<div class="panel-footer">
+							<div class="pull-right">
+								<a href="/group/data" class="btn btn-default">OK</a>
+							</div>
+						</div>
+					</form>
+				</div>
+
 			</div>
 		</panel>
 	</div>

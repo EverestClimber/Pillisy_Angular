@@ -4,8 +4,8 @@
 *  @package GroupController AngularJS module  
 */
 
-var app = angular.module('GroupController', ['ngGrid'/*, 'StateService', 'GroupDetails'*/]);     //instantiates GroupPatientsController module
-app.controller('groupController', function ($scope, $filter, $http, $location, $rootScope, apiService, groupDetails, stateService) {
+var app = angular.module('GroupController', []);     //instantiates GroupController module
+app.controller('groupController', function ($scope, stateService) {
     'use strict';
 
     console.log('groupController');

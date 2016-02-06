@@ -18,7 +18,7 @@
 					            <panel panel-class="panel-primary" data-heading="Patients medication adherence data">
 					                <panel-controls>
 					                    <panel-control-collapse></panel-control-collapse>
-					                    <button class="button-icon" ng-click="refreshPatients()"><i class="glyphicon glyphicon-refresh"></i></button>
+					  					<panel-control-refresh type="circular" is-loading="loadingPatients" ng-click="refreshPatients()"></panel-control-refresh>
 					                </panel-controls>
 
 					                <div class="input-icon right mb10">
@@ -27,47 +27,20 @@
 					                </div>
 
 					                <div style="height: 500px;" ng-grid="gridOptions"></div>
-
 					            </panel>
-
 					        </div>
 					    </div>
 					</div> 
 				</tab>
-
-				<!--<tab heading="Metrics">
-					<div class="container-fluid" ng-controller="TilesController">
-						<tabset panel-tabs="true" heading="Metrics" panel-class="panel-info">
-								<div class="row">
-									<div class="col-md-3" ng-repeat="item in largeTiles">
-										<tile-large data="item"></tile-large>
-									</div>
-								</div>
-						</tabset>
-					</div> 
-				</tab>
-
-				<tab heading="Charts">
-					<div class="container-fluid" ng-controller="TilesController">
-						<tabset panel-tabs="true" heading="Charts" panel-class="panel-info">
-								<div class="row">
-									<div class="col-md-3" ng-repeat="item in largeTiles">
-										<tile-large data="item"></tile-large>
-									</div>
-								</div>
-						</tabset>
-					</div> 
-				</tab>-->
 				
 				<tab heading="Members">
 					<div class="container-fluid" ng-controller="groupMembersController">
 					    <div class="row">
-					      <div class="col-md-12">
-					      
+					      	<div class="col-md-12">
 					            <panel panel-class="panel-primary" data-heading="Members of your organzation with access to this group">
 					                <panel-controls>
 					                    <panel-control-collapse></panel-control-collapse>
-					                    <button class="button-icon" ng-click="refreshMembers()"><i class="glyphicon glyphicon-refresh"></i></button> 
+					  					<panel-control-refresh type="circular" is-loading="loadingMembers" ng-click="refreshMembers()"></panel-control-refresh>
 					                </panel-controls>
 							        <div class="input-icon right mb10">
 					                    <i class="fa fa-search"></i>
@@ -76,11 +49,9 @@
 
 					                <div style="height: 500px;" ng-grid="gridOptions"></div>
 					            </panel>
-
 					        </div>
 					    </div>
 					</div> 
-
 				</tab>
 
 				<tab ng-show="isAdmin" heading="Manage"> 

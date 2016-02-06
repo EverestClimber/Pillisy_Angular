@@ -4,27 +4,30 @@
 *  @package CreatePatientController AngularJS module  
 */
 
-var app = angular.module('CreatePatientController', [/*'StateService'*/]);     //instantiates CreatePatientController module
-app.controller('createPatientController', function ($scope, $filter, $location, $rootScope, apiService, stateService) {
+var app = angular.module('CreatePatientController', []);     //instantiates CreatePatientController module
+app.controller('createPatientController', function ($scope, $filter, $location, apiService, stateService) {
 	'use strict';
 
     console.log('createPatientController');
 
-    if (!$rootScope.active_group){
-    	$location.path('/');
-    }
+    var pillsy = stateService.getPillsy();
 
-    var initVars = function(){
-	   	$scope.groupId      = $rootScope.active_group.id;
-	    $scope.groupName    = $rootScope.active_group.name;
-	    $scope.groupExtName = $rootScope.active_group.identifier;
+    if (!pillsy.active_group) {
+        $location.path('/');
+    }
+    else{
+        $scope.groupId      = pillsy.active_group.id;
+        $scope.groupName    = pillsy.active_group.name;
+        $scope.groupExtName = pillsy.active_group.identifier;
 
         console.log('createPatientController - $scope.groupId: '+ $scope.groupId );
         console.log('createPatientController - $scope.groupName: '+ $scope.groupName);
         console.log('createPatientController - $scope.groupExtName: '+ $scope.groupExtName);
-	}
 
-	initVars();
+        $scope.invite_patient_entry_form_visible    = true;
+        $scope.invite_patient_confirmation_visible = false;
+        $scope.invite_patient_not_found_visible    = false;
+    }
 
     $scope.createPatient = function(patient){
 
@@ -100,12 +103,16 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
                 if (result.msg == 'success'){
                     console.log('apiService.post - success - found patient, email/sms sent');
 
-                    
+                    $scope.invite_patient_entry_form_visible   = false;
+                    $scope.invite_patient_confirmation_visible = true;
+                    $scope.invite_patient_not_found_visible    = false;
                 }
                 else{
                     console.log('apiService.post - error');
 
-                    alert(result.msg);
+                    $scope.invite_patient_entry_form_visible   = false;
+                    $scope.invite_patient_confirmation_visible = false;
+                    $scope.invite_patient_not_found_visible    = true;
                 }
             });
         }

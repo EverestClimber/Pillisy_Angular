@@ -4,6 +4,7 @@ var app = angular
     'ngResource',
     'ngSanitize',
     'ngRoute',
+    'daterangepicker',
     'ngAnimate',
     'as.sortable',
     'easypiechart',
@@ -37,6 +38,7 @@ var app = angular
     'AddPatientMedController',
     'GroupPatientsController',
     'GroupPatientDrugLogsController',
+    'GroupPatientDrugScheduleController',
     'GroupMembersController',
     'PatientViewController',
     'staff_signup'

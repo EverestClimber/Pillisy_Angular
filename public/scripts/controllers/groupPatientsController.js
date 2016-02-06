@@ -62,7 +62,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 	        var data;
 
 	        apiService.get(api).then(function(result){
-	            $scope.progress = false;
+	            $scope.loadingPatients = false;
 
 	            if (result){
 	                if (result.msg == 'success'){
@@ -119,7 +119,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
     }
     
     $scope.getPagedDataAsync = function(pageSize, page, searchText) {
-        $scope.progress = true;
+        $scope.loadingPatients = true;
 
         setTimeout(function() {
 	        fireoffGroupDetailsFetch(pageSize, page, searchText);
@@ -186,7 +186,6 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
           	{ field:'interval', displayName: 'Last 7 days' },
           	{ field:'all_time', displayName: 'All time' }
         ],
-        selectedItems:      		$scope.mySelections,
         multiSelect:        		false,
         enablePaging:       		true,
         showFooter:         		true,

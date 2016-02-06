@@ -17,6 +17,47 @@
 
     <div class="container-fluid">
         <tabset panel-tabs="true" panel-class="panel-default">
+            <tab heading="Drugs">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <panel panel-class="panel-primary" data-heading="" style="height: 100%;">
+                            <panel-controls>
+                                <div style="position:absolute;top:20px;right: 60px;">
+                                    <panel-controls>
+                                        <a href="/group/patient/addmed" stye="text-align: right;"><i class="glyphicon glyphicon-plus"></i> ADD DRUG&nbsp;&nbsp;</a>
+                                    </panel-controls>
+                                </div>
+
+                                <panel-control-collapse></panel-control-collapse>
+                                <panel-control-refresh type="circular" is-loading="loadingMeds" ng-click="refreshMeds()"></panel-control-refresh>
+                            </panel-controls>
+
+                            <!--<div class="input-icon right mb10">
+                                <i class="fa fa-search"/>
+                                <input type="text" ng-model="filterOptions.filterText" class="form-control" placeholder="Search Filter"/>
+                            </div>-->
+                            <div style="height: 300px;" ng-grid="medsGridOptions"/>
+                        </panel>
+                    </div>
+                </div>   
+            </tab> 
+
+            <tab heading="Notes">
+                <div class="container-fluid">
+                    <div class="row">
+
+                    </div>
+                </div>
+            </tab>
+
+            <tab heading="Messages">
+                <div class="container-fluid">
+                    <div class="row">
+
+                    </div>
+                </div>
+            </tab>
+
             <tab heading="Profile">
                 <div class="row">
                     <div class="col-xs-12">
@@ -89,198 +130,6 @@
                         </panel>
                     </div>
                 </div> 
-            </tab>
-
-            <tab heading="Drugs">
-                <div class="row">
-                    <div class="col-xs-12">
-                        
-                        <panel panel-class="panel-primary" data-heading="" style="height: 100%;">
-                            <panel-controls>
-                                <div style="position:absolute;top:20px;right: 60px;">
-                                    <panel-controls>
-                                        <a href="/group/patient/addmed" stye="text-align: right;"><i class="glyphicon glyphicon-plus"></i> ADD DRUG&nbsp;&nbsp;</a>
-                                    </panel-controls>
-                                </div>
-
-                                <panel-control-collapse></panel-control-collapse>
-                                <panel-control-refresh type="circular" is-loading="loadingMeds" ng-click="refreshMeds()"></panel-control-refresh>
-                            </panel-controls>
-
-                            <div class="input-icon right mb10">
-                                <i class="fa fa-search"/>
-                                <input type="text" ng-model="filterOptions.filterText" class="form-control" placeholder="Search Filter"/>
-                            </div>
-                            <div style="height: 300px;" ng-grid="medsGridOptions"/>
-                        </panel>
-
-                    </div>
-                </div>   
-
-                <!--<p><br>-->
-                <!--<div class="row">
-                    <div class="col-xs-12">
-
-                        <panel panel-class="panel-primary no-padding" heading="Adherence - Trends">
-                            <panel-controls>
-                                <panel-control-collapse></panel-control-collapse>
-                                <panel-control-refresh type="circular" is-loading="loadingTrendsChartData" ng-click="refreshTrendsAction()"></panel-control-refresh>
-                                <div class="pull-right mr10 hidden-xs">
-                                    <button class="btn btn-sm btn-default" style="text-transform: uppercase;" daterangepicker="drp_options" date-begin="drp_start" date-end="drp_end">
-                                        <i class="glyphicon glyphicon-calendar"></i> <span style="margin-left: 5px">{{drp_start}} - {{drp_end}}</span> <b class="caret"></b>
-                                    </button>
-                                </div>
-                                <div class="pull-right mr10 hidden-xs">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-default " data-toggle="dropdown" style="text-transform: uppercase;">
-                                            <i class="glyphicon glyphicon-time"/>
-                                            <span style="margin-left: 5px">
-                                                {{selected_dose_trends.tag}}
-                                            </span>
-                                            <span style="margin-left: 2px">
-                                                <b class="caret"/>
-                                            </span>
-                                        </button>
-                                        <ul class="dropdown-menu" dropdown-menu>
-                                            <li ng-repeat="dose in doses">
-                                                <a ng-click="selectDoseTrends(dose)">{{dose.tag}}</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </panel-controls>
-
-                            <div class="p20">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                       <div class="" 
-                                            flot-chart style="width: 100%; height:319px" 
-                                            data-flot-data="trendsData"
-                                            data-flot-options="trendsDataOptions">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-            
-                        </panel>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-12 animated-content">
-                        <br><br>
-                        <panel panel-class="panel-primary no-padding" heading="Adherence - by medication">
-                            <panel-controls>
-                                <panel-control-collapse></panel-control-collapse>
-                                <panel-control-refresh type="circular" is-loading="loadingMedsChartData" ng-click="refreshMedsAction()"></panel-control-refresh>
-                                <div class="pull-right mr10 hidden-xs">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-default " data-toggle="dropdown" style="text-transform: uppercase;">
-                                            <i class="glyphicon glyphicon-time"/>
-                                            <span style="margin-left: 5px">
-                                                {{selected_period}}
-                                            </span>
-                                            <span style="margin-left: 2px">
-                                                <b class="caret"/>
-                                            </span>
-                                        </button>
-                                        <ul class="dropdown-menu" dropdown-menu>
-                                            <li ng-repeat="period in periods">
-                                                <a ng-click="selectPeriod(period)">{{period}}</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="pull-right mr10 hidden-xs">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-default " data-toggle="dropdown" style="text-transform: uppercase;">
-                                            <i class="glyphicon glyphicon-time"/>
-                                            <span style="margin-left: 5px">
-                                                {{selected_dose_meds.tag}}
-                                            </span>
-                                            <span style="margin-left: 2px">
-                                                <b class="caret"/>
-                                            </span>
-                                        </button>
-                                        <ul class="dropdown-menu" dropdown-menu>
-                                            <li ng-repeat="dose in doses">
-                                                <a ng-click="selectDoseMeds(dose)">{{dose.tag}}</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>-->
-                                <!--<div class="pull-right mr10 hidden-xs">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-default " data-toggle="dropdown" style="text-transform: uppercase;">
-                                            <i class="glyphicon glyphicon-time"/>
-                                            <span style="margin-left: 5px">
-                                                {{medChartType}}
-                                            </span>
-                                            <span style="margin-left: 2px">
-                                                <b class="caret"/>
-                                            </span>
-                                        </button>
-                                        <ul class="dropdown-menu" dropdown-menu>
-                                            <li ng-repeat="type in medChartTypes">
-                                                <a ng-click="changeMedChartType(type)">{{type}}</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>-->
-                            <!--</panel-controls>
-                            <br><br>
-                            <nvd3-multi-bar-chart 
-                                class="animate-show"
-                                ng-show="medChartType == 'Bar'"
-                                data="multiBarChartData" 
-                                id="multiBarChartExample" 
-                                height="350" 
-                                showLegend="true"
-                                showControls="true"
-                                reduceXTicks="false"
-                                delay="2400"
-                                tooltips="true"
-                                showxaxis="false" 
-                                showyaxis="true" 
-                                interactive="true" 
-                                tooltipcontent="toolTipContentFunction()">
-                                <svg></svg>
-                            </nvd3-multi-bar-chart>
-
-                            <nvd3-pie-chart 
-                                ng-show="medChartType == 'Pie'"
-                                data="pieChartData" 
-                                id="pieChartExample" 
-                                height="350" 
-                                tooltips="true"
-                                tooltipcontent="toolTipContentPieFunction()"
-                                showlabels="true" 
-                                interactive="true" 
-                                x="xPieFunction()" 
-                                y="yPieFunction()">
-                                    <svg height="250"></svg>
-                            </nvd3-pie-chart>
-
-                        </panel>
-
-                    </div>
-                </div>-->
-            </tab> 
-
-            <tab heading="Notes">
-                <div class="container-fluid">
-                    <div class="row">
-
-                    </div>
-                </div>
-            </tab>
-
-            <tab heading="Messages">
-                <div class="container-fluid">
-                    <div class="row">
-
-                    </div>
-                </div>
             </tab>
         </tabset>
     </div>

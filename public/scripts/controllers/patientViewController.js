@@ -75,7 +75,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		
 		$scope.totalMeds = 0;
 		$scope.medsPagingOptions = {
-		   	pageSizes: [5, 10, 20],
+		   	pageSizes: [5, 10, 20, 30],
 		   	pageSize: 5,
 		    currentPage: 1
 		};
@@ -236,56 +236,30 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	        
 	};
 
-	var checkboxCellTemplate = '<div class="ngSelectionCell" ng-class="Header"><input tabindex="-1" class="ngSelectionCheckbox" class="Header" type="checkbox" ng-model="row.entity.selected" ng-change="medClick(row.entity)"/>';
 	var rowTemplate = '<div ng-click="onMedRowClick(row)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="col.colIndex()" class="ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
 
 	$scope.medsGridOptions = {
 	   	data: 'meds',
 	    columnDefs: [
-	    	{
-	      		field: 'name',
-	      		displayName: 'Name'
-	    	}, 
-	    	{
-	      		field: 'status',
-	      		displayName: 'Status'
-	    	}, 
-	    	{
-	      		field: 'doseTime',
-	      		displayName: 'Dose Time'
-	    	}, 
-	    	{
-	      		field: 'doseTaken',
-	      		displayName: 'Dose Taken'
-	    	}, 
-	    	{
-	      		field: 'interval',
-	      		displayName: 'Last 3 days'
-	    	},
-	    	{
-	      		field: 'avg',
-	      		displayName: 'Average Taken'
-	    	}, 
-	    	{
-	      		field: 'remaining',
-	      		displayName: 'Remaining'
-	    	}, 
+	    	{ field: 'name',      displayName: 'Name' }, 
+	    	{ field: 'status',    displayName: 'Status' }, 
+	    	{ field: 'doseTime',  displayName: 'Dose Time' }, 
+	    	{ field: 'doseTaken', displayName: 'Dose Taken' }, 
+	    	{ field: 'interval',  displayName: 'Last 3 days' },
+	    	{ field: 'avg',       displayName: 'Average Taken' }, 
+	    	{ field: 'remaining', displayName: 'Remaining' }, 
 		],
 		multiSelect:        		false,
-	   	enablePaging:       		true,
-	   	showFooter:         		true,
-	   	enableRowSelection: 		true, 
-	   	enableSelectAll:    		false,
-	    enableRowHeaderSelection: 	false,
-	    noUnselect:         		true,
-	    enableGridMenu:     		true,
+        enablePaging:       		true,
+        showFooter:         		true,
+        enableRowSelection: 		true, 
+        enableSelectAll:    		false,
+        enableRowHeaderSelection: 	false,
+        noUnselect:         		true,
+        enableGridMenu:     		true,
 	    totalServerItems:   		'totalMeds',
 	    pagingOptions:      		$scope.medsPagingOptions,
 	    filterOptions:      		$scope.medsFilterOptions,
-	    selectWithCheckboxOnly: 	true,
-	    showSelectionCheckbox: 		true,
-	    checkboxCellTemplate: 		checkboxCellTemplate,
-	    selectedItems: 				[],
 	    rowTemplate: 				rowTemplate
 	};
 

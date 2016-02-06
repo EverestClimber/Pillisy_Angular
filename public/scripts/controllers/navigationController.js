@@ -59,10 +59,10 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
 
     var setParent = function(children, parent) {
       	angular.forEach(children, function(child) {
-        	child.parent = parent;
-        	if (child.children !== undefined) {
-          		setParent(child.children, child);
-        	}
+            child.parent = parent;
+            if (child.children !== undefined) {
+          		  setParent(child.children, child);
+            }
       	});
     };
 
@@ -89,13 +89,24 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
     $scope.select = function(item) {
 
         if (item.type == 'group'){
-            var group = item; 
             var pillsy = stateService.getPillsy();
 
             if (pillsy){
-                if (stateService.setActiveGroup(group)){
-                    $rootScope.active_group = group;
-                }
+
+                var group = {
+                    "id":           item.id,
+                    "name":         item.name,
+                    "identifier":   item.identifier,
+                    "avg":          item.avg,
+                    "last_3_days":  item.last_3_days,
+                    "patients":     item.patients,
+                    "members":      item.members,
+                    "label":        item.label,
+                    "url":          item.url,
+                    "type":         item.type
+                };
+
+                stateService.setActiveGroup(group);
             }
         }
 
@@ -219,18 +230,10 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
     function updateMyGroupsMenu(groups){
         console.log('groupsController - updateMyGroupsMenu');
 
-        var children = [];
-        groups.forEach(function(group){
-            group.label = group.name;
-            group.url   = '/group/data';
-            group.type  = 'group';
-            children.push(group);
-        });
-
         $scope.menu.forEach(function(menuItem){
             if (menuItem.id == 'my_groups'){
                 var index = $scope.menu.indexOf(menuItem);
-                $scope.menu[index].children = children;
+                $scope.menu[index].children = groups;
             }
         });
     }
