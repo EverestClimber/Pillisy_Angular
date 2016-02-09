@@ -10,7 +10,14 @@ var app = angular.module('PatientViewController', ['theme.core.services','theme.
 app.controller('patientViewController', function ($scope, $timeout, $theme, $window, $location, $filter, apiService, stateService) {
     'use strict';
 
-    var d3 = $window.d3;
+    var d3        = $window.d3;
+    var now       = moment();
+    var interval  = {    //default last three days
+    	startTime: now.subtract(3,'days').startOf('day').valueOf(),
+    	endTime:   now.valueOf()
+    }; 
+
+    $scope.interval = encodeURIComponent(JSON.stringify(interval));
 
     //patient
     var pillsy = stateService.getPillsy();
@@ -107,7 +114,8 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 
 	      	var patientId = null;
 	      	var groupId   = null;
-	      	var interval  = 'last_3_days';
+	      	var interval  = $scope.interval;
+	      	var timeNow   = moment().valueOf();
 
 	      	var pillsy = stateService.getPillsy();
 
@@ -125,9 +133,8 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	      	}
 
 	        if (patientId && groupId){
-		        var api = '/v1/a/organization/group/'+groupId+'/patient/'+patientId+'/drugs/adherence?interval='+interval;
+		        var api = '/v1/a/organization/group/'+groupId+'/patient/'+patientId+'/drugs/adherence?interval='+interval+'&timeNow='+timeNow;
 		        console.log('api is: '+api);
-
 		        /*var data;
 
 		        var largeLoad = [
@@ -257,6 +264,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
         enableRowHeaderSelection: 	false,
         noUnselect:         		true,
         enableGridMenu:     		true,
+        enableColumnResize:         true,
 	    totalServerItems:   		'totalMeds',
 	    pagingOptions:      		$scope.medsPagingOptions,
 	    filterOptions:      		$scope.medsFilterOptions,
