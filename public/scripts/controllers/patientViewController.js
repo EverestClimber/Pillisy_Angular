@@ -135,8 +135,8 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	        if (patientId && groupId){
 		        var api = '/v1/a/organization/group/'+groupId+'/patient/'+patientId+'/drugs/adherence?interval='+interval+'&timeNow='+timeNow;
 		        console.log('api is: '+api);
+		        
 		        /*var data;
-
 		        var largeLoad = [
 			       	{
 					  	id: 		'WERUY-987-THE',
@@ -147,7 +147,6 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 						eve:   		$filter('date')((new Date()).setHours(18,30,0,0), 'h:mm a'),
 						night: 		$filter('date')((new Date()).setHours(22,30,0,0), 'h:mm a')
 					}, 
-					
 				]; */
 
 				apiService.get(api).then(function(result){
