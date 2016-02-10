@@ -26,7 +26,6 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	  	$location.path('/');
 	}
 	else{
-
 		$scope.groupName = pillsy.active_group.name;
 		$scope.patient   = pillsy.active_patient;
 
@@ -136,19 +135,6 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		        var api = '/v1/a/organization/group/'+groupId+'/patient/'+patientId+'/drugs/adherence?interval='+interval+'&timeNow='+timeNow;
 		        console.log('api is: '+api);
 		        
-		        /*var data;
-		        var largeLoad = [
-			       	{
-					  	id: 		'WERUY-987-THE',
-					  	selected: 	true,
-						name: 		"Truvada",
-						morn: 		$filter('date')((new Date()).setHours(9,30,0,0), 'h:mm a'),
-						day:  		$filter('date')((new Date()).setHours(14,0,0,0), 'h:mm a'),
-						eve:   		$filter('date')((new Date()).setHours(18,30,0,0), 'h:mm a'),
-						night: 		$filter('date')((new Date()).setHours(22,30,0,0), 'h:mm a')
-					}, 
-				]; */
-
 				apiService.get(api).then(function(result){
               		$scope.progress = false;
 
@@ -644,8 +630,24 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 
 		                  		if (patient){
 		                  			if (patient.id == user.id){
-		                  				
-		                  				stateService.setActivePatient(user);
+
+		                  				for (var property in user) {
+										    if (user.hasOwnProperty(property)) {
+										        patient[property] = user[property];
+										    }
+										}
+
+										var nameArr = patient.name.split(', ');
+
+								        if (nameArr.length > 0){
+								            patient.lastname = nameArr[0];
+
+								            if (nameArr.length == 2){
+								                patient.firstname = nameArr[1];
+								            }
+								        }
+                  				
+		                  				stateService.setActivePatient(patient);
 		                  				pillsy         = stateService.getPillsy();
 		                  				$scope.patient = pillsy.active_patient;
 		                  			}
@@ -653,17 +655,17 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		                  	}
 		               	}
 		               	else{
-
+		               		alert(result.msg);
 		               	}
 		           	}
 		           	else{
-
+		           		alert('Server error');
 		           	}
 		      	});
 
 		   	}
 		   	else{
-
+		   		alert('Server error');
 		   	}
 
 	  	}	

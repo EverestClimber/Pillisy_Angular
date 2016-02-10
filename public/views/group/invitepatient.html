@@ -11,9 +11,9 @@
 	</div>
 
 	<div class="container-fluid">
-		<panel panel-class="panel" data-heading="Search for an existing patient">
+		<panel panel-class="panel" is-loading="loading" data-heading="Search for an existing patient">
 			<div class="col-sm-4">
-				<div ng-show="invite_patient_entry_form_visible">
+				<div ng-show="invite_patient_form">
 					Please enter an email and/or phone number to search for an existing Pillsy user to invite to this group. <br><br>
 					<form name="createpatient" ng-submit="searchPatient(user)" class="form-horizontal" style="margin-bottom: 0px !important;">
 						<div class="form-group">
@@ -37,26 +37,17 @@
 						<div class="panel-footer">
 							<div class="pull-right">
 								<a href="/group/data" class="btn btn-default">Cancel</a>
-								<button type="submit" data-ng-disabled="progress.active()" class="btn btn-primary">Search</button>
+								<button type="submit" class="btn btn-primary" ng-disabled="searchLoading"> 
+							        <span ng-show="searchButtonText == 'Searching'"><i class="glyphicon glyphicon-refresh glyphicon-spin"></i></span>
+							        {{ searchButtonText }}
+							    </button>
 							</div>
 						</div>
 						<br>
 					</form>
 				</div>
 
-				<div ng-show="invite_patient_confirmation_visible">
-					An invitation has been sent to the patient via SMS. You will have access to their medication information when they approve your invitation.<br><br>
-					<form name="createpatient" class="form-horizontal" style="margin-bottom: 0px !important;">
-						<div class="panel-footer">
-							<div class="pull-right">
-								<a href="/group/data" class="btn btn-default">OK</a>
-							</div>
-						</div>
-					</form>
-				</div>
-
-				<div ng-show="invite_patient_not_found_visible">
-					This patient you are searching for does not exist on the Pillsy platform. Try searching again with a valid phone number and email, or create a new patient.<br><br>
+				<div ng-show="invite_patient_status">{{ serverMsg }}<br><br>
 					<form name="createpatient" class="form-horizontal" style="margin-bottom: 0px !important;">
 						<div class="panel-footer">
 							<div class="pull-right">

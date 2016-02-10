@@ -41,7 +41,8 @@ var app = angular
     'GroupPatientDrugScheduleController',
     'GroupMembersController',
     'PatientViewController',
-    'staff_signup'
+    'staff_signup',
+    'angular-loading-bar'
 ]);
 
 

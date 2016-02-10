@@ -1,7 +1,8 @@
 /** Pillsy
 *  @author  Chuks Onwuneme
 *  @version 1.0
-*  @package GroupPatientsController AngularJS module  
+*  @package GroupPatientsController AngularJS module
+*  @Copyright 2016 Pillsy, Inc.  
 */
 
 var app = angular.module('GroupPatientsController', ['ngGrid','GroupDetails']);     //instantiates GroupPatientsController module
@@ -37,6 +38,19 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 	    };
 	}
 
+    function getInterval(){
+        var now      = moment();
+        var interval = {
+            startTime: now.startOf('day').subtract(7,'days').valueOf(),
+            endTime:   now.valueOf(),
+            today:     now.valueOf(),
+        };
+
+        interval = decodeURIComponent( JSON.stringify(interval) );
+
+        return interval;
+    }
+
     $scope.setPagingData = function(data, page, pageSize) {
         var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
         $scope.myData = pagedData;
@@ -52,13 +66,11 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 
     function fireoffGroupDetailsFetch(pageSize, page, searchText){
 
-    	var groupid = $scope.groupId;
+    	var groupId = $scope.groupId;
 
-    	if (groupid){
-            var request  = 'fetch_group_patients';
-            var interval = 'last_7_days'; 
-            var today    = new Date().getTime();
-    		var api      = '/v1/a/organization/group/'+groupid+'/patients?interval='+interval+'&request='+request+'&today='+today;
+    	if (groupId){
+            var request = 'fetch_group_patients';
+    		var api     = '/v1/a/organization/group/'+groupId+'/patients?interval='+getInterval()+'&request='+request;
 	        var data;
 
 	        apiService.get(api).then(function(result){

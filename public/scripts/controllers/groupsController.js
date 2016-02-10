@@ -22,6 +22,19 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         currentPage: 1
     };
 
+    function getInterval(){
+        var now      = moment();
+        var interval = {
+            startTime: now.startOf('day').subtract(3,'days').valueOf(),
+            endTime:   now.valueOf(),
+            today:     now.valueOf(),
+        };
+
+        interval = decodeURIComponent( JSON.stringify(interval) );
+
+        return interval;
+    }
+
     $scope.setPagingData = function(data, page, pageSize) {
         var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
         $scope.myData = pagedData;
@@ -43,8 +56,7 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
 
             if (userId){
 	          	var request = 'get_organization_user_groups';  
-	          	var intervals = [3, 0];
-                var api = '/v1/a/organization/user/groups?request='+request+'&intervals='+JSON.stringify(intervals);
+                var api     = '/v1/a/organization/user/groups?request='+request+'&interval='+getInterval();
 
         	    console.log('groupsController - apiService.get - api to call is: '+api);
 
@@ -60,16 +72,16 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
 
 	                  		groups.forEach(function(group){
                                 var obj = {
-                                    "id":           group.id,
-                                    "name":         group.name,
-                                    "identifier":   group.extName,
-                                    "avg":          group.avg,
-                                    "last_3_days":  group.last_3_days,
-                                    "patients":     group.patients,
-                                    "members": 		group.members,
-                                    "label":        group.name,
-                                    "url":          '/group/data',
-                                    "type":         'group'
+                                    "id":                  group.id,
+                                    "name":                group.name,
+                                    "identifier":          group.extName,
+                                    "avg":                 group.avg,
+                                    "adherence_interval":  group.adherence_interval,
+                                    "patients":            group.patients,
+                                    "members": 		       group.members,
+                                    "label":               group.name,
+                                    "url":                 '/group/data',
+                                    "type":                'group'
                                 };
 
                                 largeLoad.push(obj);
@@ -135,11 +147,11 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
     $scope.gridOptions = {
         data:                      'myData',
         columnDefs: [
-          	{ field:'name',        	displayName: 'Name' },
-          	{ field:'avg',      	displayName: 'Avg.' },
-          	{ field:'last_3_days',  displayName: 'Last 3 days' },
-          	{ field:'patients', 	displayName: 'Patients' },
-          	{ field:'members',		displayName: 'Members' },
+          	{ field:'name',        	      displayName: 'Name' },
+          	{ field:'avg',      	      displayName: 'Avg.' },
+          	{ field:'adherence_interval', displayName: 'Last 3 days' },
+          	{ field:'patients', 	      displayName: 'Patients' },
+          	{ field:'members',		      displayName: 'Members' },
         ],
         selectedItems:      		$scope.mySelections,
         multiSelect:        		false,
@@ -174,9 +186,10 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
     };
 
     $scope.types = [
-        { name: 'Clinical trials', desc: 'Patients activities in this group will be used in clinical trials.'},
-        { name: 'Research', desc: 'Patients activities in this group will be used for research.'},
-        { name: 'Monitor', desc: 'Patients activities in this group will be used for monitoring behavior.'}
+        //{ name: 'Clinical trials', desc: 'Patients activities in this group will be used in clinical trials.'},
+        { name: 'Monitor',  desc: 'This group will be used for monitoring adherence behavior of patients.'},
+        { name: 'Research', desc: 'This group will be used for research.'},
+        { name: 'Study',    desc: 'This group will be used for conducting studies.'},
     ];
 
     $scope.selected_type = $scope.types[0].name;

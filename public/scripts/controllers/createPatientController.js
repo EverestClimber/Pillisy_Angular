@@ -12,21 +12,26 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
 
     var pillsy = stateService.getPillsy();
 
+    var toggleForm = function(visible){
+        $scope.invite_patient_form   = visible;
+        $scope.invite_patient_status = !visible;
+    };
+
     if (!pillsy.active_group) {
         $location.path('/');
     }
     else{
-        $scope.groupId      = pillsy.active_group.id;
-        $scope.groupName    = pillsy.active_group.name;
-        $scope.groupExtName = pillsy.active_group.identifier;
+        $scope.searchButtonText = 'Search';
+        $scope.searchLoading    = false;
+        $scope.groupId          = pillsy.active_group.id;
+        $scope.groupName        = pillsy.active_group.name;
+        $scope.groupExtName     = pillsy.active_group.identifier;
 
         console.log('createPatientController - $scope.groupId: '+ $scope.groupId );
         console.log('createPatientController - $scope.groupName: '+ $scope.groupName);
         console.log('createPatientController - $scope.groupExtName: '+ $scope.groupExtName);
 
-        $scope.invite_patient_entry_form_visible    = true;
-        $scope.invite_patient_confirmation_visible = false;
-        $scope.invite_patient_not_found_visible    = false;
+        toggleForm(true);
     }
 
     $scope.createPatient = function(patient){
@@ -90,8 +95,8 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
             });
         }
     }
-
-    $scope.searchPatient= function(patient){
+    
+    $scope.searchPatient = function(patient){
         if (!patient.email){
             alert('Email required');
         }
@@ -99,20 +104,37 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
             var groupId = $scope.groupId;
             var api = '/v1/a/organization/group/'+groupId+'/patient/groupInvitation';   //basically create a new groupInvitation for this patient to approve
 
+            $scope.searchButtonText = 'Searching';
+            $scope.searchLoading    = true;
+
             apiService.post(api, patient).then(function(result){
+                $scope.searchButtonText = 'Search';
+                $scope.searchLoading = false;
+
                 if (result.msg == 'success'){
                     console.log('apiService.post - success - found patient, email/sms sent');
 
-                    $scope.invite_patient_entry_form_visible   = false;
-                    $scope.invite_patient_confirmation_visible = true;
-                    $scope.invite_patient_not_found_visible    = false;
+                    var inviteStatus = result.data.status; 
+                    switch(inviteStatus){
+                        case 0:
+                            $scope.serverMsg = 'The patient you are searching for does not exist on the Pillsy platform. '+
+                                               'Try searching again with a valid phone number and email, or create a new patient.';
+                            break;
+                        case 1:
+                            $scope.serverMsg = 'An invitation has been sent to the patient via SMS. You will have access to their '+
+                                               'medication information when they approve your invitation.';
+                            break;
+                        case 2:
+                            $scope.serverMsg = 'This patient is already actively sharing their medication information with your group.';
+                            break;
+                    }
+
+                    toggleForm(false);
                 }
                 else{
                     console.log('apiService.post - error');
 
-                    $scope.invite_patient_entry_form_visible   = false;
-                    $scope.invite_patient_confirmation_visible = false;
-                    $scope.invite_patient_not_found_visible    = true;
+                    alert(result.msg);
                 }
             });
         }
