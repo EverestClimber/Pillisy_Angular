@@ -196,7 +196,8 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
           	{ field:'status',   displayName: 'Status' },
           	{ field:'today',    displayName: 'Today' },
           	{ field:'interval', displayName: 'Last 7 days' },
-          	{ field:'all_time', displayName: 'All time' }
+          	{ field:'all_time', displayName: 'All time' },
+            { field:'phone',    displayName: 'Phone#' }
         ],
         multiSelect:        		false,
         enablePaging:       		true,
