@@ -1,7 +1,8 @@
 /** Pillsy
 *  @author  Chuks Onwuneme
 *  @version 1.0
-*  @package GroupPatientDrugScheduleController AngularJS module  
+*  @package GroupPatientDrugScheduleController AngularJS module 
+*  @Copyright Pillsy, Inc.  
 */
 
 var app = angular.module('GroupPatientDrugScheduleController', ['ngGrid','daterangepicker']);     //instantiates GroupPatientDrugScheduleController module
@@ -46,12 +47,12 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
     }
 
     var refresh = function(){
+        $scope.loadingSchedule = true;
         $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     }
 
     //Watch for date changes
     $scope.$watch('datePicker.date', function(newValue, oldValue) {
-        $scope.loadingSchedule = true;
         refresh();
     });
 
@@ -106,7 +107,13 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
                         var scheduleEvents = result.data;
                         scheduleEvents.forEach(function(scheduleEvent){
                             scheduleEvent.time      = moment(scheduleEvent.time).format("HH:mm a");
-                            scheduleEvent.open_time = moment(scheduleEvent.open_time).format("HH:mm a");
+                            scheduleEvent.open_time = scheduleEvent.open_time;
+
+                            if (scheduleEvent.open_time){
+                                if (scheduleEvent.open_time != 'N/A'){
+                                    scheduleEvent.open_time = moment(scheduleEvent.open_time).format("HH:mm a");
+                                }
+                            }
                         });
 
                         $scope.setPagingData(scheduleEvents, page, pageSize);

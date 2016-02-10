@@ -2,6 +2,7 @@
 *  @author  Chuks Onwuneme
 *  @version 1.0
 *  @package PatientViewController AngularJS module  
+*  @Copyright Pillsy, Inc. 
 */
 
 var app = angular.module('PatientViewController', ['theme.core.services','theme.chart.flot', 'ngGrid', 'angular-skycons',
@@ -161,8 +162,15 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	                    				console.log('apiService.get - found doses, display...');
 
 	                    				var firstDose = todayDoses[0];
+	                    				if (firstDose.doseTime){
+	                    					if (firstDose.doseTime != 'N/A'){
+	                    						firstDose.doseTime = moment(firstDose.doseTime).format("HH:mm A")
+	                    					}
+	                    				}
+
 	                    				obj.doseTime  = firstDose.doseTime;
 	                     				obj.doseTaken = firstDose.doseTaken;
+	   
 	                     			}
 	                     			else{
 	                     				console.log('apiService.get - there are no doses...');

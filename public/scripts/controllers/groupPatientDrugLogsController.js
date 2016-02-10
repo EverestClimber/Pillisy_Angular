@@ -2,6 +2,7 @@
 *  @author  Chuks Onwuneme
 *  @version 1.0
 *  @package GroupPatientDrugLogsController AngularJS module  
+*  @Copyright Pillsy, Inc. 
 */
 
 var app = angular.module('GroupPatientDrugLogsController', ['ngGrid','daterangepicker']);     //instantiates GroupPatientDrugLogsController module
@@ -46,12 +47,12 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
     }
 
     var refresh = function(){
+        $scope.loadingLogs = true;
         $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     }
 
     //Watch for date changes
     $scope.$watch('logsDatePicker.date', function(newValue, oldValue) {
-        $scope.loadingSchedule = true;
         refresh();
     });
 
@@ -73,6 +74,7 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
     };
 
     $scope.refreshLogs = function(){
+        refresh();
         $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     };
 
@@ -115,7 +117,7 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
                         drugEvents.forEach(function(drugEvent){
                             var obj   = {};
                             obj.date  = getDate(drugEvent.eventTime);
-                            obj.time  = moment(drugEvent.eventTime).format("HH:mm a");
+                            obj.time  = moment(drugEvent.eventTime).format("HH:mm A");
                             obj.event = drugEvent.eventValue; 
                             
                             objs.push(obj);
