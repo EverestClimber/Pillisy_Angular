@@ -38,6 +38,7 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
             useExternalFilter: true
         };
 
+
         $scope.totalServerItems = 0;
         $scope.pagingOptions = {
             pageSizes:   [25, 50, 100],

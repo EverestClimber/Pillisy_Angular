@@ -35,6 +35,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 
 	function initData(){
 	   	//init data
+	   	
 	    $scope.trendsData = [];
 		$scope.multiBarChartData = [];
 		$scope.pieChartData = [];
