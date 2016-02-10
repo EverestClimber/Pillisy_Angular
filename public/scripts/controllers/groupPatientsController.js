@@ -177,7 +177,6 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         }
 
         if (stateService.setActivePatient(patient)){
-
             $location.path('/group/patient/data');
         }
         else{
