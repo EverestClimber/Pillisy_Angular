@@ -117,7 +117,7 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
 
                         drugEvents.forEach(function(drugEvent){
                             var obj   = {};
-                            obj.date  = getDate(drugEvent.eventTime);
+                            obj.date  = moment(drugEvent.eventTime).format('YYYY-MM-DD');
                             obj.time  = moment(drugEvent.eventTime).format("HH:mm A");
                             obj.event = drugEvent.eventValue; 
                             
@@ -184,12 +184,6 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
         noUnselect:                 false,
         enableGridMenu:             false,
     };
-
-    function getDate(date) {
-        var local = new Date(date);
-        return local.toJSON().slice(0, 10);
-    }
-
 });
 
 app.filter('fromNow', function() {

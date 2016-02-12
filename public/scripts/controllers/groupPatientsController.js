@@ -39,16 +39,15 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 	}
 
     function getInterval(){
-        var now      = moment();
+        var now = new Date();
+
         var interval = {
-            startTime: now.startOf('day').subtract(7,'days').valueOf(),
-            endTime:   now.valueOf(),
-            today:     now.valueOf(),
+            startTime: moment(now.getTime()).startOf('day').subtract(7,'days').valueOf(),
+            endTime:   now.getTime(),
+            today:     now.getTime(),
         };
 
-        interval = decodeURIComponent( JSON.stringify(interval) );
-
-        return interval;
+        return encodeURIComponent( JSON.stringify(interval) );
     }
 
     $scope.setPagingData = function(data, page, pageSize) {

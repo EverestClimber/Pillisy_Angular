@@ -81,12 +81,15 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
     function callPillsyService(pageSize, page, searchText){
         console.log('groupMembersController - callPillsySerice');
 
-        var startTime = moment($scope.datePicker.date.startDate).startOf('day');
-        var endTime   = moment($scope.datePicker.date.endDate).startOf('day');
+        var startTime = moment($scope.datePicker.date.startDate).startOf('day').valueOf();
+        var momentEnd = moment($scope.datePicker.date.endDate).endOf('day').valueOf();
+        var now       = moment().valueOf();
+        var endTime   = momentEnd > now ? now : momentEnd;
 
         var interval = {
-            startTime: startTime.valueOf(),
-            endTime:   endTime.valueOf()
+            startTime: startTime,
+            endTime:   endTime,
+            today:     new Date().getTime()
         };
 
         interval = decodeURIComponent( JSON.stringify(interval) );
@@ -107,13 +110,16 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
 
                         var scheduleEvents = result.data;
                         scheduleEvents.forEach(function(scheduleEvent){
-                            scheduleEvent.time      = moment(scheduleEvent.time).format("HH:mm a");
-                            scheduleEvent.open_time = scheduleEvent.open_time;
+                            scheduleEvent.date = moment(scheduleEvent.date).format('YYYY-MM-DD');
+                            
+                            scheduleEvent.reminder_time = scheduleEvent.reminder_time;
+                            if (scheduleEvent.reminder_time != 'N/A'){
+                                scheduleEvent.reminder_time = moment(scheduleEvent.reminder_time).format("HH:mm A");
+                            }
 
-                            if (scheduleEvent.open_time){
-                                if (scheduleEvent.open_time != 'N/A'){
-                                    scheduleEvent.open_time = moment(scheduleEvent.open_time).format("HH:mm a");
-                                }
+                            scheduleEvent.open_time = scheduleEvent.open_time;
+                            if (scheduleEvent.open_time != 'N/A'){
+                                scheduleEvent.open_time = moment(scheduleEvent.open_time).format("HH:mm A");
                             }
                         });
 
@@ -165,10 +171,10 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
         pagingOptions:    $scope.pagingOptions,
         filterOptions:    $scope.filterOptions,
         columnDefs: [
-            { field: 'date',      displayName: 'Date' },
-            { field: 'time',      displayName: 'Time' },
-            { field: 'status',    displayName: 'Status' },
-            { field: 'open_time', displayName: 'Open Time'}
+            { field: 'date',          displayName: 'Date' },
+            { field: 'reminder_time', displayName: 'Time' },
+            { field: 'status',        displayName: 'Status', cellTemplate: '<div class="ngCellText" ng-class="{\'green\' : row.getProperty(\'status\') == \'OKAY\' }">{{ row.getProperty(col.field) }}</div>' },
+            { field: 'open_time',     displayName: 'Open Time'}
         ],
         multiSelect:                false,
         enablePaging:               true,
