@@ -11,14 +11,38 @@ var app = angular.module('PatientViewController', ['theme.core.services','theme.
 app.controller('patientViewController', function ($scope, $timeout, $theme, $window, $location, $filter, apiService, stateService) {
     'use strict';
 
-    var d3        = $window.d3;
-    var now       = moment();
-    var interval  = {    //default last three days
-    	startTime: now.subtract(3,'days').startOf('day').valueOf(),
-    	endTime:   now.valueOf()
-    }; 
+   	function getInterval(){
+        var now = new Date();
 
-    $scope.interval = encodeURIComponent(JSON.stringify(interval));
+        var interval = {
+            startTime: moment(now.getTime()).startOf('day').subtract(3,'days').valueOf(),
+            endTime:   now.getTime(),
+            today:     now.getTime(),
+        };
+
+        return encodeURIComponent( JSON.stringify(interval) );
+    }
+
+    function getPercentValue(value, total){
+    	var percent;
+
+    	if (total > 0){
+            if (value > 0){
+                var numY = (value / total) * 100;
+                percent = (Math.round( numY * 10 ) / 10) + '%';
+            }
+            else{
+                percent = '0%';
+            }
+        }
+        else{
+            percent = 'N/A';
+        }
+
+        return percent;
+    };
+
+    var d3 = $window.d3;
 
     //patient
     var pillsy = stateService.getPillsy();
@@ -116,9 +140,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	      	var patientId = null;
 	      	var groupId   = null;
 	      	var interval  = $scope.interval;
-	      	var timeNow   = moment().valueOf();
-
-	      	var pillsy = stateService.getPillsy();
+	      	var pillsy    = stateService.getPillsy();
 
 	      	if (pillsy){
 	      		var group   = pillsy.active_group;
@@ -134,7 +156,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	      	}
 
 	        if (patientId && groupId){
-		        var api = '/v1/a/organization/group/'+groupId+'/patient/'+patientId+'/drugs/adherence?interval='+interval+'&timeNow='+timeNow;
+		        var api = '/v1/a/organization/group/'+groupId+'/patient/'+patientId+'/drugs/adherence?interval='+getInterval();
 		        console.log('api is: '+api);
 		        
 				apiService.get(api).then(function(result){
@@ -146,13 +168,13 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 
                   			var data = [];
                   			result.data.forEach(function(drug){
-
+                  				
 	                    		var obj = {
 	                    			"id": 		   drug.id,
 	                      			"name":        drug.name,
 	                      			"status":      drug.status,
-	                     			"interval":    drug.interval,
-	                      			"avg": 		   drug.avg,
+	                     			"interval":    getPercentValue(drug.intervalTaken, drug.intervalTotal),
+	                      			"avg": 		   getPercentValue(drug.allTimeTaken, drug.allTimeTotal),
 	                      			"remaining":   drug.remaining
 	                    		};
 
@@ -171,7 +193,6 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 
 	                    				obj.doseTime  = firstDose.doseTime;
 	                     				obj.doseTaken = firstDose.doseTaken;
-	   
 	                     			}
 	                     			else{
 	                     				console.log('apiService.get - there are no doses...');
@@ -245,7 +266,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	    	{ field: 'name',      displayName: 'Name' }, 
 	    	{ field: 'status',    displayName: 'Status' }, 
 	    	{ field: 'doseTime',  displayName: 'Dose Time' }, 
-	    	{ field: 'doseTaken', displayName: 'Dose Taken' }, 
+	    	{ field: 'doseTaken', displayName: 'Time taken today' }, 
 	    	{ field: 'interval',  displayName: 'Last 3 days' },
 	    	{ field: 'avg',       displayName: 'Average Taken' }, 
 	    	{ field: 'remaining', displayName: 'Remaining' }, 
