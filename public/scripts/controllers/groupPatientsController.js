@@ -10,7 +10,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 	'use strict';
 
     console.log('groupPatientsController');
-
+    
 	var pillsy = stateService.getPillsy();
 
     if (!pillsy.active_group) {

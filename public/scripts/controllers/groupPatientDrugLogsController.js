@@ -87,7 +87,8 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
 
         var interval = {
             startTime: startTime.valueOf(),
-            endTime:   endTime.valueOf()
+            endTime:   endTime.valueOf(),
+            today:     new Date().getTime()
         };
 
         interval = decodeURIComponent( JSON.stringify(interval) );
@@ -106,12 +107,6 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
                     if (result.msg == 'success'){
                         console.log('groupMembersController - callPillsySerice - apiService.get - successfully retrieved drugEvents: '+result);
 
-                        // result.docs 
-                        // result.total 
-                        // result.limit - 10 
-                        // result.page - 3 
-                        // result.pages
-                         
                         var drugEvents = result.data;
                         var objs       = [];
 

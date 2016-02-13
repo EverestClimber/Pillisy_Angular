@@ -185,16 +185,4 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
         noUnselect:                 false,
         enableGridMenu:             false,
     };
-
-    function getTime(date) {
-        var local = new Date(date);
-        var time = local.getHours() + ":" + local.getMinutes() + ":" + local.getSeconds();
-        return time;
-    }
-
-    function getDate(date) {
-        var local = new Date(date);
-        return local.toJSON().slice(0, 10);
-    }
-
 });
