@@ -183,7 +183,38 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	                    			if (todayDoses.length > 0){
 	                    				console.log('apiService.get - found doses, display...');
 
-	                    				var firstDose = todayDoses[0];
+	                    				var doseTime  = '';
+	                    				var doseTaken = '';
+	                    				var index = 0;
+
+	                    				todayDoses.forEach(function(todayDose){
+	                    					if (todayDose.doseTime){
+		                    					if (todayDose.doseTime != 'N/A'){
+		                    						todayDose.doseTime = moment(todayDose.doseTime).format("h:mm A")
+		                    					}
+		                    				}
+
+		                    				doseTime = doseTime + todayDose.doseTime;
+
+		                    				if (todayDose.doseTaken){
+		                    					if ((todayDose.doseTaken != 'N/A') && (todayDose.doseTaken != '--')){
+		                    						todayDose.doseTaken = moment(todayDose.doseTaken).format("h:mm A")
+		                    					}
+		                    				}
+
+		                    				doseTaken = doseTaken + todayDose.doseTaken;
+		                    				index++;
+
+		                    				if (index < todayDoses.length){
+		                    					doseTime  = doseTime + '; ';
+		                    					doseTaken = doseTaken + '; ';
+		                    				}
+	                    				});
+
+	                    				obj.doseTime  = doseTime;
+	                    				obj.doseTaken = doseTaken;
+
+	                    				/*var firstDose = todayDoses[0];
 	                    				if (firstDose.doseTime){
 	                    					if (firstDose.doseTime != 'N/A'){
 	                    						firstDose.doseTime = moment(firstDose.doseTime).format("h:mm A")
@@ -198,7 +229,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	                    					}
 	                    				}
 
-	                     				obj.doseTaken = firstDose.doseTaken;
+	                     				obj.doseTaken = firstDose.doseTaken;*/
 	                     			}
 	                     			else{
 	                     				console.log('apiService.get - there are no doses...');
@@ -271,8 +302,8 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	    columnDefs: [
 	    	{ field: 'name',      displayName: 'Name' }, 
 	    	{ field: 'status',    displayName: 'Status' }, 
-	    	{ field: 'doseTime',  displayName: 'Dose Time' }, 
-	    	{ field: 'doseTaken', displayName: 'Time taken today' }, 
+	    	{ field: 'doseTime',  displayName: 'Dose Time(s)' }, 
+	    	{ field: 'doseTaken', displayName: 'Time(s) taken today' }, 
 	    	{ field: 'interval',  displayName: 'Last 3 days' },
 	    	{ field: 'avg',       displayName: 'Average Taken' }, 
 	    	{ field: 'remaining', displayName: 'Remaining' }, 
