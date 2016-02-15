@@ -23,16 +23,15 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
     };
 
     function getInterval(){
-        var now      = moment();
+        var now = new Date();
+
         var interval = {
-            startTime: now.startOf('day').subtract(3,'days').valueOf(),
-            endTime:   now.valueOf(),
-            today:     now.valueOf(),
+            startTime: moment(now.getTime()).startOf('day').subtract(3,'days').valueOf(),
+            endTime:   moment().endOf('day').valueOf(),
+            today:     now.getTime(),
         };
 
-        interval = decodeURIComponent( JSON.stringify(interval) );
-
-        return interval;
+        return encodeURIComponent( JSON.stringify(interval) );
     }
 
     $scope.setPagingData = function(data, page, pageSize) {
@@ -47,6 +46,7 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
     $scope.refreshGroups = function(){
         $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     };
+
 
     $scope.getPagedDataAsync = function(pageSize, page, searchText) {
         $scope.loadingGroups = true;

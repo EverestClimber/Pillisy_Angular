@@ -38,7 +38,6 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
             useExternalFilter: true
         };
 
-
         $scope.totalServerItems = 0;
         $scope.pagingOptions = {
             pageSizes:   [25, 50, 100],
@@ -83,7 +82,7 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
         console.log('groupMembersController - callPillsySerice');
 
         var startTime = moment($scope.logsDatePicker.date.startDate).startOf('day');
-        var endTime   = moment($scope.logsDatePicker.date.endDate).startOf('day');
+        var endTime   = moment($scope.logsDatePicker.date.endDate).endOf('day');
 
         var interval = {
             startTime: startTime.valueOf(),
@@ -113,7 +112,7 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
                         drugEvents.forEach(function(drugEvent){
                             var obj   = {};
                             obj.date  = moment(drugEvent.eventTime).format('YYYY-MM-DD');
-                            obj.time  = moment(drugEvent.eventTime).format("HH:mm A");
+                            obj.time  = moment(drugEvent.eventTime).format("h:mm A");
                             obj.event = drugEvent.eventValue; 
                             
                             objs.push(obj);

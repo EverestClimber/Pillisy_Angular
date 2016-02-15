@@ -16,7 +16,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 
         var interval = {
             startTime: moment(now.getTime()).startOf('day').subtract(3,'days').valueOf(),
-            endTime:   now.getTime(),
+            endTime:   moment().endOf('day').valueOf(),
             today:     now.getTime(),
         };
 
@@ -44,7 +44,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 
     var d3 = $window.d3;
 
-    //patient
+    //patient cache data
     var pillsy = stateService.getPillsy();
     
 	if ( (!pillsy.active_patient) || (!pillsy.active_group) ){
@@ -186,11 +186,18 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	                    				var firstDose = todayDoses[0];
 	                    				if (firstDose.doseTime){
 	                    					if (firstDose.doseTime != 'N/A'){
-	                    						firstDose.doseTime = moment(firstDose.doseTime).format("HH:mm A")
+	                    						firstDose.doseTime = moment(firstDose.doseTime).format("h:mm A")
 	                    					}
 	                    				}
 
 	                    				obj.doseTime  = firstDose.doseTime;
+
+	                    				if (firstDose.doseTaken){
+	                    					if ((firstDose.doseTaken != 'N/A') && (firstDose.doseTaken != '--')){
+	                    						firstDose.doseTaken = moment(firstDose.doseTaken).format("h:mm A")
+	                    					}
+	                    				}
+
 	                     				obj.doseTaken = firstDose.doseTaken;
 	                     			}
 	                     			else{

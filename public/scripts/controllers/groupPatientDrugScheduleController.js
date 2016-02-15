@@ -18,6 +18,7 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
         initVars();
     }
 
+
     function initVars(){
 
         var m = moment();
@@ -114,12 +115,12 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
                             
                             scheduleEvent.reminder_time = scheduleEvent.reminder_time;
                             if (scheduleEvent.reminder_time != 'N/A'){
-                                scheduleEvent.reminder_time = moment(scheduleEvent.reminder_time).format("HH:mm A");
+                                scheduleEvent.reminder_time = moment(scheduleEvent.reminder_time).format("h:mm A");
                             }
 
                             scheduleEvent.open_time = scheduleEvent.open_time;
-                            if (scheduleEvent.open_time != 'N/A'){
-                                scheduleEvent.open_time = moment(scheduleEvent.open_time).format("HH:mm A");
+                            if ( (scheduleEvent.open_time != 'N/A') && (scheduleEvent.open_time != '--') ){
+                                scheduleEvent.open_time = moment(scheduleEvent.open_time).format("h:mm A");
                             }
                         });
 
