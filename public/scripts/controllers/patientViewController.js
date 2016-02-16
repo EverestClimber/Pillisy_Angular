@@ -213,23 +213,6 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 
 	                    				obj.doseTime  = doseTime;
 	                    				obj.doseTaken = doseTaken;
-
-	                    				/*var firstDose = todayDoses[0];
-	                    				if (firstDose.doseTime){
-	                    					if (firstDose.doseTime != 'N/A'){
-	                    						firstDose.doseTime = moment(firstDose.doseTime).format("h:mm A")
-	                    					}
-	                    				}
-
-	                    				obj.doseTime  = firstDose.doseTime;
-
-	                    				if (firstDose.doseTaken){
-	                    					if ((firstDose.doseTaken != 'N/A') && (firstDose.doseTaken != '--')){
-	                    						firstDose.doseTaken = moment(firstDose.doseTaken).format("h:mm A")
-	                    					}
-	                    				}
-
-	                     				obj.doseTaken = firstDose.doseTaken;*/
 	                     			}
 	                     			else{
 	                     				console.log('apiService.get - there are no doses...');
@@ -292,7 +275,6 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	   	else{
 	       	//could not set group
 	   	}
-	        
 	};
 
 	var rowTemplate = '<div ng-click="onMedRowClick(row)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="col.colIndex()" class="ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';

@@ -18,14 +18,23 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
         initVars();
     }
 
-
     function initVars(){
 
-        var m = moment();
+        $scope.ranges = {
+            'Today':        [ moment(), moment() ],
+            'Yesterday':    [ moment().subtract(1, 'days'), moment().subtract(1, 'days') ],
+            'Last 7 days':  [ moment().subtract(7, 'days'), moment() ],
+            'Last 30 days': [ moment().subtract(30,'days'), moment() ],
+            'This month':   [ moment().startOf('month'), moment().endOf('month') ]
+        };
+
+        var ranges = $scope.ranges;
+        var last7  = ranges['Last 7 days'];
+
         $scope.datePicker      = {};
         $scope.datePicker.date = {
-            startDate: m,
-            endDate:   m
+            startDate: last7[0].startOf('day'),
+            endDate:   last7[1].endOf('day') 
         };
 
         $scope.groupId      = pillsy.active_group.id;
@@ -67,14 +76,6 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
         }
     };
 
-    $scope.ranges = {
-        'Today':        [ moment(), moment() ],
-        'Yesterday':    [ moment().subtract(1, 'days'), moment().subtract(1, 'days') ],
-        'Last 7 days':  [ moment().subtract(7, 'days'), moment() ],
-        'Last 30 days': [ moment().subtract(30,'days'), moment() ],
-        'This month':   [ moment().startOf('month'), moment().endOf('month') ]
-    };
-
     $scope.refreshSchedule = function(){
         refresh();
     };
@@ -83,9 +84,7 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
         console.log('groupMembersController - callPillsySerice');
 
         var startTime = moment($scope.datePicker.date.startDate).startOf('day').valueOf();
-        var momentEnd = moment($scope.datePicker.date.endDate).endOf('day').valueOf();
-        var now       = moment().valueOf();
-        var endTime   = momentEnd > now ? now : momentEnd;
+        var endTime   = moment($scope.datePicker.date.endDate).endOf('day').valueOf();
 
         var interval = {
             startTime: startTime,

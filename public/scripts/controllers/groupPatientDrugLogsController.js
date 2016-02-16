@@ -5,6 +5,7 @@
 *  @Copyright Pillsy, Inc. 
 */
 
+
 var app = angular.module('GroupPatientDrugLogsController', ['ngGrid','daterangepicker']);     //instantiates GroupPatientDrugLogsController module
 app.controller('groupPatientDrugLogsController', function ($scope, $filter, $http, $location, apiService, stateService) {
 	'use strict';
@@ -20,11 +21,21 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
 
     function initVars(){
 
-        var m = moment();
+        $scope.logRanges = {
+            'Today':        [ moment(), moment() ],
+            'Yesterday':    [ moment().subtract(1, 'days'), moment().subtract(1, 'days') ],
+            'Last 7 days':  [ moment().subtract(7, 'days'), moment() ],
+            'Last 30 days': [ moment().subtract(30,'days'), moment() ],
+            'This month':   [ moment().startOf('month'), moment().endOf('month') ]
+        };
+
+        var ranges = $scope.logRanges;
+        var last7  = ranges['Last 7 days'];
+
         $scope.logsDatePicker      = {};
         $scope.logsDatePicker.date = {
-            startDate: m,
-            endDate:   m
+            startDate: last7[0].startOf('day'),
+            endDate:   last7[1].endOf('day') 
         };
 
         $scope.groupId      = pillsy.active_group.id;
@@ -63,14 +74,6 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
         if (!$scope.$$phase) {
             $scope.$apply();
         }
-    };
-
-    $scope.logRanges = {
-        'Today':        [ moment(), moment() ],
-        'Yesterday':    [ moment().subtract(1, 'days'), moment().subtract(1, 'days') ],
-        'Last 7 days':  [ moment().subtract(7, 'days'), moment() ],
-        'Last 30 days': [ moment().subtract(30,'days'), moment() ],
-        'This month':   [ moment().startOf('month'), moment().endOf('month') ]
     };
 
     $scope.refreshLogs = function(){
@@ -112,7 +115,7 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
                         drugEvents.forEach(function(drugEvent){
                             var obj   = {};
                             obj.date  = moment(drugEvent.eventTime).format('YYYY-MM-DD');
-                            obj.time  = moment(drugEvent.eventTime).format("h:mm A");
+                            obj.time  = moment(drugEvent.eventTime).format("h:mm:ss A");
                             obj.event = drugEvent.eventValue; 
                             
                             objs.push(obj);
