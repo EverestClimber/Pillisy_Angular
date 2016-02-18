@@ -1,26 +1,213 @@
-<header class="hero-unit" id="banner">
-  <!--<div class="container">
-    <h1 class="noselect">Medication management made easy</h1>
-    <p class="lead noselect">Next generation medication management system</p>
-    <img src="assets/img/pillsylogo.png" alt="Pillsy">
-  </div>-->
-</header>
+<div class="container-fluid" ng-controller="organizationSignupController" style="text-align: center; padding: 30px;">
+	<div ng-show="login">
+		<br><br><br><br>
+		<div class="row">
+			<div class="panel panel-primary col-sm-4" style="display: inline-block;float: none;"> 
+		    	<div class="panel-body">
+		      		<h4 class="text-center" style="margin-bottom: 25px;">Log in to get started or <a data-ng-click="toggleVisible('register')">Sign Up</a></h4>
+		      		<form name="login_form" action="/" class="form-horizontal" style="margin-bottom: 0px !important;">
+		        		<div class="form-group">
+		          			<div class="col-sm-12">
+		            			<div class="input-group">
+		              				<span class="input-group-addon"><i class="fa fa-user"></i></span>
+		              				<input type="email" name="email_login" data-ng-model="email_login" class="form-control" id="email_login" placeholder="Email" required />
+		            			</div>
+		          			</div>
+		        		</div>
+		        
+		        		<div class="form-group">
+		          			<div class="col-sm-12">
+		            			<div class="input-group">
+		              				<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+		              				<input type="password" name="password_login" data-ng-model="password_login" class="form-control" id="password_login" placeholder="Password" required />
+		            			</div>
+		          			</div>
+		        		</div>
 
-<!--<div class="container">
-  <div class="row">
-    <div class="col-lg-12">
-      <h1 class="page-header">Features:</h1>
-      <ul class="nav nav-tabs nav-stacked col-md-4 col-lg-4 col-sm-6" ng-repeat="thing in awesomeThings">
-        <li><a href="#" tooltip="{{thing.info}}">{{thing.name}}</a></li>
-      </ul>
-    </div>
-  </div>
-</div>-->
+		        		<div class="clearfix">
+		          			<div class="pull-right"><label><input type="checkbox" style="margin-bottom: 20px" checked=""> Remember Me</label></div>
+		        		</div>
+		      		</form>
+		    	</div>
+		    	<div class="panel-footer">
+		      		<a data-ng-click="toggleVisible('password')" class="pull-left btn btn-link" style="padding-left:0">Forgot password?</a>
+		      		<div class="pull-right">
+		        		<a data-ng-click="reset_login_form()" class="btn btn-default">Reset</a>
+		        		<button data-ng-disabled="loginLoading" data-ng-click="submit_login_form()" class="btn btn-primary" > 
+							<span ng-show="loginLoading"><i class="glyphicon glyphicon-refresh glyphicon-spin"></i></span>
+							        Log In
+						</button>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+	</div>
 
-<footer class="footer">
-  <div class="container">
-      <p>Pillsy, Inc. &copy; {{ copyright_year }} |
-      <!--<a href="https://twitter.com/tyhenkel">@tyhenkel</a> |
-      <a href="https://github.com/DaftMonk/generator-angular-fullstack/issues?state=open">Issues</a></p>-->
-  </div>
-</footer>
+	<div ng-show="password">
+		<br><br><br><br>
+		<div class="row">
+			<div class="panel panel-primary col-sm-4" style="display: inline-block;float: none;"> 
+		    	<div class="panel-body">
+		      		<h4 class="text-center" style="margin-bottom: 25px;">Enter your email to reset your password</h4>
+		      		<form name="password_reset_form" action="/" class="form-horizontal" style="margin-bottom: 0px !important;">
+		        		<div class="form-group">
+		          			<div class="col-sm-12">
+		            			<div class="input-group">
+		              				<span class="input-group-addon"><i class="fa fa-user"></i></span>
+		              				<input type="email" name="email_forgot" data-ng-model="email_forgot" class="form-control" id="email_forgot" placeholder="Email" required />
+		            			</div>
+		            			<br>
+		            			<div class="pull-left">
+									<t style="color:red;">{{email_forgot_required}}</t><br/>
+								</div>
+		          			</div>
+		        		</div>
+		      		</form>
+		    	</div>
+		    	<div class="panel-footer">
+		      		<div class="pull-right">
+		        		<a data-ng-click="toggleVisible('login')" class="btn btn-default">Cancel</a>
+		        		<button data-ng-disabled="forgotLoading" data-ng-click="submit_password_reset_form()" class="btn btn-primary" > 
+							<span ng-show="forgotLoading"><i class="glyphicon glyphicon-refresh glyphicon-spin"></i></span>
+							        Submit
+						</button>
+		      		</div>
+		    	</div>
+		  	</div>
+		</div>
+	</div>
+
+	<div ng-show="message">
+		<div class="row">
+			<div class="panel panel-primary col-sm-4" style="display: inline-block;float: none;">
+				<div class="panel-body">
+					<i class="text-center"> {{ result_message }} </i>
+				</div>
+				<div class="panel-footer">
+			      	<div class="pull-right">
+			        	<a data-ng-click="toggleVisible('login')" class="btn btn-primary">OK</a>
+			      	</div>
+			    </div>
+			</div>
+		</div>
+	</div>
+
+	<div ng-show="register">
+		<div class="row">
+			<div class="panel panel-primary col-sm-4" style="display: inline-block;float: none;">
+				<div class="panel-body">
+					<h4 class="text-center" style="margin-bottom: 25px;">Sign Up</h2>
+					<form name="register_form" action="/" class="form-horizontal" style="margin-bottom: 0px !important;">
+				
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<input type="text" name="firstname" data-ng-model="firstname" class="form-control" id="firstname" placeholder="First name" required />
+								</div>
+								<div>
+									<t style="color:red;">{{firstname_required}}</t><br/>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<input type="text" name="lastname" data-ng-model="lastname" class="form-control" id="lastname" placeholder="Last name" required />
+								</div>
+								<div>
+									<t style="color:red;">{{lastname_required}}</t><br/>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<input type="text" name="title" data-ng-model="title" class="form-control" id="title" placeholder="Title" required />
+								</div>
+								<div>
+									<t style="color:red;">{{title_required}}</t><br/>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
+									<input type="email" name="email_register" data-ng-model="email_register" class="form-control" id="email_register" placeholder="Email" required />
+								</div>
+								<div>
+									<t style="color:red;">{{email_required}}</t><br/>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-mobile-phone"></i></span>
+									<input type="tel" name="phone" data-ng-model="phone" class="form-control" id="phone" placeholder="Phone" required />
+								</div>
+								<div>
+									<t style="color:red;">{{phone_required}}</t><br/>
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+									<input type="password" name="password_register" data-ng-model="password_register" class="form-control" id="password_register" placeholder="Password" required />
+								</div>
+								<div>
+									<t style="color:red;">{{password_required}}</t><br/>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+									<input type="password" name="confirm_password" data-ng-model="confirm_password" class="form-control" id="confirm_password" placeholder="Confirm Password" required />
+								</div>
+								<div>
+									<t style="color:red;">{{verify_password}}</t><br/>
+								</div>
+							</div>
+						</div>
+
+						<div class="checkbox block" style="text-align:center">
+							<input type="checkbox"
+								   ng-model="accept_agreement"
+								   [ng-change="accept_agreement"]/>
+							<span>I accept the <a href="https://www.pillsy.com/terms.html">Terms and Conditions</a> and <a href="https://www.pillsy.com/privacy.html">Privacy Policy</a>></span>
+							<div>
+								<t style="color:red;">{{please_accept_agreement}}</t><br/>
+							</div>
+						</div>
+					</form>	
+
+					<div class="panel-footer">
+						<div class="pull-left">
+							<a class="btn btn-default" data-ng-click="toggleVisible('login')">Cancel</a>
+						</div>
+						<div class="pull-right">
+							<button data-ng-disabled="registerLoading" data-ng-click="submit_register_form()" class="btn btn-primary" > 
+								<span ng-show="registerLoading"><i class="glyphicon glyphicon-refresh glyphicon-spin"></i></span>
+								        Sign up
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>
+</div>
+

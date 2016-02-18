@@ -17,7 +17,7 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
     else{
         initVars();
     }
-
+    
     function initVars(){
 
         $scope.ranges = {

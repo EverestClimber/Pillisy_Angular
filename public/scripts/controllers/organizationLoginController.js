@@ -8,12 +8,53 @@ var app = angular.module('OrganizationLoginController', ['theme.core.services'])
 app.controller('organizationLoginController', function ($scope, $http, $theme, $window, apiService, stateService) {
 	'use strict';
 
-	$theme.set('fullscreen', true);
-	$scope.$on('$destroy', function() {
-      	$theme.set('fullscreen', false);
-    });
+    $scope.login    = true;
+    $scope.register = false;
+    $scope.message  = false;
+    $scope.password = false;
 
-    $scope.submit = function(form) {
+    $scope.toggleVisible = function(view){
+        setVisibleView(view);
+    };
+
+    function setVisibleView(view){
+        switch (view){
+            case 'login':
+                $scope.login    = true;
+                $scope.register = false;
+                $scope.message  = false;
+                $scope.password = false;
+                break;
+
+            case 'register':
+                $scope.login    = false;
+                $scope.register = true;
+                $scope.message  = false;
+                $scope.password = false;
+                break;
+
+            case 'message':
+                $scope.login    = false;
+                $scope.register = false;
+                $scope.message  = true;
+                $scope.password = false;
+                break;
+
+            case 'password':
+                $scope.login    = false;
+                $scope.register = false;
+                $scope.message  = false;
+                $scope.password = true;
+                break;
+        }
+    };
+
+    $scope.reset_login_form = function(){
+        $scope.email = '';
+        $scope.password = '';
+    };
+
+    $scope.submit_login_form = function(form) {
       	console.log('organizationLoginController - submitted form...email: '+ $scope.email);
       	console.log('organizationLoginController - submitted form...password: '+ $scope.password);
 

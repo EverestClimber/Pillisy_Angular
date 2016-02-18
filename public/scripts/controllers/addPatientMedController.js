@@ -22,12 +22,6 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
         $scope.patient = pillsy.active_patient;
     }
 
-    /*configService.retrieveConfigs()
-    .then(function(configs){
-
-        $scope.drug_search_url = configs.apiHost + "/v1/n/ndcdrug?query=";
-    });*/
-
     $scope.drug_search_url = "/v1/n/ndcdrug?query=";
     
     $scope.integerval  = /^\d*$/;
@@ -39,47 +33,142 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
         yearRange:   '2016:-0'
     };
 
-    $scope.submit = function(drug){
+    $scope.drug = {
+        doses_day: 1
+    };
 
-        if (!drug.name){
+    $scope.numDoses = $scope.drug.doses_day;
+
+    $scope.$watch('drug', function() {
+        console.log('form model has been changed');
+
+        $scope.numDoses = $scope.drug.doses_day;
+    }, true);
+
+    function getReminderTime(reminderTime){
+
+        var startDateMoment    = moment($scope.drug.start_date);
+        var reminderTimeMoment = moment(reminderTime);
+        var reminder           = moment(startDateMoment);
+        reminder.hour( reminderTimeMoment.hour() );
+        reminder.minute( reminderTimeMoment.minute() );
+        reminder.second( 0 );
+        reminder.millisecond(0);
+
+        return reminder;
+    }
+
+    //$scope.submit = function(drug){
+    $scope.submit_create_drug_form = function(){
+
+        if (!$scope.drug.name){
             alert('Drug name required');
         }
-        else if (!drug.start_date){
+        else if(!$scope.drug.quantity){
+            alert('Drug quantity required');
+        }
+        else if (!$scope.drug.start_date){
             alert('Start date required');
         }
-        else if (!drug.pills_dose){
-            alert('Pills dose required');
+        else if (!$scope.drug.pills_dose){
+            alert('Number of pills per dose required');
         }
-        else if (!drug.doses_day){
+        else if (!$scope.drug.doses_day){
             alert('Doses per day required');
         }
-        else if (!drug.reminder_time){
-            alert('Reminder time required');
+        else if($scope.drug.doses_day){
+            if ($scope.drug.doses_day == 1){
+                if (!$scope.drug.reminder1_time){
+                    alert('Reminder 1 time required');
+                }
+            }
+            if ($scope.drug.doses_day == 2){
+                if (!$scope.drug.reminder1_time){
+                    alert('Reminder 1 time required');
+                }
+                if (!$scope.drug.reminder2_time){
+                    alert('Reminder 2 time required');
+                }
+            }
+            if ($scope.drug.doses_day == 3){
+                if (!$scope.drug.reminder1_time){
+                    alert('Reminder 1 time required');
+                }
+                if (!$scope.drug.reminder2_time){
+                    alert('Reminder 2 time required');
+                }
+                if (!$scope.drug.reminder3_time){
+                    alert('Reminder 3 time required');
+                }
+            }
+            if ($scope.drug.doses_day == 4){
+                if (!$scope.drug.reminder1_time){
+                    alert('Reminder 1 time required');
+                }
+                if (!$scope.drug.reminder2_time){
+                    alert('Reminder 2 time required');
+                }
+                if (!$scope.drug.reminder3_time){
+                    alert('Reminder 3 time required');
+                }
+                if (!$scope.drug.reminder4_time){
+                    alert('Reminder 4 time required');
+                }
+            }
         }
-        else if (!drug.days_therapy){
+        else if (!$scope.drug.days_therapy){
             alert('Days of therapy required');
         }
-        else if (!drug.end_date){
+        else if (!$scope.drug.end_date){
             alert('End date required');
         }
-        else if (!drug.pillsyCapId){
+        else if (!$scope.drug.pillsyCapId){
             alert('PillsyCap identifier required');
         }
         else{
             console.log('Passwords match, proceed with registration...');
 
+            var initScheduleTimes = [];
+
+            for (var i=0; i<$scope.drug.doses_day; i++){
+
+                switch(i){
+                    case 0:
+                        initScheduleTimes.push( getReminderTime($scope.drug.reminder1_time) );
+                        break;
+                    case 1:
+                        initScheduleTimes.push( getReminderTime($scope.drug.reminder1_time) );
+                        initScheduleTimes.push( getReminderTime($scope.drug.reminder2_time) );
+                        break;
+                    case 2:
+                        initScheduleTimes.push( getReminderTime($scope.drug.reminder1_time) );
+                        initScheduleTimes.push( getReminderTime($scope.drug.reminder2_time) );
+                        initScheduleTimes.push( getReminderTime($scope.drug.reminder3_time) );
+                        break;
+                    case 3:
+                        initScheduleTimes.push( getReminderTime($scope.drug.reminder1_time) );
+                        initScheduleTimes.push( getReminderTime($scope.drug.reminder2_time) );
+                        initScheduleTimes.push( getReminderTime($scope.drug.reminder3_time) );
+                        initScheduleTimes.push( getReminderTime($scope.drug.reminder4_time) );
+                        break;
+
+                }
+                
+            }
+
             // Trigger validation flag.
             $scope.submitted = true;
 
-            var name = "";
-
             var dataObj = {
-                'name':        name,
-                'source':      'PillsyCap',
-                'pillsyCapId': drug.pillsyCapId,
+                'name':              $scope.drug.name,
+                'source':            'PillsyCap',
+                'pillsyCapId':       $scope.drug.pillsyCapId,
+                'initScheduleTimes': initScheduleTimes,   //reminders
+                'quantityPerDose':   $scope.drug.pills_dose,
+                'quantity':          $scope.drug.quantity
             }; 
 
-            if (drug.name instanceof Object){
+            /*if (drug.name instanceof Object){
 
                 if ( Object.prototype.hasOwnProperty.call(drug.name, 'originalObject') ){
 
@@ -113,14 +202,14 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
                         dataObj.nDCCode11Digit = nDCCode11Digit;
                     }
                 }
-            }
+            }*/
                 
-            if (drug.pillsyHubId){
-                dataObj.pillsyHubId = drug.pillsyHubId;
+            if ($scope.drug.pillsyHubId){
+                dataObj.pillsyHubId = $scope.drug.pillsyHubId;
             }
 
-            if ( (drug.quantity != null) && (drug.quantity != undefined) ){
-                dataObj.quantity = drug.quantity;
+            if ( ($scope.drug.quantity != null) && ($scope.drug.quantity != undefined) ){
+                dataObj.quantity = $scope.drug.quantity;
             }
 
             var groupId   = $scope.group.id;
@@ -129,9 +218,13 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
             var api = '/v1/a/organization/group/'+groupId+'/patient/'+patientId+'/drug'
             console.log('apiService.post - api is: '+api);
 
+            $scope.createDrugLoading = true;
+
+            alert('posting to: '+api);
             apiService.post(api,dataObj).then(function(result){
+                $scope.createDrugLoading = false;
                 if (result){
-                    console.log('apiService.post - result is: '+JSON.stringify(result));
+                    alert('apiService.post - result is: '+JSON.stringify(result));
 
                     if (result.msg == 'success'){
                         console.log('apiService.post - success');

@@ -42,6 +42,7 @@ var app = angular
     'GroupMembersController',
     'PatientViewController',
     'staff_signup',
+    'InviteMemberController',
     'angular-loading-bar'
 ]);
 
