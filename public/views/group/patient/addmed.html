@@ -15,7 +15,7 @@
 		<panel panel-class="panel" data-heading="Drug details">
 			<div class="col-md-6">
 				<div>
-					<form name="createdrug" action="/" class="form-horizontal" style="margin-bottom: 0px !important;" novalidate>
+					<form name="create_drug_form" class="form-horizontal" style="margin-bottom: 0px !important;" novalidate>
 						<div class="form-group">
 							<div class="col-sm-12">
 								<span>*Drug Name</span>
@@ -53,7 +53,7 @@
 								<span>*Start Date</span>
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input ui-date="{ dateFormat: 'yy-mm-dd' }" name="start_date" data-ng-model="drug.start_date" class="form-control" id="start_date" placeholder="Start date (YYYY-MM-DD)" required />
+									<input ui-date="dateOptions" name="start_date" data-ng-model="drug.start_date" class="form-control" id="start_date" placeholder="Start date (YYYY-MM-DD)" required />
 								</div>
 							</div>
 						</div>
@@ -126,7 +126,7 @@
 								<span>*Therapy end date</span>
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input ui-date="{ dateFormat: 'yy-mm-dd' }" name="end_date" data-ng-model="drug.end_date" class="form-control" id="end_date" placeholder="End date (YYYY-MM-DD)" required />
+									<input ui-date="dateOptions" name="end_date" data-ng-model="drug.end_date" class="form-control" id="end_date" placeholder="End date (YYYY-MM-DD)" required />
 								</div>
 							</div>
 						</div>

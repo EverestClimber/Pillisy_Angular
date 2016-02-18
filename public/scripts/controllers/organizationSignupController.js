@@ -4,7 +4,7 @@
 *  @package OrganizationSignupController AngularJS module  
 */
 
-var app = angular.module('OrganizationSignupController', ['theme.core.services'/*, 'APIService'*/]);     //instantiates OrganizationSignupController module
+var app = angular.module('OrganizationSignupController', ['theme.core.services']);     //instantiates OrganizationSignupController module
 app.controller('organizationSignupController', function ($scope, $http, $theme, $window, $timeout, apiService, stateService) {
 	'use strict';
         

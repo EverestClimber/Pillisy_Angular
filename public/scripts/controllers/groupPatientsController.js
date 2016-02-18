@@ -82,6 +82,18 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 	                  	var largeLoad = [];
 	                  	result.data.forEach(function(patient){
 
+                            var drugsArr = patient.drugs;
+                            var drugsStr = '';
+
+                            drugsArr.forEach(function(drug){
+                                if (drugsStr == ''){
+                                    drugsStr = drug;
+                                }
+                                else{
+                                    drugsStr = drugsStr + ', '+drug;
+                                }
+                            });
+
 	                    	var obj = {
 	                        	"id":           patient.id,
 	                        	"name":         patient.name,
@@ -96,7 +108,8 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
                                 "zip":          patient.zip,
                                 "phone":        patient.phone,
                                 "phone2":       patient.phone2,
-                                "email":        patient.email
+                                "email":        patient.email,
+                                "drugs":        drugsStr,
 	                   		};
 
 	                    	largeLoad.push(obj);
@@ -191,7 +204,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         data:             'myData',
         columnDefs: [
           	{ field:'name',     displayName: 'Name' },
-          	{ field:'status',   displayName: 'Status' },
+          	{ field:'drugs',    displayName: 'Drugs' },
           	{ field:'today',    displayName: 'Today' },
           	{ field:'interval', displayName: 'Last 7 days' },
           	{ field:'all_time', displayName: 'All time' },
@@ -205,6 +218,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         enableRowHeaderSelection: 	false,
         noUnselect:         		true,
         enableGridMenu:     		true,
+        enableColumnResize:         true,
         totalServerItems:   		'totalServerItems',
         pagingOptions:      		$scope.pagingOptions,
         filterOptions:      		$scope.filterOptions,
