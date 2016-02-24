@@ -3,12 +3,12 @@
 	<div id="page-heading">
 	    <ol class="breadcrumb">
 	        <li><a href="/">My Groups</a></li>
-	        <li><a href="/group/data">{{ group.name }}</a></li>
-	        <li><a href="/group/patient/data">{{ patient.name }}</a></li>
+	        <li><a href="/group/data">{{ activeGroup.name }}</a></li>
+	        <li><a href="/group/patient/data">{{ activePatient.name }}</a></li>
 	        <li class="active">Add patient medication</li>
 	    </ol>
 
-		<h1>Add a new drug for {{ patient.name }} </h1>  
+		<h1>Add a new drug for {{ activePatient.name }} </h1>  
 	</div>
 
 	<div class="container-fluid">
@@ -53,7 +53,7 @@
 								<span>*Start Date</span>
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input ui-date="dateOptions" name="start_date" data-ng-model="drug.start_date" class="form-control" id="start_date" placeholder="Start date (YYYY-MM-DD)" required />
+									<input ui-date="dateOptions" name="start_date" data-ng-model="drug.start_date" class="form-control" id="start_date" placeholder="Start date (MM-DD-YYYY)" required />
 								</div>
 							</div>
 						</div>
@@ -126,7 +126,7 @@
 								<span>*Therapy end date</span>
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input ui-date="dateOptions" name="end_date" data-ng-model="drug.end_date" class="form-control" id="end_date" placeholder="End date (YYYY-MM-DD)" required />
+									<input ui-date="dateOptions" name="end_date" data-ng-model="drug.end_date" class="form-control" id="end_date" placeholder="End date (MM-DD-YYYY)" required />
 								</div>
 							</div>
 						</div>

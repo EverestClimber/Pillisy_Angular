@@ -11,54 +11,21 @@ var app = angular.module('PatientViewController', ['theme.core.services','theme.
 app.controller('patientViewController', function ($scope, $timeout, $theme, $window, $location, $filter, apiService, stateService) {
     'use strict';
 
-   	function getInterval(){
-        var now = new Date();
-
-        var interval = {
-            startTime: moment(now.getTime()).startOf('day').subtract(3,'days').valueOf(),
-            endTime:   moment().endOf('day').valueOf(),
-            today:     now.getTime(),
-        };
-
-        return encodeURIComponent( JSON.stringify(interval) );
-    }
-
-    function getPercentValue(value, total){
-    	var percent;
-
-    	if (total > 0){
-            if (value > 0){
-                var numY = (value / total) * 100;
-                percent = (Math.round( numY * 10 ) / 10) + '%';
-            }
-            else{
-                percent = '0%';
-            }
-        }
-        else{
-            percent = 'N/A';
-        }
-
-        return percent;
-    };
-
     var d3 = $window.d3;
 
     //patient cache data
-    var pillsy = stateService.getPillsy();
-    
-	if ( (!pillsy.active_patient) || (!pillsy.active_group) ){
+    $scope.activeGroup   = stateService.getActiveGroup();
+    $scope.activePatient = stateService.getActivePatient();
+
+	if ( !$scope.activeGroup || !$scope.activePatient){
 	  	$location.path('/');
 	}
 	else{
-		$scope.groupName = pillsy.active_group.name;
-		$scope.patient   = pillsy.active_patient;
-
 		initData();
 	}
 
 	function initData(){
-	   	
+
 	    $scope.trendsData = [];
 		$scope.multiBarChartData = [];
 		$scope.pieChartData = [];
@@ -105,16 +72,45 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		};
 		
 		$scope.totalMeds = 0;
-		$scope.medsPagingOptions = {
+		$scope.pagingOptions = {
 		   	pageSizes: [5, 10, 20, 30],
 		   	pageSize: 5,
 		    currentPage: 1
 		};
 	}
 
-	$scope.setMedsPagingData = function(data, page, pageSize) {
-	    $scope.loadingMeds = false;
+	function getInterval(){
+        var now = new Date();
 
+        var interval = {
+            startTime: moment(now.getTime()).startOf('day').subtract(3,'days').valueOf(),
+            endTime:   moment().endOf('day').valueOf(),
+            today:     now.getTime(),
+        };
+
+        return encodeURIComponent( JSON.stringify(interval) );
+    }
+
+    function getPercentValue(value, total){
+    	var percent;
+
+    	if (total > 0){
+            if (value > 0){
+                var numY = (value / total) * 100;
+                percent = (Math.round( numY * 10 ) / 10) + '%';
+            }
+            else{
+                percent = '0%';
+            }
+        }
+        else{
+            percent = 'N/A';
+        }
+
+        return percent;
+    };
+
+	function setMedsPagingData(data, page, pageSize) {
 	   	var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
 	   	$scope.meds = pagedData;
 	   	$scope.totalMeds = data.length;
@@ -122,154 +118,142 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	        $scope.$apply();
 	   	}
 
-	   	setPlotTrendsChartData();
-	   	setMultiBarChartData();
+	   	//setPlotTrendsChartData();
+	   	//setMultiBarChartData();
 	};
 
 	$scope.refreshMeds = function(){
-	    $scope.loadingMeds = true;
-	   	$scope.getMedsPagedDataAsync($scope.medsPagingOptions.pageSize, $scope.medsPagingOptions.currentPage);
+	   	getMedsPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
 	};
 
-	$scope.getMedsPagedDataAsync = function(pageSize, page, searchText) {
-	    $scope.progress = true;
+	function getMedsPagedDataAsync(pageSize, page, searchText) {
 
-	   	setTimeout(function() {
+	   	var patientId = $scope.activePatient.id;
+	    var groupId   = $scope.activeGroup.id;
 
-	      	var patientId = null;
-	      	var groupId   = null;
-	      	var interval  = $scope.interval;
-	      	var pillsy    = stateService.getPillsy();
-
-	      	if (pillsy){
-	      		var group   = pillsy.active_group;
-	      		var patient = pillsy.active_patient;
-
-	      		if (group){
-	      			groupId = group.id;
-	      		}
-	      			
-	      		if (patient){
-	      			patientId = patient.id;
-	      		}
-	      	}
-
-	        if (patientId && groupId){
-		        var api = '/v1/a/organization/group/'+groupId+'/patient/'+patientId+'/drugs/adherence?interval='+getInterval();
-		        console.log('api is: '+api);
+	    if (patientId && groupId){
+		  	var api = '/v1/a/organization/group/'+groupId+'/patient/'+patientId+'/drugs/adherence?interval='+getInterval();
+		   	console.log('api is: '+api);
 		        
-				apiService.get(api).then(function(result){
-              		$scope.progress = false;
+		    $scope.loadingMeds = true;
+			apiService.get(api).then(function(result){
+              	$scope.loadingMeds = false;
 
-              		if (result){
-                		if (result.msg == 'success'){
-                  			console.log('apiService.get - successfully retrieved group patients: '+result);
+              	if (result){
+                	if (result.msg == 'success'){
+                  		console.log('apiService.get - successfully retrieved group patients: '+result);
 
-                  			var data = [];
-                  			result.data.forEach(function(drug){
+                  		var data = [];
+                  		result.data.forEach(function(drug){
                   				
-	                    		var obj = {
-	                    			"id": 		   drug.id,
-	                      			"name":        drug.name,
-	                      			"status":      drug.status,
-	                     			"interval":    getPercentValue(drug.intervalTaken, drug.intervalTotal),
-	                      			"avg": 		   getPercentValue(drug.allTimeTaken, drug.allTimeTotal),
-	                      			"remaining":   drug.remaining
-	                    		};
+	                    	var obj = {
+	                    		"id": 		   drug.id,
+	                      		"name":        drug.name,
+	                      		"status":      drug.status,
+	                     		"interval":    getPercentValue(drug.intervalTaken, drug.intervalTotal),
+	                      		"avg": 		   getPercentValue(drug.allTimeTaken, drug.allTimeTotal),
+	                      		"remaining":   drug.remaining,
+	                      		"quantity":    drug.quantity,
+	                      		"reminders":   drug.reminders
+	                    	};
 
-	                    		if (drug.todayDoses){
-	                    			var todayDoses = drug.todayDoses;
+	                    	if (drug.todayDoses){
+	                    		var todayDoses = drug.todayDoses;
+	                    		
+	                    		if (todayDoses.length > 0){
+	                    			console.log('apiService.get - found doses, display...');
 
-	                    			if (todayDoses.length > 0){
-	                    				console.log('apiService.get - found doses, display...');
+	                    			var doseTime  = '';
+	                    			var doseTaken = '';
+	                    			var index = 0;
 
-	                    				var doseTime  = '';
-	                    				var doseTaken = '';
-	                    				var index = 0;
-
-	                    				todayDoses.forEach(function(todayDose){
-	                    					if (todayDose.doseTime){
-		                    					if (todayDose.doseTime != 'N/A'){
-		                    						todayDose.doseTime = moment(todayDose.doseTime).format("h:mm A")
-		                    					}
+	                    			todayDoses.forEach(function(todayDose){
+	                    				if (todayDose.doseTime){
+		                    				if (todayDose.doseTime != 'N/A'){
+		                    					todayDose.doseTime = moment(todayDose.doseTime).format("h:mm A")
 		                    				}
+		                    			}
 
-		                    				doseTime = doseTime + todayDose.doseTime;
+		                    			doseTime = doseTime + todayDose.doseTime;
 
-		                    				if (todayDose.doseTaken){
-		                    					if ((todayDose.doseTaken != 'N/A') && (todayDose.doseTaken != '--')){
-		                    						todayDose.doseTaken = moment(todayDose.doseTaken).format("h:mm A")
-		                    					}
+		                    			if (todayDose.doseTaken){
+		                    				if ((todayDose.doseTaken != 'N/A') && (todayDose.doseTaken != '--')){
+		                    					todayDose.doseTaken = moment(todayDose.doseTaken).format("h:mm A")
 		                    				}
+		                    			}
 
-		                    				doseTaken = doseTaken + todayDose.doseTaken;
-		                    				index++;
+		                    			doseTaken = doseTaken + todayDose.doseTaken;
+		                    			index++;
 
-		                    				if (index < todayDoses.length){
-		                    					doseTime  = doseTime + '; ';
-		                    					doseTaken = doseTaken + '; ';
-		                    				}
-	                    				});
+		                    			if (index < todayDoses.length){
+		                    				doseTime  = doseTime + '; ';
+		                    				doseTaken = doseTaken + '; ';
+		                    			}
+	                    			});
 
-	                    				obj.doseTime  = doseTime;
-	                    				obj.doseTaken = doseTaken;
-	                     			}
-	                     			else{
-	                     				console.log('apiService.get - there are no doses...');
+	                    			obj.doseTime  = doseTime;
+	                    			obj.doseTaken = doseTaken;
+	                     		}
+	                     		else{
+	                     			console.log('apiService.get - there are no doses...');
 
-	                     				obj.doseTime  = 'N/A';
-	                     				obj.doseTaken = 'N/A';
-	                     			}
-	                    		}
+	                     			obj.doseTime  = 'N/A';
+	                     			obj.doseTaken = 'N/A';
+	                     		}
+	                    	}
 
-	                    		data.push(obj);
+	                    	data.push(obj);
+                  		});
+
+                  		if (searchText) {
+							var ft = searchText.toLowerCase();
+                  			data = data.filter(function(item) {
+                    			return JSON.stringify(item).toLowerCase().indexOf(ft) !== -1;
                   			});
+                  		}
 
-                  			if (searchText) {
-								var ft = searchText.toLowerCase();
-                  				data = data.filter(function(item) {
-                    				return JSON.stringify(item).toLowerCase().indexOf(ft) !== -1;
-                  				});
-                  			}
+                  		stateService.setPatientDetails($scope.activePatient.id, data);
+                  		setMedsPagingData(data, page, pageSize);
+                	}
+                	else{
+                  		console.log('apiService.get - error retrieving patient meds: '+result.msg);
 
-                  			$scope.setMedsPagingData(data, page, pageSize);
-                		}
-                		else{
-                  			console.log('apiService.get - error retrieving patient meds: '+result.msg);
-
-                  			alert(result.msg);
-                		}
-              		}
-              		else{
-                		console.log('apiService.get - error - no result from server');
-              		}
-            	});
-		   	}
-		   	else{
-	          	$scope.setMedsPagingData([], page, pageSize);
-	        }
-
-	   	},100);
+                  		alert(result.msg);
+                	}
+              	}
+              	else{
+                	console.log('apiService.get - error - no result from server');
+              	}
+            });
+	    }
 	};
 
-	$scope.getMedsPagedDataAsync($scope.medsPagingOptions.pageSize, $scope.medsPagingOptions.currentPage);
+	//get from cache
+    var cachedData = stateService.getPatientDetails($scope.activePatient.id);
+    if (cachedData){
 
-	$scope.$watch('medsPagingOptions', function(newVal, oldVal) {
+        setMedsPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
+    }
+
+    //now make service call...
+	getMedsPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+
+	$scope.$watch('pagingOptions', function(newVal, oldVal) {
 	   	if (newVal !== oldVal) {
-	        $scope.getMedsPagedDataAsync($scope.medsPagingOptions.pageSize, $scope.medsPagingOptions.currentPage, $scope.medsFilterOptions.filterText);
+	        getMedsPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.medsFilterOptions.filterText);
 	   	}
 	}, true);
 
 	$scope.$watch('medsFilterOptions', function(newVal, oldVal) {
 	   	if (newVal !== oldVal) {
-	       	$scope.getMedsPagedDataAsync($scope.medsPagingOptions.pageSize, $scope.medsPagingOptions.currentPage, $scope.medsFilterOptions.filterText);
+	       	getMedsPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.medsFilterOptions.filterText);
 	   	}
 	}, true);
 
 	$scope.onMedRowClick = function(row) {
 	   	console.log("onMedRowClick");
 
-	  	if (stateService.setActivePatientMed(row.entity)){
+	  	if (stateService.setActivePatientDrug(row.entity)){
 	       	$location.path('/group/patient/med/data');
 	  	}
 	   	else{
@@ -300,7 +284,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
         enableGridMenu:     		true,
         enableColumnResize:         true,
 	    totalServerItems:   		'totalMeds',
-	    pagingOptions:      		$scope.medsPagingOptions,
+	    pagingOptions:      		$scope.pagingOptions,
 	    filterOptions:      		$scope.medsFilterOptions,
 	    rowTemplate: 				rowTemplate
 	};
@@ -312,9 +296,67 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	  	setMultiBarChartData();
 	}
 
+	//--profile----
+	$scope.postPatientData = function(key, value){
+
+		var patientId = $scope.activePatient.id;
+	    var groupId   = $scope.activeGroup.id;
+
+	   	if (patientId && groupId){
+
+			var api = '/v1/a/organization/group/'+ groupId +'/patient/'+ patientId +'/data';
+			var patientData  = {};
+			patientData[key] = value;
+
+			apiService.put(api, patientData).then(function(result){
+		    	$scope.progress = false;
+
+		       	if (result){
+		           	if (result.msg == 'success'){
+		               	console.log('apiService.get - successfully updated patient\'s '+key);
+
+		               	var user = result.data;
+
+		               	if ($scope.activePatient.id == user.id){
+		               		for (var property in $scope.activePatient) {
+								if (user.hasOwnProperty(property)) {
+									$scope.activePatient[property] = user[property];
+								}
+							}
+
+							var nameArr = $scope.activePatient.name.split(', ');
+
+							if (nameArr.length > 0){
+								$scope.activePatient.lastname = nameArr[0];
+
+								if (nameArr.length == 2){
+								    $scope.activePatient.firstname = nameArr[1];
+								}
+							}
+                  				
+		                  	stateService.setActivePatient($scope.activePatient);
+		               	}
+		          	}
+		          	else{
+		               	alert(result.msg);
+		           	}
+		      	}
+		      	else{
+		           	alert('Server error');
+		      	}
+		 	});
+
+		}
+		else{
+		   	alert('Server error');
+		}	
+	}
+
+
+	//-----------CHARTS------------------NOT USED-----------------
 	//-------trends charts
 
-	$scope.trendsDataOptions = {
+	/*$scope.trendsDataOptions = {
 	    series: {
 	        	stack: true,
 	        	lines: {
@@ -637,88 +679,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
       	return function(d) {
         	return d.y;
       	};
-    };
-
-
-	//--profile----
-	$scope.postPatientData = function(key, value){
-
-		var pillsy = stateService.getPillsy();
-
-	  	if (pillsy){
-	      	var group     = pillsy.active_group;
-	      	var patient   = pillsy.active_patient;
-	      	var groupId   = null;
-	      	var patientId = null;
-
-	      	if (group){
-	      		groupId = group.id;
-	      	}
-	      			
-	      	if (patient){
-	      		patientId = patient.id;
-	      	}
-
-	      	if (patientId && groupId){
-
-				var api = '/v1/a/organization/group/'+ groupId +'/patient/'+ patientId +'/data';
-				var patientData = {};
-				patientData[key] = value;
-
-				apiService.put(api, patientData).then(function(result){
-		            $scope.progress = false;
-
-		            if (result){
-		                if (result.msg == 'success'){
-		                  	console.log('apiService.get - successfully updated patient\'s '+key);
-
-		                  	var user = result.data;
-		                  	pillsy = stateService.getPillsy();
-		                  	if (pillsy){
-		                  		var patient = pillsy.active_patient;
-
-		                  		if (patient){
-		                  			if (patient.id == user.id){
-
-		                  				for (var property in user) {
-										    if (user.hasOwnProperty(property)) {
-										        patient[property] = user[property];
-										    }
-										}
-
-										var nameArr = patient.name.split(', ');
-
-								        if (nameArr.length > 0){
-								            patient.lastname = nameArr[0];
-
-								            if (nameArr.length == 2){
-								                patient.firstname = nameArr[1];
-								            }
-								        }
-                  				
-		                  				stateService.setActivePatient(patient);
-		                  				pillsy         = stateService.getPillsy();
-		                  				$scope.patient = pillsy.active_patient;
-		                  			}
-		                  		}
-		                  	}
-		               	}
-		               	else{
-		               		alert(result.msg);
-		               	}
-		           	}
-		           	else{
-		           		alert('Server error');
-		           	}
-		      	});
-
-		   	}
-		   	else{
-		   		alert('Server error');
-		   	}
-
-	  	}	
-	}
+    };*/
 
 })
 .filter('fromNow', function() {

@@ -8,11 +8,45 @@ var app = angular.module('StateService', []);     //instantiates StateService mo
 app.service('stateService', function($window, $rootScope, $location, $cookies, $http, apiService){
 	console.log('stateService...');
 
-	this.setActivePatientMed = function(med){
+    //---------CACHING------------
+    //for caching groups
+    this.setGroupDetails = function(groupId, groupDetails){
         var pillsy = this.getPillsy();
-
         if (pillsy){
-            pillsy.active_patient_med = med;
+            if (pillsy.group_details){
+                
+                var gDetails = pillsy.group_details;
+                var exists = false;
+
+                gDetails.some(function(group){
+                    if (group.id == groupId){
+                        group.details = groupDetails;
+                        exists = true;
+                        return true;
+                    }
+                });
+
+                if (exists){
+                    pillsy.group_details = gDetails;
+                }
+                else{
+                    var obj = {
+                        id:      groupId,
+                        details: groupDetails
+                    };
+
+                    pillsy.group_details.push(obj);
+                }
+            }
+            else{
+                var obj = {
+                    id:      groupId,
+                    details: groupDetails
+                };
+
+                pillsy.group_details = [];
+                pillsy.group_details.push(obj);
+            }
 
             $window.sessionStorage.pillsy = JSON.stringify(pillsy);
 
@@ -21,9 +55,201 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
         else{
             return false;
         }
+    };
+
+    this.getGroupDetails = function(groupId){
+        var pillsy       = this.getPillsy();
+        var groupDetails = null;
+
+        if (pillsy){
+
+            var gDetails = pillsy.group_details;
+            if (gDetails){
+
+                gDetails.some(function(group){
+                    if (group.id == groupId){
+                        groupDetails = group.details;
+                        return true;
+                    }
+                });
+            }
+        }
+        
+        return groupDetails;
     }
 
-    this.setActiveGroup = function(group){
+    //for caching patients
+    this.setPatientDetails = function(patientId, patientDetails){
+        var pillsy = this.getPillsy();
+        if (pillsy){
+            if (pillsy.patient_details){
+                
+                var pDetails = pillsy.patient_details;
+                var exists = false;
+
+                pDetails.some(function(patient){
+                    if (patient.id == patientId){
+                        patient.details = patientDetails;
+                        exists = true;
+                        return true;
+                    }
+                });
+
+                if (exists){
+                    pillsy.patient_details = pDetails;
+                }
+                else{
+                    var obj = {
+                        id:                patientId,
+                        details:           patientDetails,
+                        drugsCacheDetails: null
+                    };
+
+                    pillsy.patient_details.push(obj);
+                }
+            }
+            else{
+                var obj = {
+                    id:                patientId,
+                    details:           patientDetails,
+                    drugsCacheDetails: null
+                };
+
+                pillsy.patient_details = [];
+                pillsy.patient_details.push(obj);
+            }
+
+            $window.sessionStorage.pillsy = JSON.stringify(pillsy);
+
+            return true;
+        }
+        else{
+            return false;
+        }
+    };
+
+    this.getPatientDetails = function(patientId){
+        var pillsy         = this.getPillsy();
+        var patientDetails = null;
+
+        if (pillsy){
+
+            var pDetails = pillsy.patient_details;
+            if (pDetails){
+
+                pDetails.some(function(patient){
+                    if (patient.id == patientId){
+                        patientDetails = patient.details;
+                        return true;
+                    }
+                });
+            }
+        }
+        
+        return patientDetails;
+    }
+
+    //for caching patients default interval schedule or logs
+    this.setPatientDrugDefaultIntervalCache = function(patientId, drugId, defaultIntervalDetails, type){
+        var pillsy = this.getPillsy();
+        if (pillsy){
+            if (pillsy.patient_details){
+                
+                var pDetails = pillsy.patient_details;
+                var modified = false;
+
+                pDetails.some(function(patient){
+                    if (patientId == patient.id){
+
+                        if (patient.drugsCacheDetails){
+                            patient.drugsCacheDetails.some(function(drugCacheDetails){
+                                if (drugCacheDetails.drugId == drugId){
+                                    if (type == 'schedule'){
+                                        drugCacheDetails.scheduleDetails = defaultIntervalDetails;
+                                    }
+                                    else if (type == 'logs'){
+                                        drugCacheDetails.logDetails = defaultIntervalDetails;
+                                    }
+
+                                    modified = true;
+                                    return true;
+                                }
+                            });
+                        }
+                        else{
+                            patient.drugsCacheDetails = [];
+                            var drugCacheDetailsObj   = {
+                                drugId: drugId
+                            };
+
+                            if (type == 'schedule'){
+                                drugCacheDetailsObj.scheduleDetails = defaultIntervalDetails;
+                                drugCacheDetailsObj.logDetails      = null;
+                            }
+                            else if (type == 'logs'){
+                                drugCacheDetailsObj.scheduleDetails = null;
+                                drugCacheDetailsObj.logDetails      = defaultIntervalDetails;
+                            }
+                            
+                            patient.drugsCacheDetails.push(drugCacheDetailsObj);
+                            modified = true;
+                        }
+
+                        return true;
+                    }
+                });
+
+                if (modified){
+                    pillsy.patient_details = pDetails;
+                    $window.sessionStorage.pillsy = JSON.stringify(pillsy);
+                }
+            }
+
+            return true;
+        }
+        else{
+            return false;
+        }
+    };
+
+    this.getPatientDrugDefaultIntervalCache = function(patientId, drugId, type){
+        var pillsy               = this.getPillsy();
+        var intervalCacheDetails = null;  //type, either 'schedule', or 'logs'
+
+        if (pillsy){
+            var pDetails = pillsy.patient_details;
+            if (pDetails){
+
+                pDetails.some(function(patient){
+                    if (patientId == patient.id){
+                        if (patient.drugsCacheDetails){
+                            patient.drugsCacheDetails.some(function(drugCacheDetails){
+                                if (drugCacheDetails.drugId == drugId){
+                                    if (type == 'schedule'){
+                                        intervalCacheDetails = drugCacheDetails.scheduleDetails;
+                                    }
+                                    else if (type == 'logs'){
+                                        intervalCacheDetails = drugCacheDetails.logDetails;
+                                    }
+                                    return true;
+                                }
+                            });
+                        }
+                        return true;
+                    }
+                });
+            }
+        }
+        
+        return intervalCacheDetails;
+    }
+
+    //---------------END CACHING------------------
+
+
+    //------------ACTIVE STATE--------------------
+    //when a group is opened, this sets that group as the actively opened group
+     this.setActiveGroup = function(group){
         console.log('stateService - setActiveGroup...');
 
         var pillsy = this.getPillsy();
@@ -40,8 +266,121 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
         else{
             return false;
         }
+    };
+
+    this.getActiveGroup = function(){
+        console.log('stateService - getActiveGroup...');
+
+        var pillsy = this.getPillsy();
+
+        if (pillsy){
+            return pillsy.active_group;
+        }
+        else{
+            return null;
+        }
+    };
+
+    //when a patient is clicked, this sets that patient as the actively opened patient within a group
+    this.setActivePatient = function(patient){
+        var pillsy = this.getPillsy();
+
+        if (pillsy){
+            var activeGroup = this.getActiveGroup();
+
+            if (activeGroup){
+                try{
+                    activeGroup.active_patient    = patient;
+                    pillsy.active_group           = activeGroup;
+                    $window.sessionStorage.pillsy = JSON.stringify(pillsy);
+
+                    return true;
+                }
+                catch(e){
+                    console.log('stateService - setActivePatient - error setting active patient: '+e);
+
+                    return false;
+                }
+            }
+            else{
+                return false;
+            }
+        }
+        else{
+            return false;
+        }
     }
 
+    this.getActivePatient = function(){
+        var activePatient = null;
+        var pillsy        = this.getPillsy();
+
+        if (pillsy){
+            var activeGroup = this.getActiveGroup();
+
+            if (activeGroup){
+                activePatient = activeGroup.active_patient;
+            }
+        }
+
+        return activePatient;
+    };
+
+	this.setActivePatientDrug = function(drug){
+        var pillsy = this.getPillsy();
+
+        try{
+            if (pillsy){
+                var activeGroup = this.getActiveGroup();
+
+                if (activeGroup){
+                    var activePatient = activeGroup.active_patient;
+
+                    if (activePatient){
+                        activePatient.active_drug     = drug;
+                        activeGroup.active_patient    = activePatient;
+                        pillsy.active_group           = activeGroup;
+                        $window.sessionStorage.pillsy = JSON.stringify(pillsy);
+
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
+                }
+                else{
+                    return false;
+                }
+            }
+            else{
+                return false;
+            }
+        }
+        catch(e){
+            return false;
+        }
+    };
+
+    this.getActivePatientDrug = function(){
+        var activePatientDrug = null;
+        var pillsy = this.getPillsy();
+
+        if (pillsy){
+            var activeGroup = this.getActiveGroup();
+
+            if (activeGroup){
+                var activePatient = activeGroup.active_patient;
+
+                if (activePatient){
+                    activePatientDrug = activePatient.active_drug;
+                }    
+            }
+        }
+
+        return activePatientDrug;
+    }
+
+    
     this.setUserGroups = function(groups){
         console.log('stateService - setUserGroups...');
 
@@ -50,31 +389,39 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
         if (pillsy){
             console.log('stateService - setUserGroups, got pillsy, set groups');
 
-            pillsy.user_groups = groups;
+            var user = pillsy.user;
 
-            $window.sessionStorage.pillsy = JSON.stringify(pillsy);
+            if (user){
+                user.groups = groups;
+                pillsy.user = user;
+                $window.sessionStorage.pillsy = JSON.stringify(pillsy);
 
-            return true;
+                return true;
+            }
+            else{
+                return false;
+            }
         }
         else{
             return false;
         }
     }
 
-    this.setActivePatient = function(patient){
+    this.getUserGroups = function(){
+
+        var groups = null;
         var pillsy = this.getPillsy();
 
         if (pillsy){
-            pillsy.active_patient = patient;
+            var user = pillsy.user;
 
-            $window.sessionStorage.pillsy = JSON.stringify(pillsy);
+            if (user){
+                groups = user.groups;
+            }
+        }
 
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
+        return groups;
+    };
 
     this.getPillsy = function(){
         console.log('stateService - getPillsy');
@@ -103,62 +450,32 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
     this.getUser = function(){
         console.log('stateService - getUser');
 
-        var user = null;
+        var user   = null;
+        var pillsy = this.getPillsy();
 
-        try{
-            if ($window.sessionStorage.pillsy){
-                console.log('stateService - getUser - got pillsy, parse...');
-
-                user = JSON.parse($window.sessionStorage.pillsy).user;
-           	}
-            else{
-                console.log('stateService - getUser - no pillsy, ignore...');
-            }
-
-            return user; 
+        if (pillsy){
+            user = pillsy.user;
         }
-        catch(error){
-            console.log('stateService - getUser Error retrieving user - '+error.message);
 
-            return null;
-        }
+        return user;
     };
 
     this.isLoggedIn = function(){
         console.log('stateService - isLoggedIn?..');
 
-        try{
-           	if ($window.sessionStorage.pillsy){
-                console.log('stateService - isLoggedIn?..got pillsy, check...');
+        var loggedIn = false;
+        var pillsy   = this.getPillsy();
 
-                var pillsy = JSON.parse($window.sessionStorage.pillsy);
-                var token  = pillsy.token; 
-                var user   = pillsy.user;  
-                console.log('stateService - isLoggedIn - token is: '+token);
-                console.log('stateService - isLoggedIn - user is: '+user);
+        if (pillsy){
+            var user   = pillsy.user;
+            var token  = pillsy.token; 
 
-                if ( token && user ){
-                    console.log('stateService - isLoggedIn is true');
-
-                    return true;
-                }
-                else{
-                    console.log('stateService - isLoggedIn is false');
-
-                    return false;
-                }
-            }
-            else{
-                console.log('stateService - isLoggedIn?..no pillsy, not logged in...');
-
-                return false;
+            if (user && token){
+                loggedIn = true;
             }
         }
-        catch(error){
-            console.log('stateService - isLoggedIn error: '+error.message);
 
-            return false;
-        }
+        return loggedIn;
     };
 
     this.loginSuccessCallback = function(data){

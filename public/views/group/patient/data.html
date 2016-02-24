@@ -3,11 +3,11 @@
     <div id="page-heading">
         <ol class="breadcrumb">
             <li><a href="/">My Groups</a></li>
-            <li><a href="/group/data">{{ groupName }}</a></li>
+            <li><a href="/group/data">{{ activeGroup.name }}</a></li>
             <li class="active">Patient</li>
         </ol>
 
-        <h1>Patient: {{ patient.name }} </h1>
+        <h1>Patient: {{ activePatient.name }} </h1>
         <div class="options">
             <div class="btn-toolbar">
                     
@@ -46,70 +46,70 @@
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">First Name</label>
                                     <div class="col-sm-6 form-control-static" name="editableForm">
-                                        <a editable-text="patient.firstname" onaftersave="postPatientData('firstname', patient.firstname)">{{ patient.firstname || 'empty' }}</a>
+                                        <a editable-text="activePatient.firstname" onaftersave="postPatientData('firstname', activePatient.firstname)">{{ activePatient.firstname || 'empty' }}</a>
                                     </div>
                                 </div>
                                     
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Last Name</label>
                                     <div class="col-sm-6 form-control-static">
-                                        <a href="#" editable-text="patient.lastname" onaftersave="postPatientData('lastname', patient.lastname)">{{ patient.lastname || 'empty' }}</a>
+                                        <a href="#" editable-text="activePatient.lastname" onaftersave="postPatientData('lastname', activePatient.lastname)">{{ activePatient.lastname || 'empty' }}</a>
                                     </div>
                                 </div>
                                     
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Address1</label>
                                     <div class="col-sm-6 form-control-static">
-                                        <a href="#" editable-text="patient.address1" onaftersave="postPatientData('address1', patient.address1)">{{ patient.address1 || 'empty' }}</a>
+                                        <a href="#" editable-text="activePatient.address1" onaftersave="postPatientData('address1', activePatient.address1)">{{ activePatient.address1 || 'empty' }}</a>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Address2</label>
                                     <div class="col-sm-6 form-control-static">
-                                        <a href="#" editable-text="patient.address2" onaftersave="postPatientData('address2', patient.address2)">{{ patient.address2 || 'empty' }}</a>
+                                        <a href="#" editable-text="activePatient.address2" onaftersave="postPatientData('address2', activePatient.address2)">{{ activePatient.address2 || 'empty' }}</a>
                                     </div>
                                 </div>
                                 
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">City</label>
                                     <div class="col-sm-6 form-control-static">
-                                        <a href="#" editable-text="patient.city" onaftersave="postPatientData('city', patient.city)">{{ patient.city || 'empty' }}</a>
+                                        <a href="#" editable-text="activePatient.city" onaftersave="postPatientData('city', activePatient.city)">{{ activePatient.city || 'empty' }}</a>
                                     </div>
                                 </div> 
 
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">State</label>
                                     <div class="col-sm-6 form-control-static">
-                                        <a href="#" editable-text="patient.state" onaftersave="postPatientData('state', patient.state)">{{ patient.state || 'empty' }}</a>
+                                        <a href="#" editable-text="activePatient.state" onaftersave="postPatientData('state', activePatient.state)">{{ activePatient.state || 'empty' }}</a>
                                     </div>
                                 </div>    
 
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Zip</label>
                                     <div class="col-sm-6 form-control-static">
-                                        <a href="#" editable-text="patient.zip" onaftersave="postPatientData('zip', patient.zip)">{{ patient.zip || 'empty' }}</a>
+                                        <a href="#" editable-text="activePatient.zip" onaftersave="postPatientData('zip', activePatient.zip)">{{ activePatient.zip || 'empty' }}</a>
                                     </div>
                                 </div>  
 
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Email</label>
                                     <div class="col-sm-6 form-control-static" name="editableForm">
-                                        <a editable-text="patient.firstname" onaftersave="postPatientData('email', patient.email)">{{ patient.email || 'empty' }}</a>
+                                        <a editable-text="activePatient.email" onaftersave="postPatientData('email', activePatient.email)">{{ activePatient.email || 'empty' }}</a>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Mobile#</label>
                                     <div class="col-sm-6 form-control-static">
-                                        <a href="#" editable-text="patient.phone" onaftersave="postPatientData('phone', patient.phone)">{{ patient.phone || 'empty' }}</a>
+                                        <a href="#" editable-text="activePatient.phone" onaftersave="postPatientData('phone', activePatient.phone)">{{ activePatient.phone || 'empty' }}</a>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Home#</label>
                                     <div class="col-sm-6 form-control-static">
-                                        <a href="#" editable-text="patient.phone2" onaftersave="postPatientData('phone2', patient.phone2)">{{ patient.phone2 || 'empty' }}</a>
+                                        <a href="#" editable-text="activePatient.phone2" onaftersave="postPatientData('phone2', activePatient.phone2)">{{ activePatient.phone2 || 'empty' }}</a>
                                     </div>
                                 </div> 
 

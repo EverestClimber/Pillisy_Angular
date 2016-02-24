@@ -7,43 +7,43 @@
 
 var app = angular.module('GroupPatientsController', ['ngGrid','GroupDetails']);     //instantiates GroupPatientsController module
 app.controller('groupPatientsController', function ($scope, $filter, $http, $location, $rootScope, apiService, groupDetails, stateService) {
-	'use strict';
+    'use strict';
 
     console.log('groupPatientsController');
-    
-	var pillsy = stateService.getPillsy();
 
-    if (!pillsy.active_group) {
+    var activeGroup = stateService.getActiveGroup();
+
+    if (!activeGroup) {
         $location.path('/');
     }
     else{
         initVars();
     }
    
-   	function initVars(){
-	   	$scope.groupId      = pillsy.active_group.id;
-        $scope.groupName    = pillsy.active_group.name;
-        $scope.groupExtName = pillsy.active_group.identifier;
+    function initVars(){
+        $scope.groupId      = activeGroup.id;
+        $scope.groupName    = activeGroup.name;
+        $scope.groupExtName = activeGroup.identifier;
 
-	    $scope.filterOptions = {
-	        filterText: '',
-	        useExternalFilter: true
-	    };
+        $scope.filterOptions = {
+            filterText: '',
+            useExternalFilter: true
+        };
 
-	    $scope.totalServerItems = 0;
-	    $scope.pagingOptions = {
-	        pageSizes: [25, 50, 100],
-	        pageSize:  25,
-	        currentPage: 1
-	    };
-	}
+        $scope.totalServerItems = 0;
+        $scope.pagingOptions = {
+            pageSizes: [25, 50, 100],
+            pageSize:  25,
+            currentPage: 1
+        };
+    }
 
     function getInterval(){
         var now = new Date();
 
         var interval = {
             startTime: moment(now.getTime()).startOf('day').subtract(7,'days').valueOf(),
-            endTime:   now.getTime(),
+            endTime:   moment(now.getTime()).endOf('day').valueOf(),
             today:     now.getTime(),
         };
 
@@ -55,52 +55,40 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         $scope.myData = pagedData;
         $scope.totalServerItems = data.length;
         if (!$scope.$$phase) {
-          	$scope.$apply();
+            $scope.$apply();
         }
     };
 
     $scope.refreshPatients = function(){
-        $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+        getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     };
 
     function fireoffGroupDetailsFetch(pageSize, page, searchText){
+        var groupId = $scope.groupId;
 
-    	var groupId = $scope.groupId;
-
-    	if (groupId){
+        if (groupId){
             var request = 'fetch_group_patients';
-    		var api     = '/v1/a/organization/group/'+groupId+'/patients?interval='+getInterval()+'&request='+request;
-	        var data;
+            var api     = '/v1/a/organization/group/'+groupId+'/patients?interval='+getInterval()+'&request='+request;
+            var data;
 
-	        apiService.get(api).then(function(result){
-	            $scope.loadingPatients = false;
+            $scope.loadingPatients = true;
+            apiService.get(api).then(function(result){
+                $scope.loadingPatients = false;
 
-	            if (result){
-	                if (result.msg == 'success'){
-	                  	console.log('groupPatientsController - apiService.get - successfully retrieved group patients: '+result);
+                if (result){
+                    if (result.msg == 'success'){
+                        console.log('groupPatientsController - apiService.get - successfully retrieved group patients: '+result);
 
-	                  	var largeLoad = [];
-	                  	result.data.forEach(function(patient){
+                        var largeLoad = [];
+                        result.data.forEach(function(patient){
 
-                            var drugsArr = patient.drugs;
-                            var drugsStr = '';
-
-                            drugsArr.forEach(function(drug){
-                                if (drugsStr == ''){
-                                    drugsStr = drug;
-                                }
-                                else{
-                                    drugsStr = drugsStr + ', '+drug;
-                                }
-                            });
-
-	                    	var obj = {
-	                        	"id":           patient.id,
-	                        	"name":         patient.name,
-	                        	"status":       patient.status,
-	                        	"today":        patient.adherence_today,
-	                        	"interval":     patient.adherence_interval,
-	                        	"all_time":     patient.adherence_all,
+                            var obj = {
+                                "id":           patient.id,
+                                "name":         patient.name,
+                                "status":       patient.status,
+                                "today":        patient.adherence_today,
+                                "interval":     patient.adherence_interval,
+                                "all_time":     patient.adherence_all,
                                 "address1":     patient.address1,
                                 "address2":     patient.address2,
                                 "city":         patient.city,
@@ -109,13 +97,13 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
                                 "phone":        patient.phone,
                                 "phone2":       patient.phone2,
                                 "email":        patient.email,
-                                "drugs":        drugsStr,
-	                   		};
+                                "drugs":        patient.drugs,
+                            };
 
-	                    	largeLoad.push(obj);
-	                  	});
+                            largeLoad.push(obj);
+                        });
 
-	                  	if (searchText) {
+                        if (searchText) {
                             console.log('groupsController - using searchText...');
 
                             var ft = searchText.toLowerCase();
@@ -124,54 +112,58 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
                             });
                         }
 
+                        stateService.setGroupDetails($scope.groupId, largeLoad);
                         $scope.setPagingData(largeLoad, page, pageSize);
-	               	}
-	                else{
-	                  	console.log('groupPatientsController - apiService.get - error creating group: '+result.msg);
+                    }
+                    else{
+                        console.log('groupPatientsController - apiService.get - error creating group: '+result.msg);
 
-	                  	alert(result.msg);
-	                }
-	            }
-	            else{
-	                console.log('groupPatientsController - apiService.get - error - no result from server');
-	            }
-	       	});
-    	}
-    	else{
-	        $scope.setPagingData([], page, pageSize);
-	    }
+                        alert(result.msg);
+                    }
+                }
+                else{
+                    console.log('groupPatientsController - apiService.get - error - no result from server');
+                }
+            });
+        }
+        else{
+            $scope.setPagingData([], page, pageSize);
+        }
     }
     
-    $scope.getPagedDataAsync = function(pageSize, page, searchText) {
-        $scope.loadingPatients = true;
+    function getPagedDataAsync(pageSize, page, searchText) {
+        fireoffGroupDetailsFetch(pageSize, page, searchText);
+    };
 
-        setTimeout(function() {
-	        fireoffGroupDetailsFetch(pageSize, page, searchText);
-	  	}, 100);
-	};
+    //get from cache
+    var cachedData = stateService.getGroupDetails($scope.groupId)
+    if (cachedData){
+        $scope.setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
+    }
 
-    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+    getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
 
     $scope.$watch('pagingOptions', function(newVal, oldVal) {
-      	if (newVal !== oldVal) {
-        	$scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
-      	}
+        if (newVal !== oldVal) {
+            getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+        }
     }, true);
 
     $scope.$watch('filterOptions', function(newVal, oldVal) {
-      	if (newVal !== oldVal) {
-        	$scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
-      	}
+        if (newVal !== oldVal) {
+            getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+        }
     }, true);
 
-    $scope.$watch(function() {
-	  	return $rootScope.active_group;
-	}, function() {
+    /*$scope.$watch(function() {
 
-	  	initVars();
-    	$scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+        return $rootScope.active_group;
+    }, function() {
 
-	}, true);
+        //initVars();
+        //getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+
+    }, true);*/
 
     $scope.openPatientRecord = function(rowItem) {
         console.log("openPatientRecord");
@@ -203,33 +195,32 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
     $scope.gridOptions = {
         data:             'myData',
         columnDefs: [
-          	{ field:'name',     displayName: 'Name' },
-          	{ field:'drugs',    displayName: 'Drugs' },
-          	{ field:'today',    displayName: 'Today' },
-          	{ field:'interval', displayName: 'Last 7 days' },
-          	{ field:'all_time', displayName: 'All time' },
+            { field:'name',     displayName: 'Name' },
+            { field:'drugs',    displayName: 'Drugs' },
+            { field:'today',    displayName: 'Today' },
+            { field:'interval', displayName: 'Last 7 days' },
+            { field:'all_time', displayName: 'All time' },
             { field:'phone',    displayName: 'Phone#' }
         ],
-        multiSelect:        		false,
-        enablePaging:       		true,
-        showFooter:         		true,
-        enableRowSelection: 		true, 
-        enableSelectAll:    		false,
-        enableRowHeaderSelection: 	false,
-        noUnselect:         		true,
-        enableGridMenu:     		true,
+        multiSelect:                false,
+        enablePaging:               true,
+        showFooter:                 true,
+        enableRowSelection:         true, 
+        enableSelectAll:            false,
+        enableRowHeaderSelection:   false,
+        noUnselect:                 true,
+        enableGridMenu:             true,
         enableColumnResize:         true,
-        totalServerItems:   		'totalServerItems',
-        pagingOptions:      		$scope.pagingOptions,
-        filterOptions:      		$scope.filterOptions,
-        rowTemplate:        		rowTemplate
+        totalServerItems:           'totalServerItems',
+        pagingOptions:              $scope.pagingOptions,
+        filterOptions:              $scope.filterOptions,
+        rowTemplate:                rowTemplate
     };
 
 });
 
 app.filter('fromNow', function() {
     return function(dateString) {
-      	return moment(dateString).fromNow()
+        return moment(dateString).fromNow()
     };
 });
-

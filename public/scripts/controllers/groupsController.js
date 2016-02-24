@@ -22,6 +22,19 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         currentPage: 1
     };
 
+    $scope.setPagingData = function(data, page, pageSize) {
+        var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
+        $scope.myData = pagedData;
+        $scope.totalServerItems = data.length;
+        if (!$scope.$$phase) {
+          	$scope.$apply();
+        }
+    };
+
+    $scope.refreshGroups = function(){
+        getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+    };
+
     function getInterval(){
         var now = new Date();
 
@@ -34,21 +47,7 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         return encodeURIComponent( JSON.stringify(interval) );
     }
 
-    $scope.setPagingData = function(data, page, pageSize) {
-        var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
-        $scope.myData = pagedData;
-        $scope.totalServerItems = data.length;
-        if (!$scope.$$phase) {
-          	$scope.$apply();
-        }
-    };
-
-    $scope.refreshGroups = function(){
-        $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
-    };
-
-
-    $scope.getPagedDataAsync = function(pageSize, page, searchText) {
+    function getPagedDataAsync(pageSize, page, searchText) {
         $scope.loadingGroups = true;
 
         setTimeout(function() {
@@ -117,17 +116,24 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
 	  	}, 100);
     };
 
-    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+    //read from cache first, before reading from server
+    var cachedGroups = stateService.getUserGroups();
+    if (cachedGroups){
+        $scope.setPagingData(cachedGroups, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
+    }
+
+    //now call server
+    getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
 
     $scope.$watch('pagingOptions', function(newVal, oldVal) {
       	if (newVal !== oldVal) {
-        	$scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+        	getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
       	}
     }, true);
 
     $scope.$watch('filterOptions', function(newVal, oldVal) {
       	if (newVal !== oldVal) {
-        	$scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+        	getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
       	}
     }, true);
 
@@ -233,20 +239,48 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         else{
             console.log('groupsController - createNewGroup() - group fields ok, proceed...');
 
-            $scope.group.type = $scope.selected_type;
+            $scope.group.type     = $scope.selected_type;
+            $scope.group.interval = getInterval(); 
 
             var api = '/v1/a/organization/group';
             console.log('groupsController - apiService.post - api to call is: '+api);
 
-            $scope.progress = true;  
             apiService.post(api,$scope.group).then(function(result){
                 $scope.loadingGroups = false;
 
                 if (result){
                     if (result.msg == 'success'){
-                        console.log('groupsController - apiService.post - successfully created group. Redirecting to groups');
+                        console.log('groupsController - apiService.post - successfully created group. Redirecting to open group');
 
-                        $location.path('/groups/mygroups');
+                        var group = result.data;
+
+                        var obj = {
+                            "id":                  group.id,
+                            "name":                group.name,
+                            "identifier":          group.extName,
+                            "avg":                 group.avg,
+                            "adherence_interval":  group.adherence_interval,
+                            "patients":            group.patients,
+                            "members":             group.members,
+                            "label":               group.name,
+                            "url":                 '/group/data',
+                            "type":                'group'
+                        };
+
+                        var userGroups = stateService.getUserGroups();
+                        if (userGroups){
+                            userGroups.push(obj);
+                            stateService.setUserGroups(userGroups);
+                        }
+                        else{
+                            userGroups = [];
+                            userGroups.push(obj);
+                            stateService.setUserGroups(userGroups);
+                        }
+
+                        if (stateService.setActiveGroup(obj)){
+                            $location.path('/group/data');
+                        }
                     }
                     else{
                         console.log('groupsController - apiService.post - error creating group: '+result.msg);

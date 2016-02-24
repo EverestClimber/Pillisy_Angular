@@ -10,39 +10,46 @@ var app = angular.module('GroupPatientDrugLogsController', ['ngGrid','daterangep
 app.controller('groupPatientDrugLogsController', function ($scope, $filter, $http, $location, apiService, stateService) {
 	'use strict';
 
-    var pillsy = stateService.getPillsy();
+    //patient cache data
+    $scope.activeGroup = stateService.getActiveGroup();
+    var last7;
 
-    if (!pillsy.active_group) {
-        $location.path('/')
+    if (!$scope.activeGroup){
+        $location.path('/');
     }
     else{
-        initVars();
+        try{
+
+            $scope.activePatient = $scope.activeGroup.active_patient;
+            $scope.activeDrug    = $scope.activeGroup.active_patient.active_drug;
+
+            initVars();
+        }
+        catch(e){
+            alert('error: '+e);
+
+            $location.path('/');
+        }
     }
 
     function initVars(){
 
         $scope.logRanges = {
-            'Today':        [ moment(), moment() ],
-            'Yesterday':    [ moment().subtract(1, 'days'), moment().subtract(1, 'days') ],
-            'Last 7 days':  [ moment().subtract(7, 'days'), moment() ],
-            'Last 30 days': [ moment().subtract(30,'days'), moment() ],
-            'This month':   [ moment().startOf('month'), moment().endOf('month') ]
+            'Today':        [ moment().startOf('day'), moment().endOf('day') ],
+            'Yesterday':    [ moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day') ],
+            'Last 7 days':  [ moment().subtract(7, 'days').startOf('day'), moment().endOf('day') ],
+            'Last 30 days': [ moment().subtract(30,'days').startOf('day'), moment().endOf('day') ],
+            'This month':   [ moment().startOf('month').startOf('day'), moment().endOf('month').endOf('day') ]
         };
 
         var ranges = $scope.logRanges;
-        var last7  = ranges['Last 7 days'];
+        last7  = ranges['Last 7 days'];
 
         $scope.logsDatePicker      = {};
         $scope.logsDatePicker.date = {
-            startDate: last7[0].startOf('day'),
-            endDate:   last7[1].endOf('day') 
+            startDate: last7[0],
+            endDate:   last7[1]
         };
-
-        $scope.groupId      = pillsy.active_group.id;
-        $scope.groupName    = pillsy.active_group.name;
-        $scope.groupExtName = pillsy.active_group.identifier;
-        $scope.patientId    = pillsy.active_patient.id;
-        $scope.drugId       = pillsy.active_patient_med.id;
 
         $scope.filterOptions = {
             filterText: '',
@@ -58,8 +65,7 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
     }
 
     var refresh = function(){
-        $scope.loadingLogs = true;
-        $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+        getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     }
 
     //Watch for date changes
@@ -78,30 +84,27 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
 
     $scope.refreshLogs = function(){
         refresh();
-        $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     };
 
     function callPillsyService(pageSize, page, searchText){
         console.log('groupMembersController - callPillsySerice');
 
-        var startTime = moment($scope.logsDatePicker.date.startDate).startOf('day');
-        var endTime   = moment($scope.logsDatePicker.date.endDate).endOf('day');
-
         var interval = {
-            startTime: startTime.valueOf(),
-            endTime:   endTime.valueOf(),
+            startTime: moment($scope.logsDatePicker.date.startDate).startOf('day').valueOf(),
+            endTime:   moment($scope.logsDatePicker.date.endDate).endOf('day').valueOf(),
             today:     new Date().getTime()
         };
 
         interval = decodeURIComponent( JSON.stringify(interval) );
 
-        if ($scope.groupId && $scope.patientId && $scope.drugId){
+        if ($scope.activeGroup.id && $scope.activePatient.id && $scope.activeDrug.id){
             var request = 'fetch_group_patient_drug_events';
-            var api     = '/v1/a/organization/group/'+ $scope.groupId +'/patient/'+ $scope.patientId +'/drug/'+ $scope.drugId +'/drugEvents?interval='+interval+'&request='+request;
+            var api     = '/v1/a/organization/group/'+ $scope.activeGroup.id +'/patient/'+ $scope.activePatient.id +'/drug/'+ $scope.activeDrug.id +'/drugEvents?interval='+interval+'&request='+request;
             var data;
 
             console.log('groupMembersController - callPillsySerice - api: '+api);
 
+            $scope.loadingLogs = true;
             apiService.get(api).then(function(result){
                 $scope.loadingLogs = false;
 
@@ -113,13 +116,20 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
                         var objs       = [];
 
                         drugEvents.forEach(function(drugEvent){
-                            var obj   = {};
-                            obj.date  = moment(drugEvent.eventTime).format('YYYY-MM-DD');
-                            obj.time  = moment(drugEvent.eventTime).format("h:mm:ss A");
-                            obj.event = drugEvent.eventValue; 
+                            var obj      = {};
+                            obj.date     = moment(drugEvent.eventTime).format('YYYY-MM-DD');
+                            obj.time     = moment(drugEvent.eventTime).format("h:mm:ss A");
+                            obj.event    = drugEvent.eventValue; 
+                            obj.platform = drugEvent.platform;
+                            obj.source   = drugEvent.source;
+                            obj.method   = drugEvent.method;
                             
                             objs.push(obj);
                         });
+
+                        if ( ($scope.logsDatePicker.date.startDate == last7[0]) && ($scope.logsDatePicker.date.endDate == last7[1]) ){
+                            stateService.setPatientDrugDefaultIntervalCache($scope.activePatient.id, $scope.activeDrug.id, objs, 'logs');
+                        }
 
                         $scope.setPagingData(objs, page, pageSize);
                     }
@@ -139,28 +149,31 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
         }
     }
 
-    $scope.getPagedDataAsync = function(pageSize, page, searchText) {
-        $scope.loadingLogs = true;
-        setTimeout(function() {
-            callPillsyService(pageSize, page, searchText);
-        }, 100);
+    var getPagedDataAsync = function(pageSize, page, searchText) {
+        callPillsyService(pageSize, page, searchText);
     };
 
-    $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+    //load from cache
+    var logs = stateService.getPatientDrugDefaultIntervalCache($scope.activePatient.id, $scope.activeDrug.id, 'logs');
+    if (logs){
+        $scope.setPagingData(logs, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
+    }
+
+    getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
 
     $scope.$watch('pagingOptions', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-            $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+            getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
         }
     }, true);
 
     $scope.$watch('filterOptions', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-            $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+            getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
         }
     }, true);
 
-    $scope.gridOptions = {
+    $scope.logGridOptions = {
         data:             'myData',
         enablePaging:     true,
         showFooter:       true,
@@ -168,15 +181,19 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
         pagingOptions:    $scope.pagingOptions,
         filterOptions:    $scope.filterOptions,
         columnDefs: [
-            { field:'date',  displayName: 'Date' },
-            { field:'time',  displayName: 'Time' },
-            { field:'event', displayName: 'Event' }
+            { field:'date',     displayName: 'Date' },
+            { field:'time',     displayName: 'Time' },
+            { field:'event',    displayName: 'Event' },
+            { field:'platform', displayName: 'Platform' },
+            { field:'source',   displayName: 'Source' },
+            { field:'method',   displayName: 'Method' }
         ],
         multiSelect:                false,
         enablePaging:               true,
         showFooter:                 true,
         enableRowSelection:         false, 
         enableSelectAll:            false,
+        enableColumnResize:         true,
         enableRowHeaderSelection:   false,
         noUnselect:                 false,
         enableGridMenu:             false,

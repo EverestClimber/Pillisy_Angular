@@ -10,31 +10,20 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
 
     console.log('addPatientMedController');
 
-    //patient
-    var pillsy = stateService.getPillsy();
+    //patient cache data
+    $scope.activeGroup   = stateService.getActiveGroup();
+    $scope.activePatient = stateService.getActivePatient();
     
-    if ( (!pillsy.active_patient) || (!pillsy.active_group) ){
+    if ( !$scope.activeGroup || !$scope.activePatient){
         $location.path('/');
     }
-    else{
-        
-        $scope.group   = pillsy.active_group;
-        $scope.patient = pillsy.active_patient;
-    }
-
+   
     $scope.drug_search_url = "/v1/n/ndcdrug?query=";
     
     $scope.integerval  = /^\d*$/;
-
-    $scope.dateOptions = {
-        changeYear:  true,
-        changeMonth: true,
-        changeDay:   true,
-        yearRange:   '2016:-0'
-    };
-
+    
     $scope.dateOptions = { 
-        dateFormat: 'yy-mm-dd',
+        dateFormat: 'mm-dd-yy',
         minDate:    new Date() 
     } 
 
@@ -256,8 +245,8 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
             dataObj.quantity = $scope.drug.quantity;
         }
 
-        var groupId   = $scope.group.id;
-        var patientId = $scope.patient.id;
+        var groupId   = $scope.activeGroup.id;
+        var patientId = $scope.activePatient.id;
             
         console.log('apiService.post - dataObj: '+JSON.stringify(dataObj));
        

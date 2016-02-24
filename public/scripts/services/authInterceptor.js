@@ -28,7 +28,7 @@ app.factory('authInterceptor', function ($rootScope, $q, $window, $cookies) {
 							console.log('authInterceptor - successfully retrieved token and user');
 
 							config.headers['x-access-token'] = token;
-							config.headers['x-key'] = user.id;
+							config.headers['x-key']          = user.id;
 						}
 						else{
 							console.log('authInterceptor - missing token and user');
