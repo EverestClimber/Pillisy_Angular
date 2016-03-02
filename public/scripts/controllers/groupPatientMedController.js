@@ -19,7 +19,7 @@ app.config(['$routeProvider', function($routeProvider) {
         });
 }]);
 
-app.controller('groupPatientMedController', function ($scope, $filter, $http, $location, apiService, stateService) {
+app.controller('groupPatientMedController', function ($scope, $filter, $http, $location, $rootScope, apiService, stateService) {
     'use strict';
 
     //patient cache data
@@ -30,6 +30,9 @@ app.controller('groupPatientMedController', function ($scope, $filter, $http, $l
     }
     else{
         try{
+
+            var groups = stateService.getUserGroups();
+            $rootScope.$emit("my_groups_callback", {groups: groups});
 
             $scope.activePatient       = $scope.activeGroup.active_patient;
             $scope.activeDrug          = $scope.activeGroup.active_patient.active_drug;

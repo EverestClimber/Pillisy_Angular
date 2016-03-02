@@ -94,18 +94,20 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
             if (pillsy){
 
                 var group = {
-                    "id":           item.id,
-                    "name":         item.name,
-                    "identifier":   item.identifier,
-                    "avg":          item.avg,
-                    "last_3_days":  item.last_3_days,
-                    "patients":     item.patients,
-                    "members":      item.members,
-                    "label":        item.label,
-                    "url":          item.url,
-                    "type":         item.type
+                    "id":                  item.id,
+                    "name":                item.name,
+                    "description":         item.description,
+                    "identifier":          item.identifier,
+                    "avg":                 item.avg,
+                    "adherence_interval":  item.adherence_interval,
+                    "patients":            item.patients,
+                    "members":             item.members,
+                    "label":               item.label,
+                    "isAdmin":             item.isAdmin,
+                    "url":                 item.url,
+                    "type":                item.type
                 };
-
+ 
                 stateService.setActiveGroup(group);
             }
         }

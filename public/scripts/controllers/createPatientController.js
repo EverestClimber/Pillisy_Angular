@@ -77,7 +77,7 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
                 if (result.msg == 'success'){
                     console.log('apiService.post - success');
 
-                    var patient = result.data;
+                    var patient = result.data.patient_info;
 
                     if (stateService.setActivePatient(patient)){
                         $location.path('/group/patient/addmed');

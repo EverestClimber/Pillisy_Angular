@@ -155,16 +155,6 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         }
     }, true);
 
-    /*$scope.$watch(function() {
-
-        return $rootScope.active_group;
-    }, function() {
-
-        //initVars();
-        //getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
-
-    }, true);*/
-
     $scope.openPatientRecord = function(rowItem) {
         console.log("openPatientRecord");
 

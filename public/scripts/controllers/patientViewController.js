@@ -8,7 +8,7 @@
 var app = angular.module('PatientViewController', ['theme.core.services','theme.chart.flot', 'ngGrid', 'angular-skycons',
     'theme.demos.forms','theme.demos.tasks', 'nvd3ChartDirectives']);     //instantiates PatientViewController module
 
-app.controller('patientViewController', function ($scope, $timeout, $theme, $window, $location, $filter, apiService, stateService) {
+app.controller('patientViewController', function ($scope, $timeout, $theme, $window, $location, $filter, $rootScope, apiService, stateService) {
     'use strict';
 
     var d3 = $window.d3;
@@ -25,6 +25,9 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	}
 
 	function initData(){
+
+		var groups = stateService.getUserGroups();
+        $rootScope.$emit("my_groups_callback", {groups: groups});
 
 	    $scope.trendsData = [];
 		$scope.multiBarChartData = [];
@@ -169,7 +172,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 
 	                    			todayDoses.forEach(function(todayDose){
 	                    				if (todayDose.doseTime){
-		                    				if (todayDose.doseTime != 'N/A'){
+		                    				if ( (todayDose.doseTime != 'N/A') && (todayDose.doseTime != 'MISSED') && (todayDose.doseTime != '--')){
 		                    					todayDose.doseTime = moment(todayDose.doseTime).format("h:mm A")
 		                    				}
 		                    			}
@@ -177,8 +180,8 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		                    			doseTime = doseTime + todayDose.doseTime;
 
 		                    			if (todayDose.doseTaken){
-		                    				if ((todayDose.doseTaken != 'N/A') && (todayDose.doseTaken != '--')){
-		                    					todayDose.doseTaken = moment(todayDose.doseTaken).format("h:mm A")
+		                    				if ((todayDose.doseTaken != 'N/A') && (todayDose.doseTaken != 'MISSED') && (todayDose.doseTaken != '--')){
+		                    					todayDose.doseTaken = moment(todayDose.doseTaken).format("h:mm:ss A")
 		                    				}
 		                    			}
 

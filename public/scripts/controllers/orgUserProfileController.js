@@ -5,8 +5,11 @@
 */
 
 var app = angular.module('OrgUserProfileController', ['xeditable'/*, 'StateService'*/]);     //instantiates OrgUserProfileController module
-app.controller('orgUserProfileController', function ($scope, $filter, $window, apiService, stateService) {
+app.controller('orgUserProfileController', function ($scope, $filter, $window, $rootScope, apiService, stateService) {
 	'use strict';
+
+  var groups = stateService.getUserGroups();
+  $rootScope.$emit("my_groups_callback", {groups: groups});
 
 	initUser();
 

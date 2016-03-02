@@ -73,12 +73,14 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
                                 var obj = {
                                     "id":                  group.id,
                                     "name":                group.name,
+                                    "description":         group.description,
                                     "identifier":          group.extName,
                                     "avg":                 group.avg,
                                     "adherence_interval":  group.adherence_interval,
                                     "patients":            group.patients,
                                     "members": 		       group.members,
                                     "label":               group.name,
+                                    "isAdmin":             group.isAdmin,
                                     "url":                 '/group/data',
                                     "type":                'group'
                                 };
@@ -257,12 +259,14 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
                         var obj = {
                             "id":                  group.id,
                             "name":                group.name,
+                            "description":         group.description,
                             "identifier":          group.extName,
                             "avg":                 group.avg,
                             "adherence_interval":  group.adherence_interval,
                             "patients":            group.patients,
                             "members":             group.members,
                             "label":               group.name,
+                            "isAdmin":             group.isAdmin,
                             "url":                 '/group/data',
                             "type":                'group'
                         };
@@ -278,6 +282,8 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
                             stateService.setUserGroups(userGroups);
                         }
 
+                        $rootScope.$emit("my_groups_callback", {groups: userGroups});
+                        
                         if (stateService.setActiveGroup(obj)){
                             $location.path('/group/data');
                         }
