@@ -60,8 +60,9 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
             var api      = '/v1/a/organization/group/'+groupid+'/members';
             var data;
 
+            $scope.loadingMembers = true;
             apiService.get(api).then(function(result){
-                $scope.progress = false;
+                $scope.loadingMembers = false;
 
                 if (result){
                     if (result.msg == 'success'){
@@ -109,10 +110,7 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
     }
 
     $scope.getPagedDataAsync = function(pageSize, page, searchText) {
-      	setTimeout(function() {
-
-            callPillsyService(pageSize, page, searchText);
-      	}, 100);
+      	callPillsyService(pageSize, page, searchText);
     };
 
     $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
@@ -129,7 +127,7 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
       	}
     }, true);
 
-    $scope.gridOptions = {
+    $scope.membersGridOptions = {
       	data: 			  'myData',
       	enablePaging: 	  true,
       	showFooter: 	  true,

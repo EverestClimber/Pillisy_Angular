@@ -181,6 +181,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
     $scope.mySelections = [];
 
     var rowTemplate = '<div ng-click="openPatientRecord(row)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="col.colIndex()" class="ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
+    var removeTemplate = '<div><input type="button" value="Remove" ng-click="removeRow($event, row.entity)" />';
 
     $scope.gridOptions = {
         data:             'myData',
@@ -190,7 +191,8 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
             { field:'today',    displayName: 'Today' },
             { field:'interval', displayName: 'Last 7 days' },
             { field:'all_time', displayName: 'All time' },
-            { field:'phone',    displayName: 'Phone#' }
+            { field:'phone',    displayName: 'Phone#' },
+            { field:'remove',   displayName:'', cellTemplate: removeTemplate}
         ],
         multiSelect:                false,
         enablePaging:               true,
@@ -205,6 +207,75 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         pagingOptions:              $scope.pagingOptions,
         filterOptions:              $scope.filterOptions,
         rowTemplate:                rowTemplate
+    };
+
+    $scope.removeRow = function($event, patient) {
+        $event.stopPropagation();
+        var answer = confirm('Are you sure you want to remove '+patient.name+' from this group?');
+        
+        if (answer){
+            var request = 'remove_patient_from_group';
+            var api     = '/v1/a/organization/group/'+ $scope.groupId +'/patient/'+patient.id;
+            
+            $scope.loadingPatients = true;
+
+            apiService.delete(api).then(function(result){
+                $scope.loadingPatients = false;
+
+                if (result){
+                    if (result.msg == 'success'){
+
+                        var groupDetails = stateService.getGroupDetails($scope.groupId);
+
+                        if (groupDetails){
+                            if (groupDetails.length > 0){
+                                for (var i = groupDetails.length -1; i >= 0 ; i--){
+                                    if (groupDetails[i].id == patient.id){
+                                        groupDetails.splice(i, 1);
+
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                       
+                        var data = result.data;
+
+                        if (data.numPatients){
+                            var userGroups = stateService.getUserGroups();
+
+                            if (userGroups){
+                                if (userGroups.length > 0){
+                                    userGroups.some(function(group){
+                                        if (group.id == $scope.groupId){
+                                            group.patients = data.numPatients;
+                                            return true;
+                                        }
+                                    });
+
+                                    stateService.setUserGroups(userGroups);
+                                }
+                            }
+                        }
+
+                        stateService.setGroupDetails($scope.groupId, groupDetails);
+                        $scope.myData.splice($scope.myData.indexOf(patient), 1);
+                    }
+                    else{
+                        console.log('groupPatientsController - apiService.get - error deleting patient from group: '+result.msg);
+
+                        alert(result.msg);
+                    }
+                }
+                else{
+                     console.log('groupPatientsController - apiService.get - error - no result from server');
+                }
+            });
+
+        }
+        else{
+            //some code
+        }
     };
 
 });
