@@ -21,9 +21,9 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
     }
    
     function initVars(){
-        $scope.groupId      = activeGroup.id;
-        $scope.groupName    = activeGroup.name;
-        $scope.groupExtName = activeGroup.identifier;
+        $scope.groupId        = activeGroup.id;
+        $scope.groupName      = activeGroup.name;
+        $scope.groupExtName   = activeGroup.identifier;
 
         $scope.filterOptions = {
             filterText: '',
@@ -181,7 +181,8 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
     $scope.mySelections = [];
 
     var rowTemplate = '<div ng-click="openPatientRecord(row)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="col.colIndex()" class="ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
-    var removeTemplate = '<div><input type="button" value="Remove" ng-click="removeRow($event, row.entity)" />';
+    var removeTemplate  = '<div><input type="button" value="Remove" ng-click="removeRow($event, row.entity)" />';
+    var messageTemplate = '<div><input type="button" value="{{ row.entity.phone }}" ng-click="messagePatient($event, row.entity)" />'; 
 
     $scope.gridOptions = {
         data:             'myData',
@@ -191,7 +192,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
             { field:'today',    displayName: 'Today' },
             { field:'interval', displayName: 'Last 7 days' },
             { field:'all_time', displayName: 'All time' },
-            { field:'phone',    displayName: 'Phone#' },
+            { field:'phone',    displayName: 'Phone#', cellTemplate: messageTemplate },
             { field:'remove',   displayName:'', cellTemplate: removeTemplate}
         ],
         multiSelect:                false,
@@ -208,6 +209,17 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         filterOptions:              $scope.filterOptions,
         rowTemplate:                rowTemplate
     };
+
+    $scope.messagePatient = function($event, patient) {
+        $event.stopPropagation();
+
+        var data = {
+            patient: patient,
+            groupId: $scope.groupId
+        };
+
+        $rootScope.$broadcast("send_message_to_patient", data);
+    }
 
     $scope.removeRow = function($event, patient) {
         $event.stopPropagation();

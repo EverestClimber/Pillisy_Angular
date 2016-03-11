@@ -6,7 +6,7 @@
 
 var app = angular.module('GroupMembersController', ['ngGrid']);     //instantiates GroupMembersController module
 app.controller('groupMembersController', function ($scope, $filter, $http, $location, $rootScope, apiService, stateService) {
-	'use strict';
+    'use strict';
 
     var pillsy = stateService.getPillsy();
 
@@ -38,16 +38,17 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
     }
 
     $scope.setPagingData = function(data, page, pageSize) {
-      	var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
-      	$scope.myData = pagedData;
-      	$scope.totalServerItems = data.length;
-      	if (!$scope.$$phase) {
-        	$scope.$apply();
-      	}
+        var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
+
+        $scope.myData = pagedData;
+        $scope.totalServerItems = data.length;
+        if (!$scope.$$phase) {
+            $scope.$apply();
+        }
     };
 
     $scope.refreshMembers = function(){
-      	$scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+        $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     };
     
     function callPillsyService(pageSize, page, searchText){
@@ -72,12 +73,12 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
                         result.data.forEach(function(member){
 
                             var obj = {
-                                "Name":   member.name,
-                                "Title":  member.title,
-                                "Phone":  member.phone,
-                                "Email":  member.email,
-                                "Status": member.status,
-                                "Role":   member.role
+                                "name":   member.name,
+                                "title":  member.title,
+                                "phone":  member.phone,
+                                "email":  member.email,
+                                "status": member.status,
+                                "role":   member.role
                             }
 
                             members.push(obj);
@@ -110,36 +111,51 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
     }
 
     $scope.getPagedDataAsync = function(pageSize, page, searchText) {
-      	callPillsyService(pageSize, page, searchText);
+        callPillsyService(pageSize, page, searchText);
     };
 
     $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
 
     $scope.$watch('pagingOptions', function(newVal, oldVal) {
-      	if (newVal !== oldVal) {
-        	$scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
-      	}
+        if (newVal !== oldVal) {
+            $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+        }
     }, true);
 
     $scope.$watch('filterOptions', function(newVal, oldVal) {
-      	if (newVal !== oldVal) {
-        	$scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
-      	}
+        if (newVal !== oldVal) {
+            $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+        }
     }, true);
 
     $scope.membersGridOptions = {
-      	data: 			  'myData',
-      	enablePaging: 	  true,
-      	showFooter: 	  true,
-      	totalServerItems: 'totalServerItems',
-      	pagingOptions: 	  $scope.pagingOptions,
-      	filterOptions: 	  $scope.filterOptions
+        data:                       'myData',
+        columnDefs: [
+            { field: 'name',   displayName: 'Name' },
+            { field: 'title',  displayName: 'Title' },
+            { field: 'phone',  displayName: 'Phone' },
+            { field: 'email',  displayName: 'Email'},
+            { field: 'status', displayName: 'Status'},
+            { field: 'role',   displayName: 'Role'}
+        ],
+        multiSelect:                false,
+        enablePaging:               true,
+        showFooter:                 true,
+        enableRowSelection:         true, 
+        enableSelectAll:            false,
+        enableRowHeaderSelection:   false,
+        noUnselect:                 true,
+        enableGridMenu:             true,
+        enableColumnResize:         true,
+        totalServerItems:           'totalServerItems',
+        pagingOptions:              $scope.pagingOptions,
+        filterOptions:              $scope.filterOptions,
     };
 
 });
 
 app.filter('fromNow', function() {
     return function(dateString) {
-      	return moment(dateString).fromNow()
+        return moment(dateString).fromNow()
     };
 });

@@ -15,9 +15,13 @@ app.controller('groupController', function ($scope, apiService, stateService, $r
         $location.path('/');
     }
     else{
+        $scope.group_visible    = true;
         $scope.group            = pillsy.active_group;
         $scope.patients_visible = true;
         $scope.isAdmin          = $scope.group.isAdmin;
+        $scope.sendButtonText   = 'Send';
+        $scope.sendGroupId      = null;
+        $scope.sendPatient      = null;
 
         var groups = stateService.getUserGroups();
         $rootScope.$emit("my_groups_callback", {groups: groups});
@@ -45,6 +49,73 @@ app.controller('groupController', function ($scope, apiService, stateService, $r
                 break;
         }
     };
+
+    $scope.sendMessage = function(message){
+        var request = 'send_sms_to_patient';
+        var api     = '/v1/a/organization/group/'+ $scope.sendGroupId +'/patient/'+ $scope.sendPatient.id +'/sms';
+        var payload = {
+            message: message,
+            request: request
+        };
+
+        $scope.sendButtonText = 'Sending';
+        apiService.post(api, payload).then(function(result){
+            $scope.message_patient_form = false;
+            $scope.sendButtonText       = 'Send';
+
+            if (result){
+                var msg = result.msg;
+
+                if (msg == 'success'){
+
+                    var data = result.data;
+                    var output;
+
+                    if (data.found){
+                        if (data.hasPhone){
+                            if (data.smsSent){
+                                output = 'Your SMS message was successfully sent to '+ $scope.sendPatient.name;
+                            }
+                            else{
+                                output = 'Your SMS could not be sent. Please try again later';
+                            }
+                        }
+                        else{
+                            output = 'The patient, '+ $scope.sendPatient.name +', does not have a phone number associated with their account. Your SMS message was not sent.'
+                        }
+                    }
+                    else{
+                        output = 'This patient was not found.';
+                    }
+
+                    $scope.serverMsg = output
+                }
+                else{
+                    console.log('apiService.post - error');
+
+                    $scope.serverMsg = 'There was an error while sending the SMS message to '+ $scope.sendPatient.name +'. Please try again later.';
+                }
+            }
+            else{
+                console.log('apiService.post - error');
+            }
+        });
+    }
+
+    $rootScope.$on("send_message_to_patient", function (event, data) {
+
+        var patient = data.patient;
+        
+        if (patient){
+            $scope.sendPatient         = patient;
+            $scope.patient_to_send_sms = patient.name;
+        }
+
+        $scope.sendGroupId          = data.groupId;
+        $scope.group_visible        = false;
+        $scope.sendButtonText       = 'Send';
+        $scope.message_patient_form = true;
+    });
 
     $scope.updateGroup = function(key, value){
 

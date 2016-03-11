@@ -67,9 +67,9 @@ app.config(['$provide', '$routeProvider','$locationProvider', '$httpProvider','$
         //$httpProvider.interceptors.push('socket');
         //$httpProvider.interceptors.push('csrfTokenInterceptor');
 }])
-.run(['$http', '$rootScope', '$location', 'stateService', 'localStorageService', 
-    function($http, $rootScope, $location, stateService, localStorageService) {
-    
+.run(['$http', '$rootScope', '$location', '$templateCache', 'stateService', 'localStorageService', 
+    function($http, $rootScope, $location, $templateCache, stateService, localStorageService) {
+
     $rootScope.numGroupsControlerCalled = 0;
 
     // register listener to watch route changes
