@@ -40,7 +40,7 @@
 						</div>
 						<div class="form-group">
 							<div class="col-md-12"> 
-								<span>*Drug Quantity</span>
+								<span>*Refill Quantity (e.g. 15, 30, 90, etc)</span>
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
 									<input type="number" name="quantity" data-ng-model="drug.quantity" class="form-control" id="quantity" placeholder="Drug quantity" step="1" min="1" max="1000"  ng-pattern="integerval" ng-init="drug.quantity=1" required />
@@ -59,60 +59,60 @@
 						</div>
 						<div class="form-group">
 							<div class="col-sm-12">
-								<span>*Number of pills per dose</span>
+								<span>Number of pills per dose</span>
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input type="number" name="pills_dose" data-ng-model="drug.pills_dose" class="form-control" id="pills_dose" placeholder="Pills per dose" step="1" min="1" max="10"  ng-pattern="integerval" ng-init="drug.pills_dose=1" required />
+									<input type="number" name="pills_dose" data-ng-model="drug.pills_dose" class="form-control" id="pills_dose" placeholder="Pills per dose" step="1" min="1" max="10"  ng-pattern="integerval" ng-init="drug.pills_dose=1" />
 								</div>
 								<span ng-show="createpatient.pills_dose.$invalid">Invalid entry</span>
 							</div>
 						</div>
 						<div class="form-group">
 							<div class="col-sm-12">
-								<span>*Number of doses per day</span>
+								<span>Number of doses per day</span>
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input type="number" name="doses_day" data-ng-model="drug.doses_day" class="form-control" id="doses_day" placeholder="Doses per day" step="1" min="1" max="4"  ng-pattern="integerval" ng-init="drug.pills_dose=1" required />
+									<input type="number" name="doses_day" data-ng-model="drug.doses_day" class="form-control" id="doses_day" placeholder="Doses per day" step="1" min="1" max="4"  ng-pattern="integerval" ng-init="drug.pills_dose=1" />
 								</div>
 							</div>
 						</div>
 						<div class="form-group" ng-show="numDoses >= 0">
 							<div class="col-sm-12">
-								<span>*Dose 1 reminder time </span>
+								<span>Dose 1 reminder time </span>
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input type="text" name="reminder1_time" data-ng-model="drug.reminder1_time" class="form-control" id="reminder1_time" placeholder="Reminder time for first dose" data-time-format="h:mm a" data-autoclose="1" bs-timepicker required />
+									<input type="text" name="reminder1_time" data-ng-model="drug.reminder1_time" class="form-control" id="reminder1_time" placeholder="Reminder time for first dose" data-time-format="h:mm a" data-autoclose="1" bs-timepicker />
 								</div>
 							</div>
 						</div>
 						<div class="form-group" ng-show="numDoses >= 2">
 							<div class="col-sm-12">
-								<span>*Dose 2 reminder time </span>
+								<span>Dose 2 reminder time </span>
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input type="text" name="reminder2_time" data-ng-model="drug.reminder2_time" class="form-control" id="reminder2_time" placeholder="Reminder time for second dose" data-time-format="h:mm a" data-autoclose="1" bs-timepicker required />
+									<input type="text" name="reminder2_time" data-ng-model="drug.reminder2_time" class="form-control" id="reminder2_time" placeholder="Reminder time for second dose" data-time-format="h:mm a" data-autoclose="1" bs-timepicker />
 								</div>
 							</div>
 						</div>
 						<div class="form-group" ng-show="numDoses >= 3">
 							<div class="col-sm-12">
-								<span>*Dose 3 reminder time </span>
+								<span>Dose 3 reminder time </span>
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input type="text" name="reminder3_time" data-ng-model="drug.reminder3_time" class="form-control" id="reminder3_time" placeholder="Reminder time for third dose" data-time-format="h:mm a" data-autoclose="1" bs-timepicker required />
+									<input type="text" name="reminder3_time" data-ng-model="drug.reminder3_time" class="form-control" id="reminder3_time" placeholder="Reminder time for third dose" data-time-format="h:mm a" data-autoclose="1" bs-timepicker />
 								</div>
 							</div>
 						</div>
 						<div class="form-group" ng-show="numDoses >= 4">
 							<div class="col-sm-12">
-								<span>*Dose 4 reminder time </span>
+								<span>Dose 4 reminder time </span>
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input type="text" name="reminder4_time" data-ng-model="drug.reminder4_time" class="form-control" id="reminder4_time" placeholder="Reminder time for fourth dose" data-time-format="h:mm a" data-autoclose="1" bs-timepicker required />
+									<input type="text" name="reminder4_time" data-ng-model="drug.reminder4_time" class="form-control" id="reminder4_time" placeholder="Reminder time for fourth dose" data-time-format="h:mm a" data-autoclose="1" bs-timepicker />
 								</div>
 							</div>
 						</div>
-						<div class="form-group">
+						<!--<div class="form-group">
 							<div class="col-sm-12">
 								<span>*Number of days of therapy</span>
 								<div class="input-group">
@@ -129,7 +129,7 @@
 									<input ui-date="dateOptions" name="end_date" data-ng-model="drug.end_date" class="form-control" id="end_date" placeholder="End date (MM-DD-YYYY)" required />
 								</div>
 							</div>
-						</div>
+						</div>-->
 						<div class="form-group">
 							<div class="col-sm-12">
 								<span>*PillsyCap identifier</span>

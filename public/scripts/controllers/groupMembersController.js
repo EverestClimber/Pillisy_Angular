@@ -51,6 +51,26 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
         $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     };
     
+    function getFormattedPhone(phone){
+
+        if ( phone.charAt(0) === '1'){
+            phone = phone.slice(1);
+        }
+
+        String.prototype.insert = function (index, string) {
+        if (index > 0)
+            return this.substring(0, index) + string + this.substring(index, this.length);
+        else
+            return string + this;
+        };
+
+        phone = phone.insert(0, '(');
+        phone = phone.insert(4, ') ');
+        phone = phone.insert(9, '-');
+
+        return phone;
+    }
+
     function callPillsyService(pageSize, page, searchText){
         console.log('groupMembersController - callPillsySerice');
 
@@ -73,12 +93,13 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
                         result.data.forEach(function(member){
 
                             var obj = {
-                                "name":   member.name,
-                                "title":  member.title,
-                                "phone":  member.phone,
-                                "email":  member.email,
-                                "status": member.status,
-                                "role":   member.role
+                                "name":             member.name,
+                                "title":            member.title,
+                                "phone":            member.phone,
+                                "formatted_phone":  getFormattedPhone(member.phone),
+                                "email":            member.email,
+                                "status":           member.status,
+                                "role":             member.role
                             }
 
                             members.push(obj);
@@ -131,12 +152,12 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
     $scope.membersGridOptions = {
         data:                       'myData',
         columnDefs: [
-            { field: 'name',   displayName: 'Name' },
-            { field: 'title',  displayName: 'Title' },
-            { field: 'phone',  displayName: 'Phone' },
-            { field: 'email',  displayName: 'Email'},
-            { field: 'status', displayName: 'Status'},
-            { field: 'role',   displayName: 'Role'}
+            { field: 'name',            displayName: 'Name' },
+            { field: 'title',           displayName: 'Title' },
+            { field: 'formatted_phone', displayName: 'Phone' },
+            { field: 'email',           displayName: 'Email'},
+            { field: 'status',          displayName: 'Status'},
+            { field: 'role',            displayName: 'Role'}
         ],
         multiSelect:                false,
         enablePaging:               true,

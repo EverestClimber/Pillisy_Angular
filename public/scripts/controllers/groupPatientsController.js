@@ -63,6 +63,26 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     };
 
+    function getFormattedPhone(phone){
+
+        if ( phone.charAt(0) === '1'){
+            phone = phone.slice(1);
+        }
+
+        String.prototype.insert = function (index, string) {
+        if (index > 0)
+            return this.substring(0, index) + string + this.substring(index, this.length);
+        else
+            return string + this;
+        };
+
+        phone = phone.insert(0, '(');
+        phone = phone.insert(4, ') ');
+        phone = phone.insert(9, '-');
+
+        return phone;
+    }
+
     function fireoffGroupDetailsFetch(pageSize, page, searchText){
         var groupId = $scope.groupId;
 
@@ -83,21 +103,22 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
                         result.data.forEach(function(patient){
 
                             var obj = {
-                                "id":           patient.id,
-                                "name":         patient.name,
-                                "status":       patient.status,
-                                "today":        patient.adherence_today,
-                                "interval":     patient.adherence_interval,
-                                "all_time":     patient.adherence_all,
-                                "address1":     patient.address1,
-                                "address2":     patient.address2,
-                                "city":         patient.city,
-                                "state":        patient.state,
-                                "zip":          patient.zip,
-                                "phone":        patient.phone,
-                                "phone2":       patient.phone2,
-                                "email":        patient.email,
-                                "drugs":        patient.drugs,
+                                "id":               patient.id,
+                                "name":             patient.name,
+                                "status":           patient.status,
+                                "today":            patient.adherence_today,
+                                "interval":         patient.adherence_interval,
+                                "all_time":         patient.adherence_all,
+                                "address1":         patient.address1,
+                                "address2":         patient.address2,
+                                "city":             patient.city,
+                                "state":            patient.state,
+                                "zip":              patient.zip,
+                                "phone":            patient.phone,
+                                "phone_formatted":  getFormattedPhone(patient.phone),
+                                "phone2":           patient.phone2,
+                                "email":            patient.email,
+                                "drugs":            patient.drugs,
                             };
 
                             largeLoad.push(obj);
@@ -182,7 +203,9 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 
     var rowTemplate = '<div ng-click="openPatientRecord(row)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="col.colIndex()" class="ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
     var removeTemplate  = '<div><input type="button" value="Remove" ng-click="removeRow($event, row.entity)" />';
-    var messageTemplate = '<div><input type="button" value="{{ row.entity.phone }}" ng-click="messagePatient($event, row.entity)" />'; 
+    var messageTemplate = '<div><input type="button" value="{{ row.entity.phone_formatted }}" ng-click="$event.stopPropagation()"/>'+
+                          '<input type="button" value="SMS" ng-click="messagePatient($event, row.entity)" /></div>'; 
+
 
     $scope.gridOptions = {
         data:             'myData',

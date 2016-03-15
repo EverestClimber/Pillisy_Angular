@@ -18,10 +18,6 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
     }
     else{
         try{
-
-            $scope.activePatient = $scope.activeGroup.active_patient;
-            $scope.activeDrug    = $scope.activeGroup.active_patient.active_drug;
-
             initVars();
         }
         catch(e){
@@ -32,6 +28,9 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
     }
     
     function initVars(){
+
+        $scope.activePatient = $scope.activeGroup.active_patient;
+        $scope.activeDrug    = $scope.activeGroup.active_patient.active_drug;
 
         $scope.ranges = {
             'Today':        [ moment().startOf('day'), moment().endOf('day') ],
@@ -154,9 +153,11 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
     };
 
     //load from cache
-    var schedule = stateService.getPatientDrugDefaultIntervalCache($scope.activePatient.id, $scope.activeDrug.id, 'schedule');
-    if (schedule){
-        $scope.setPagingData(schedule, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
+    if ($scope.activePatient && $scope.activeDrug){
+        var schedule = stateService.getPatientDrugDefaultIntervalCache($scope.activePatient.id, $scope.activeDrug.id, 'schedule');
+        if (schedule){
+            $scope.setPagingData(schedule, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
+        }
     }
 
     getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);

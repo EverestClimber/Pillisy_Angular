@@ -39,7 +39,7 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         var now = new Date();
 
         var interval = {
-            startTime: moment(now.getTime()).startOf('day').subtract(3,'days').valueOf(),
+            startTime: moment().startOf('day').subtract(3,'days').valueOf(),
             endTime:   moment().endOf('day').valueOf(),
             today:     now.getTime(),
         };

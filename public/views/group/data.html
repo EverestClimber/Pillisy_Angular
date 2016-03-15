@@ -4,7 +4,8 @@
 	        <li><a href="/">My Groups</a></li>
 	        <li class="active">Group</li>
 	    </ol>
-		<h1>Group name: {{ group.name }} <br> Group Id: {{ group.identifier }}</h1>  
+		<h1 ng-show="group_visible">Group name: {{ group.name }} <br> Group Id: {{ group.identifier }}</h1> 
+		<h1 ng-show="!group_visible">Send SMS to {{ patient_to_send_sms }}</h1>  
 	</div>
 
 	<div class="container-fluid" ng-show="group_visible">
@@ -101,7 +102,7 @@
 	<div class="container-fluid" ng-show="!group_visible">
 		<panel panel-class="panel" is-loading="loading">
 			<div class="col-sm-4" ng-show="message_patient_form">
-				Please enter a message that would be sent to {{ patient_to_send_sms }} via SMS. <br><br>
+				Please enter a message that would be sent to {{ patient_to_send_sms }} via SMS. This is one-way only.<br><br>
 				<form name="messagepatient" ng-submit="sendMessage(message)" class="form-horizontal" style="margin-bottom: 0px !important;">
 					<div class="form-group">
 						<div class="col-sm-12">

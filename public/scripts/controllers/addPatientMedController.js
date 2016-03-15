@@ -84,7 +84,7 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
         else if (!$scope.drug.start_date){
             alert('Start date required');
         }
-        else if (!$scope.drug.pills_dose){
+        /*else if (!$scope.drug.pills_dose){
             alert('Number of pills per dose required');
         }
         else if (!$scope.drug.doses_day){
@@ -95,7 +95,7 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
         }
         else if (!$scope.drug.end_date){
             alert('End date required');
-        }
+        }*/
         else if (!$scope.drug.pillsyCapId){
             alert('PillsyCap identifier required');
         }
@@ -103,12 +103,13 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
             console.log('Got fields, proceed - $scope.drug.doses_day: '+ $scope.drug.doses_day);
 
             if ($scope.drug.doses_day == 1){
-                if (!$scope.drug.reminder1_time){
+                /*if (!$scope.drug.reminder1_time){
                     alert('Reminder 1 time required');
                 }
                 else{
                     processAddDrug();
-                }
+                }*/
+                processAddDrug();
             }
             else if ($scope.drug.doses_day == 2){
                 if (!$scope.drug.reminder1_time){
@@ -200,42 +201,6 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
             'quantity':          $scope.drug.quantity,
             'startTime':         getStartTime($scope.drug.start_date)
         }; 
-
-                /*if (drug.name instanceof Object){
-
-                    if ( Object.prototype.hasOwnProperty.call(drug.name, 'originalObject') ){
-
-                        name               = drug.name.originalObject.pillsyName;
-                        var compound       = drug.name.originalObject.chemicalName;
-                        var dose           = drug.name.originalObject.strengthNumber;
-                        var doseUnits      = drug.name.originalObject.strengthUnit;
-                        var formFactor     = drug.name.originalObject.dosageDisplay;
-                        var nDCCode        = drug.name.originalObject.nDCCode;
-                        var nDCCode11Digit = drug.name.originalObject.nDCCode11Digit;
-
-                        if (name){
-                            dataObj.name = name;
-                        }
-                        if (compound){
-                            dataObj.compound = compound;
-                        }
-                        if (dose){
-                            dataObj.dose = dose;
-                        }
-                        if (doseUnits){
-                            dataObj.doseUnits = doseUnits;
-                        }
-                        if (formFactor){
-                            dataObj.formFactor = formFactor;
-                        }
-                        if (nDCCode){
-                            dataObj.nDCCode = nDCCode;
-                        }
-                        if (nDCCode11Digit){
-                            dataObj.nDCCode11Digit = nDCCode11Digit;
-                        }
-                    }
-                }*/
                     
         if ($scope.drug.pillsyHubId){
             dataObj.pillsyHubId = $scope.drug.pillsyHubId;
