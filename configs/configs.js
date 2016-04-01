@@ -20,33 +20,42 @@ config.name = 'Pillsy Enterprise Web Application';
 config.env  = process.env.NODE_ENV;
 
 var apiHost;
+var awsBucket;
 
 switch(config.env){
 	case 'development_local':
-	  	apiHost = 'http://localhost:3000';
+	  	apiHost   = 'http://localhost:3000';
+	  	awsBucket = 'https://s3-us-west-2.amazonaws.com/pillsy-development-local';
+	  	
 	   	break;
 	
 	case 'development':
-	   	apiHost = 'https://dev.pillsy.com';
+	   	apiHost   = 'https://dev.pillsy.com';
+	   	awsBucket = 'https://s3-us-west-2.amazonaws.com/pillsy-development';
 	   	break;
 
 	case 'staging':
 	   	apiHost = 'https://staging.pillsy.com';
+	   	awsBucket = 'https://s3-us-west-2.amazonaws.com/pillsy-staging';
 	   	break;
 
 	case 'production':
-	   	apiHost = 'https://api.pillsy.com';
+	   	apiHost   = 'https://api.pillsy.com';
+	   	awsBucket = 'https://s3-us-west-2.amazonaws.com/pillsy-production'
 	   	break;
 
 	default:
-	   	apiHost = 'http://localhost:3000';
+	   	apiHost   = 'http://localhost:3000';
+	   	awsBucket = 'https://s3-us-west-2.amazonaws.com/pillsy-development-local';
 }
 
 /**
 * Server Configuration
 */
-config.apiHost = apiHost;
-config.port    = process.env.PORT || 3200;
+config.apiHost   = apiHost;
+config.awsBucket = awsBucket;
+config.port      = process.env.PORT || 3200;
+
 
 /**
  * Session Configuration
