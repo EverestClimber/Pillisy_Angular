@@ -5,7 +5,7 @@
 */
 
 var app = angular.module('OrganizationLoginController', ['theme.core.services']);     //instantiates OrganizationLoginController module
-app.controller('organizationLoginController', function ($scope, $http, $theme, $window, apiService, stateService) {
+app.controller('organizationLoginController', function ($scope, $http, $theme, $window, $location, apiService, stateService) {
 	'use strict';
 
     $scope.login    = true;
@@ -49,6 +49,22 @@ app.controller('organizationLoginController', function ($scope, $http, $theme, $
         }
     };
 
+    function getSubdomain(){
+        var host      = $location.host();
+        var parts     = host.split('.');
+        var subdomain = null;
+
+        // more than domain.com, will always return the first
+        if (parts.length > 2){
+            subdomain = parts[0];
+            subdomain = subdomain.toLowerCase();
+        }
+
+        console.log('organizationLoginController - subdomain: '+subdomain);
+
+        return subdomain;
+    }
+
     $scope.reset_login_form = function(){
         $scope.email = '';
         $scope.password = '';
@@ -60,39 +76,53 @@ app.controller('organizationLoginController', function ($scope, $http, $theme, $
 
       	// Trigger validation flag.
       	$scope.submitted = true;
+        var subdomain = getSubdomain();
 
       	var dataObj = {
-        	'email':    $scope.email,
-        	'password': $scope.password,
+        	'email':     $scope.email,
+        	'password':  $scope.password
       	};  
       
-      	var api = '/v1/n/organization/login';
-      	console.log('organizationLoginController - apiService.post - api is: '+api);
+        if (subdomain){
+            if (dataObj.email){
+                var email = dataObj.email.toLowerCase();
 
-      	apiService.post(api,dataObj).then(function(result){
-          	console.log('organizationLoginController - apiService.post - result is: '+JSON.stringify(result));
+                if ( (email.split(subdomain).length > 0) || (email == 'enterpriseadmin@pillsy.com') ){
+                  	var api = '/v1/n/organization/login';
+                  	console.log('organizationLoginController - apiService.post - api is: '+api);
 
-          	if (result.msg == 'success'){
-                console.log('organizationLoginController - apiService.post - success');
+                    if (email == 'enterpriseadmin@pillsy.com'){
+                        dataObj.subdomain = subdomain;
+                    }
 
-            	  stateService.loginSuccessCallback(result.data);
-          	}
-          	else{
-            	console.log('organizationLoginController - apiService.post - error');
+                  	apiService.post(api, dataObj).then(function(result){
+                      	console.log('organizationLoginController - apiService.post - result is: '+JSON.stringify(result));
 
-            	// Erase the token if the user fails to log in
-            	if ($window.sessionStorage.pillsy){
-                	delete $window.sessionStorage.pillsy;
-            	}
+                      	if (result.msg == 'success'){
+                            console.log('organizationLoginController - apiService.post - success');
 
-            	alert(result.msg);
-          	}
-      	});
+                        	  stateService.loginSuccessCallback(result.data);
+                      	}
+                      	else{
+                            console.log('organizationLoginController - apiService.post - error');
+
+                        	  // Erase the token if the user fails to log in
+                        	  if ($window.sessionStorage.pillsy){
+                            	  delete $window.sessionStorage.pillsy;
+                        	  }
+
+                        	alert(result.msg);
+                      	}
+                  	});
+                }
+                else{
+                    alert('You are not authorized to login to that account with your email');
+                }
+            }
+        }
 
       	// Making the fields empty
-      	//
       	$scope.email    ='';
       	$scope.password ='';
     };
-
 });
