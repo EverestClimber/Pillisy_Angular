@@ -50,6 +50,8 @@ app.controller('organizationLoginController', function ($scope, $http, $theme, $
     };
 
     function getSubdomain(){
+        console.log('organizationLoginController - getSubdomain');
+
         var host      = $location.host();
         var parts     = host.split('.');
         var subdomain = null;
@@ -60,7 +62,7 @@ app.controller('organizationLoginController', function ($scope, $http, $theme, $
             subdomain = subdomain.toLowerCase();
         }
 
-        console.log('organizationLoginController - subdomain: '+subdomain);
+        console.log('organizationLoginController - subdomain is: '+subdomain);
 
         return subdomain;
     }
@@ -84,7 +86,11 @@ app.controller('organizationLoginController', function ($scope, $http, $theme, $
       	};  
       
         if (subdomain){
+            console.log('organizationLoginController - submitted form..subdomain is not null, proceed...');
+
             if (dataObj.email){
+                console.log('organizationLoginController - got email, proceed...');
+
                 var email = dataObj.email.toLowerCase();
 
                 if ( (email.split(subdomain).length > 0) || (email == 'enterpriseadmin@pillsy.com') ){
@@ -94,6 +100,8 @@ app.controller('organizationLoginController', function ($scope, $http, $theme, $
                     if (email == 'enterpriseadmin@pillsy.com'){
                         dataObj.subdomain = subdomain;
                     }
+
+                    console.log('organizationLoginController - dataObj: '+JSON.stringify(dataObj) );
 
                   	apiService.post(api, dataObj).then(function(result){
                       	console.log('organizationLoginController - apiService.post - result is: '+JSON.stringify(result));
