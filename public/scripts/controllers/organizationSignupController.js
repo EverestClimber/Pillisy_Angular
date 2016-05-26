@@ -88,16 +88,16 @@ app.controller('organizationSignupController', function ($scope, $http, $theme, 
         };  
 
         if (subdomain){
-            console.log('organizationLoginController - submitted form..subdomain is not null, proceed...');
+            console.log('organizationSignupController - submitted form..subdomain is not null, proceed...');
 
             if (dataObj.email){
-                console.log('organizationLoginController - got email, proceed...');
+                console.log('organizationSignupController - got email, proceed...');
 
                 var email = dataObj.email.toLowerCase();
 
                 if ( (email.split(subdomain).length > 0) || (email == 'enterpriseadmin@pillsy.com') ){
                     var api = '/v1/n/organization/login';
-                    console.log('organizationLoginController - apiService.post - api is: '+api);
+                    console.log('organizationSignupController - apiService.post - api is: '+api);
 
                     if (email == 'enterpriseadmin@pillsy.com'){
                         dataObj.subdomain = subdomain;
