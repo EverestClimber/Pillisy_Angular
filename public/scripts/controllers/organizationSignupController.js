@@ -6,7 +6,7 @@
 
 var app = angular.module('OrganizationSignupController', ['theme.core.services']);     //instantiates OrganizationSignupController module
 app.controller('organizationSignupController', function ($scope, $http, $theme, $window, $location, $timeout, apiService, stateService) {
-	'use strict';
+    'use strict';
         
     $scope.login    = true;
     $scope.register = false;
@@ -54,16 +54,22 @@ app.controller('organizationSignupController', function ($scope, $http, $theme, 
     function getSubdomain(){
         console.log('organizationSignupController - getSubdomain');
 
-        var host      = $location.host();
-        var parts     = host.split('.');
         var subdomain = null;
+        var host      = $location.host();
 
-        //more than domain.com, will always return the first
-        if (parts.length > 2){
-            subdomain = parts[0];
-            subdomain = subdomain.toLowerCase();
+        if (host == 'localhost'){
+            subdomain = 'localhost';
         }
-
+        else{
+            var parts     = host.split('.');
+        
+            //more than domain.com, will always return the first
+            if (parts.length > 2){
+                subdomain = parts[0];
+                subdomain = subdomain.toLowerCase();
+            }
+        }
+        
         console.log('organizationSignupController - subdomain is: '+subdomain);
 
         return subdomain;
@@ -93,48 +99,44 @@ app.controller('organizationSignupController', function ($scope, $http, $theme, 
             if (dataObj.email){
                 console.log('organizationSignupController - got email, proceed...');
 
-                var email = dataObj.email.toLowerCase();
+                var email         = dataObj.email.toLowerCase();
+                dataObj.email     = email;
+                dataObj.subdomain = subdomain;
 
-                if ( (email.split(subdomain).length > 0) || (email == 'enterpriseadmin@pillsy.com') ){
-                    var api = '/v1/n/organization/login';
-                    console.log('organizationSignupController - apiService.post - api is: '+api);
+                var api = '/v1/n/organization/login';
+                console.log('organizationSignupController - apiService.post - api is: '+api);
 
-                    if (email == 'enterpriseadmin@pillsy.com'){
-                        dataObj.subdomain = subdomain;
+                apiService.post(api,dataObj).then(function(result){
+                    console.log('organizationSignupController - apiService.post - result is: '+JSON.stringify(result));
+                    $scope.loginLoading = false;
+
+                    if (result.msg == 'success'){
+                        console.log('organizationSignupController - apiService.post - success');
+
+                        $scope.result_message = '';
+                        stateService.loginSuccessCallback(result.data);
+                    }
+                    else{
+                        console.log('organizationSignupController - apiService.post - error');
+
+                        // Erase the token if the user fails to log in
+                        if ($window.sessionStorage.pillsy){
+                            delete $window.sessionStorage.pillsy;
+                        }
+
+                        $scope.result_message = result.msg;
+                        setVisibleView('message');
                     }
 
-                    apiService.post(api,dataObj).then(function(result){
-                        console.log('organizationSignupController - apiService.post - result is: '+JSON.stringify(result));
-                        $scope.loginLoading = false;
-
-                        if (result.msg == 'success'){
-                            console.log('organizationSignupController - apiService.post - success');
-
-                            $scope.result_message = '';
-                            stateService.loginSuccessCallback(result.data);
-                        }
-                        else{
-                            console.log('organizationSignupController - apiService.post - error');
-
-                            // Erase the token if the user fails to log in
-                            if ($window.sessionStorage.pillsy){
-                                delete $window.sessionStorage.pillsy;
-                            }
-
-                            $scope.result_message = result.msg;
-                            setVisibleView('message');
-                        }
-                    });
-                }
-                else{
-                    alert('You are not authorized to login to that account with your email');
-                }
+                    // Making the fields empty
+                    $scope.email_login    ='';
+                    $scope.password_login ='';
+                });
             }
         }
-
-        // Making the fields empty
-        $scope.email_login    ='';
-        $scope.password_login ='';
+        else{
+            $scope.loginLoading = false;
+        }
     };
 
     $scope.submit_password_reset_form = function(){
