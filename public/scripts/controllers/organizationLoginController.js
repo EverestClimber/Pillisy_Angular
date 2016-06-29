@@ -52,14 +52,19 @@ app.controller('organizationLoginController', function ($scope, $http, $theme, $
     function getSubdomain(){
         console.log('organizationLoginController - getSubdomain');
 
-        var host      = $location.host();
-        var parts     = host.split('.');
         var subdomain = null;
+        var host      = $location.host();
 
-        // more than domain.com, will always return the first
-        if (parts.length > 2){
-            subdomain = parts[0];
-            subdomain = subdomain.toLowerCase();
+        if (host == 'localhost'){
+            subdomain = 'localhost';
+        }
+        else{
+            var parts = host.split('.');
+            // more than domain.com, will always return the first
+            if (parts.length > 2){
+                subdomain = parts[0];
+                subdomain = subdomain.toLowerCase();
+            }
         }
 
         console.log('organizationLoginController - subdomain is: '+subdomain);
@@ -68,7 +73,7 @@ app.controller('organizationLoginController', function ($scope, $http, $theme, $
     }
 
     $scope.reset_login_form = function(){
-        $scope.email = '';
+        $scope.email    = '';
         $scope.password = '';
     };
 
@@ -78,59 +83,43 @@ app.controller('organizationLoginController', function ($scope, $http, $theme, $
 
       	// Trigger validation flag.
       	$scope.submitted = true;
-        var subdomain = getSubdomain();
-
-      	var dataObj = {
-        	'email':     $scope.email,
-        	'password':  $scope.password
-      	};  
+        var subdomain    = getSubdomain();
+        var dataObj      = {
+            'email':     $scope.email,
+            'password':  $scope.password,
+            'subdomain': subdomain
+        };
       
-        if (subdomain){
-            console.log('organizationLoginController - submitted form..subdomain is not null, proceed...');
+        if (dataObj.subdomain && dataObj.email && dataObj.password){
+            console.log('organizationLoginController - submitted form, got all fields, proceed...');
 
-            if (dataObj.email){
-                console.log('organizationLoginController - got email, proceed...');
+            apiService.post(api, dataObj).then(function(result){
+                console.log('organizationLoginController - apiService.post - result is: '+JSON.stringify(result));
 
-                var email = dataObj.email.toLowerCase();
+                if (result.msg == 'success'){
+                    console.log('organizationLoginController - apiService.post - success');
 
-                if ( (email.split(subdomain).length > 0) || (email == 'enterpriseadmin@pillsy.com') ){
-                  	var api = '/v1/n/organization/login';
-                  	console.log('organizationLoginController - apiService.post - api is: '+api);
-
-                    if (email == 'enterpriseadmin@pillsy.com'){
-                        dataObj.subdomain = subdomain;
-                    }
-
-                    console.log('organizationLoginController - dataObj: '+JSON.stringify(dataObj) );
-
-                  	apiService.post(api, dataObj).then(function(result){
-                      	console.log('organizationLoginController - apiService.post - result is: '+JSON.stringify(result));
-
-                      	if (result.msg == 'success'){
-                            console.log('organizationLoginController - apiService.post - success');
-
-                        	  stateService.loginSuccessCallback(result.data);
-                      	}
-                      	else{
-                            console.log('organizationLoginController - apiService.post - error');
-
-                        	  // Erase the token if the user fails to log in
-                        	  if ($window.sessionStorage.pillsy){
-                            	  delete $window.sessionStorage.pillsy;
-                        	  }
-
-                        	alert(result.msg);
-                      	}
-                  	});
+                    stateService.loginSuccessCallback(result.data);
                 }
                 else{
-                    alert('You are not authorized to login to that account with your email');
-                }
-            }
-        }
+                    console.log('organizationLoginController - apiService.post - error');
 
-      	// Making the fields empty
-      	$scope.email    ='';
-      	$scope.password ='';
+                    // Erase the token if the user fails to log in
+                    if ($window.sessionStorage.pillsy){
+                        delete $window.sessionStorage.pillsy;
+                    }
+                    alert(result.msg);
+                }
+
+                // Making the fields empty
+                $scope.email    = '';
+                $scope.password = '';
+            });
+        }
+        else{
+            console.log('organizationLoginController - submitted form, did not got all fields, error...');
+
+            alert('Please check login credentials');
+        }
     };
 });
