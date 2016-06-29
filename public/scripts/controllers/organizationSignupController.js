@@ -61,7 +61,7 @@ app.controller('organizationSignupController', function ($scope, $http, $theme, 
             subdomain = 'localhost';
         }
         else{
-            var parts     = host.split('.');
+            var parts = host.split('.');
         
             //more than domain.com, will always return the first
             if (parts.length > 2){
@@ -105,6 +105,7 @@ app.controller('organizationSignupController', function ($scope, $http, $theme, 
 
                 var api = '/v1/n/organization/login';
                 console.log('organizationSignupController - apiService.post - api is: '+api);
+                console.log('organizationSignupController - apiService.post - dataObj is: '+JSON.stringify(dataObj));
 
                 apiService.post(api,dataObj).then(function(result){
                     console.log('organizationSignupController - apiService.post - result is: '+JSON.stringify(result));
