@@ -34,6 +34,11 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
         toggleForm(true);
     }
 
+    $scope.dateOptions = { 
+        dateFormat: 'mm-dd-yy',
+        minDate:    new Date() 
+    } 
+
     $scope.createPatient = function(patient){
 
         if (!patient.firstname){

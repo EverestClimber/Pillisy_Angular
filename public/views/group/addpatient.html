@@ -14,7 +14,6 @@
 		<panel panel-class="panel" data-heading="Patient details">
 			<div class="col-sm-4">
 				<div>
-					<!--<form name="createpatient" action="/" class="form-horizontal" style="margin-bottom: 0px !important;"> -->
 					<form name="createpatient" ng-submit="createPatient(user)" class="form-horizontal" style="margin-bottom: 0px !important;">
 						<div class="form-group">
 							<div class="col-sm-12">
@@ -39,8 +38,28 @@
 						<div class="form-group">
 							<div class="col-sm-12">
 								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
+									<input type="email" name="email" ng-model="user.email" class="form-control" id="email" placeholder="Email" required />
+								</div>
+								<span>*Required</span>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-mobile-phone"></i></span>
+									<input type="tel" name="phone" ng-model="user.phone" class="form-control" id="phone" placeholder="Phone" required />
+								</div>
+								<span>*Required</span>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input type="date" name="dob" ng-model="user.dob" class="form-control" id="dob" placeholder="DOB YYYY-MM-DD" min="1900-01-01" />
+									<input ui-date="dateOptions" name="dob" ng-model="user.dob" class="form-control" id="dob" placeholder="Date Of Birth (MM-DD-YYYY)"/>
 								</div>
 							</div>
 						</div>
@@ -104,25 +123,6 @@
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-home"></i></span>
 									<input type="text" name="zip" ng-model="user.zip" class="form-control" id="zip" placeholder="Zip"/>
-								</div>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<div class="col-sm-12">
-								<div class="input-group">
-									<span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
-									<input type="email" name="email" ng-model="user.email" class="form-control" id="email" placeholder="Email" required />
-								</div>
-								<span>*Required</span>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<div class="col-sm-12">
-								<div class="input-group">
-									<span class="input-group-addon"><i class="fa fa-mobile-phone"></i></span>
-									<input type="tel" name="phone" ng-model="user.phone" class="form-control" id="phone" placeholder="Phone" required />
 								</div>
 							</div>
 						</div>
