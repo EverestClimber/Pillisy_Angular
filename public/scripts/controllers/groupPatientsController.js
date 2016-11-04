@@ -102,6 +102,21 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
                         var largeLoad = [];
                         result.data.forEach(function(patient){
 
+                            var drugsStr = '';
+                            if (patient.drugs){
+                                if (patient.drugs.length > 0){
+                                
+                                    patient.drugs.forEach(function(drug){
+                                        if (drugsStr == ''){
+                                            drugsStr = drug;
+                                        }
+                                        else{
+                                            drugsStr = drugsStr + ', '+drug;
+                                        }
+                                    });
+                                }
+                            }
+
                             var obj = {
                                 "id":               patient.id,
                                 "name":             patient.name,
@@ -118,7 +133,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
                                 "phone_formatted":  getFormattedPhone(patient.phone),
                                 "phone2":           patient.phone2,
                                 "email":            patient.email,
-                                "drugs":            patient.drugs,
+                                "drugs":            drugsStr,
                             };
 
                             largeLoad.push(obj);

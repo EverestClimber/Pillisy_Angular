@@ -26,7 +26,7 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
             initVars();
         }
         catch(e){
-            alert('error: '+e);
+            //alert('error: '+e);
 
             $location.path('/');
         }
@@ -136,7 +136,7 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
                     else{
                         console.log('groupMembersController - callPillsySerice - apiService.get - error creating group: '+result.msg);
 
-                        alert(result.msg);
+                        //alert(result.msg);
                     }
                 }
                 else{
