@@ -29,14 +29,10 @@ var logger           = new (winston.Logger)({
                         exitOnError: false
                     });  
 
-
 // configuration =================
 var root = __dirname + '/public';
 app.use(express.static(root));
-//app.use(fallback('index.html', { root: root }));
 app.use(favicon(path.join(root, 'favicon.ico')));
-
-//app.use(express.static(__dirname + '/public'));                 // set the static files location /public/img will be /img for users
 
 // log all requests to the console =======
 app.use(morgan('dev', {
