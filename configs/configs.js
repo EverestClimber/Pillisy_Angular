@@ -25,28 +25,28 @@ var awsBucket;
 switch(config.env){
 	case 'development_local':
 	  	apiHost   = 'http://localhost:3000';
-	  	awsBucket = 'https://s3-us-west-2.amazonaws.com/pillsy-development-local';
+	  	awsBucket = 'https://s3.amazonaws.com/pillsy-app-development-local';
 	  	
 	   	break;
 	
 	case 'development':
 	   	apiHost   = 'https://dev.pillsy.com';
-	   	awsBucket = 'https://s3-us-west-2.amazonaws.com/pillsy-development';
+	   	awsBucket = 'https://s3.amazonaws.com/pillsy-app-development';
 	   	break;
 
 	case 'staging':
-	   	apiHost = 'https://staging.pillsy.com';
-	   	awsBucket = 'https://s3-us-west-2.amazonaws.com/pillsy-staging';
+	   	apiHost   = 'https://staging.pillsy.com';
+	   	awsBucket = 'https://s3.amazonaws.com/pillsy-app-staging';
 	   	break;
 
 	case 'production':
 	   	apiHost   = 'https://api.pillsy.com';
-	   	awsBucket = 'https://s3-us-west-2.amazonaws.com/pillsy-production'
+	   	awsBucket = 'https://s3.amazonaws.com/pillsy-app-production';
 	   	break;
 
 	default:
 	   	apiHost   = 'http://localhost:3000';
-	   	awsBucket = 'https://s3-us-west-2.amazonaws.com/pillsy-development-local';
+	   	awsBucket = 'https://s3.amazonaws.com/pillsy-app-development-local';
 }
 
 /**
