@@ -114,6 +114,9 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
                                         }
                                     });
                                 }
+                                else{
+                                    drugsStr = 'N/A';
+                                }
                             }
 
                             var obj = {
