@@ -5,7 +5,6 @@
  */
 'use strict';
 
-// set up ========================
 var express          = require('express');
 var compress         = require('compression'); 
 var app              = express();   
