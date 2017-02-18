@@ -102,6 +102,7 @@ app.all('/*', cors(corsOptions), function(req, res, next){
     }
 });
 
+/*
 // memdump trace ================
 if ((configs.env == 'development') || (configs.env == 'development_local')){
     console.log('app - collect memdumps on dev environment...');
@@ -124,7 +125,7 @@ if ((configs.env == 'development') || (configs.env == 'development_local')){
             else console.error('Wrote snapshot: ' + file);
         });
     });
-}
+} */
 
 // routes ========================
 // Report CSP violations (*ABOVE* CSURF in the middleware stack)

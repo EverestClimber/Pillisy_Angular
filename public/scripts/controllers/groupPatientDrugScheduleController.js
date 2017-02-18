@@ -21,8 +21,6 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
             initVars();
         }
         catch(e){
-            alert('error: '+e);
-
             $location.path('/');
         }
     }
@@ -32,15 +30,17 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
         $scope.activePatient = $scope.activeGroup.active_patient;
         $scope.activeDrug    = $scope.activeGroup.active_patient.active_drug;
 
-        $scope.ranges = {
-            'Today':        [ moment().startOf('day'), moment().endOf('day') ],
-            'Yesterday':    [ moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day') ],
-            'Last 7 days':  [ moment().subtract(7, 'days').startOf('day'), moment().endOf('day') ],
-            'Last 30 days': [ moment().subtract(30,'days').startOf('day'), moment().endOf('day') ],
-            'This month':   [ moment().startOf('month').startOf('day'), moment().endOf('month').endOf('day') ]
+        var now = moment();
+        
+        $scope.logRanges = {
+            'Today':        [ moment(now).startOf('day'), moment(now).endOf('day') ],
+            'Yesterday':    [ moment(now).subtract(1, 'days').startOf('day'), moment(now).subtract(1, 'days').endOf('day') ],
+            'Last 7 days':  [ moment(now).subtract(7, 'days').startOf('day'), moment(now).endOf('day') ],
+            'Last 30 days': [ moment(now).subtract(30,'days').startOf('day'), moment(now).endOf('day') ],
+            'This month':   [ moment(now).startOf('month').startOf('day'), moment(now).endOf('month').endOf('day') ]
         };
-
-        var ranges = $scope.ranges;
+    
+        var ranges = $scope.logRanges;
         last7  = ranges['Last 7 days'];
 
         $scope.datePicker      = {};
@@ -66,6 +66,7 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
         getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     }
 
+    
     //Watch for date changes
     $scope.$watch('datePicker.date', function(newValue, oldValue) {
         refresh();

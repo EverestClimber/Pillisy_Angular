@@ -39,9 +39,11 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         var now = new Date();
 
         var interval = {
-            startTime: moment().startOf('day').subtract(3,'days').valueOf(),
-            endTime:   moment().endOf('day').valueOf(),
-            today:     now.getTime(),
+            startTime:  moment(now.getTime()).startOf('day').subtract(3,'days').valueOf(),
+            endTime:    moment(now.getTime()).endOf('day').valueOf(),
+            today:      now.getTime(),
+            startOfDay: moment(now.getTime()).startOf('day').valueOf(),
+            endOfDay:   moment(now.getTime()).endOf('day').valueOf()
         };
 
         return encodeURIComponent( JSON.stringify(interval) );

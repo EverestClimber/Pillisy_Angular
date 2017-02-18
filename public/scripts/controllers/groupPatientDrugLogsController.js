@@ -26,20 +26,20 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
             initVars();
         }
         catch(e){
-            //alert('error: '+e);
-
             $location.path('/');
         }
     }
 
     function initVars(){
 
+        var now = moment();
+        
         $scope.logRanges = {
-            'Today':        [ moment().startOf('day'), moment().endOf('day') ],
-            'Yesterday':    [ moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day') ],
-            'Last 7 days':  [ moment().subtract(7, 'days').startOf('day'), moment().endOf('day') ],
-            'Last 30 days': [ moment().subtract(30,'days').startOf('day'), moment().endOf('day') ],
-            'This month':   [ moment().startOf('month').startOf('day'), moment().endOf('month').endOf('day') ]
+            'Today':        [ moment(now).startOf('day'), moment(now).endOf('day') ],
+            'Yesterday':    [ moment(now).subtract(1, 'days').startOf('day'), moment(now).subtract(1, 'days').endOf('day') ],
+            'Last 7 days':  [ moment(now).subtract(7, 'days').startOf('day'), moment(now).endOf('day') ],
+            'Last 30 days': [ moment(now).subtract(30,'days').startOf('day'), moment(now).endOf('day') ],
+            'This month':   [ moment(now).startOf('month').startOf('day'), moment(now).endOf('month').endOf('day') ]
         };
 
         var ranges = $scope.logRanges;
