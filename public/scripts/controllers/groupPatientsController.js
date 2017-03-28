@@ -66,15 +66,19 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 
     function getFormattedPhone(phone){
 
+        if ( phone.charAt(0) === '+'){
+            phone = phone.slice(1);
+        }
+
         if ( phone.charAt(0) === '1'){
             phone = phone.slice(1);
         }
 
         String.prototype.insert = function (index, string) {
-        if (index > 0)
-            return this.substring(0, index) + string + this.substring(index, this.length);
-        else
-            return string + this;
+            if (index > 0)
+                return this.substring(0, index) + string + this.substring(index, this.length);
+            else
+                return string + this;
         };
 
         phone = phone.insert(0, '(');
