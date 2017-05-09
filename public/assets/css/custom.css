@@ -20535,3 +20535,7 @@ ul.demo-btns > li {
   -ms-user-select: none;
   user-select: none;
 }
+
+.navbar-default {
+    background-color: #4098D3;
+}

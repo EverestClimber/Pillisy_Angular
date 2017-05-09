@@ -4,7 +4,8 @@
 	ng-class="{'navbar-fixed-top': getLayoutOption('fixedHeader'), 'navbar-static-top': !getLayoutOption('fixedHeader')}"
 	role="banner"
 	ng-show="!layoutLoading"
-	ng-cloak>
+	ng-cloak
+	style="background:#4098D3">
 	<a ng-show="isLoggedIn" id="leftmenu-trigger" ng-click="toggleLeftBar()"></a>
 
 	<div class="navbar-header pull-left">
@@ -17,10 +18,8 @@
 
 	<ul class="nav navbar-nav pull-right toolbar">	
 	  	<li class="dropdown" ng-show="isLoggedIn" dropdown>
-	  		<!-- src="assets/demo/avatar/tennet.png" -->
 			<a href class="dropdown-toggle username" dropdown-toggle>
 				<img ng-src="assets/img/logos/pillsylogo.png"/>
-				<!--<img ng-src="{{ getUser() ? getUser().profileUrl : 'assets/img/logos/pillsylogo.png' }}" alt="{{ getUser() ? getUser().profileAlt : 'assets/img/logos/pillsylogo.png' }}"  /> -->
 			</a>
 			
 			<ul class="dropdown-menu animated userinfo arrow">
@@ -37,8 +36,6 @@
 			  			<i class="pull-right glyphicon glyphicon-pencil"></i>
 			  		</a>
 			  	</li>
-			  	<!--<li><a href="#">Account <i class="pull-right glyphicon glyphicon-user"></i></a></li>-->
-			  	<!--<<li><a href="#/settings">Settings <i class="pull-right glyphicon glyphicon-cog"></i></a></li>--> <!-- enable this only for somebody who is logged in as an admin-->
 			  	<li class="divider"></li>
 			  	<li>
 			  		<a href="" class="text-right" ng-click="logOut()">Sign Out

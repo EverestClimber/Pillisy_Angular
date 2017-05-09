@@ -21,25 +21,25 @@ angular
     };
 
     var brandColors = {
-      'pillsy': '#3083ac',
-	    'default': '#3083ac',//'#ecf0f1',
-      'inverse': '#95a5a6',
-      'primary': '#3498db',
-      'success': '#2ecc71',
-      'warning': '#f1c40f',
-      'danger': '#e74c3c',
-      'info': '#1abcaf',	  
-      'brown': '#c0392b',
-      'indigo': '#9b59b6',
-      'orange': '#e67e22',
-      'midnightblue': '#34495e',
-      'sky': '#82c4e6',
-      'magenta': '#e73c68',
-      'purple': '#e044ab',
-      'green': '#16a085',
-      'grape': '#00BCD4',
-      'toyo': '#556b8d',
-      'alizarin': '#e74c3c'
+      'pillsy':  '#4098D3',
+	    'default': '#4098D3',
+      'inverse': '#4098D3',
+      'primary': '#4098D3',
+      'success': '#4098D3',
+      'warning': '#4098D3',
+      'danger':  '#4098D3',
+      'info':    '#4098D3',	  
+      'brown':   '#4098D3',
+      'indigo':  '#4098D3',
+      'orange': '#4098D3',
+      'midnightblue': '#4098D3',
+      'sky': '#4098D3',
+      'magenta': '#4098D3',
+      'purple': '#4098D3',
+      'green': '#4098D3',
+      'grape': '#4098D3',
+      'toyo': '#4098D3',
+      'alizarin': '#4098D3'
     };
 
     this.getBrandColor = function(name) {
