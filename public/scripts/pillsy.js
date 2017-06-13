@@ -37,6 +37,7 @@ var app = angular
     'CreatePatientController',
     'AddPatientMedController',
     'GroupPatientsController',
+    'GroupPatientsReportsController',
     'GroupPatientDrugLogsController',
     'GroupPatientDrugScheduleController',
     'GroupMembersController',

@@ -87,6 +87,45 @@
 						    </div>
 						</div> 
 					</tab>	
+
+					<tab ng-click="onTabSelect('reports')" heading="Reports">
+						<div class="container-fluid" ng-controller="groupPatientsReportsController">
+
+						    <div class="row">
+						        <div class="col-md-12">
+						            <panel panel-class="panel-primary" data-heading="Patients medication adherence data">
+						                <panel-controls>
+						                    <panel-control-collapse></panel-control-collapse>
+						  					<panel-control-refresh type="circular" is-loading="loadingPatients" ng-click="refreshPatients()"></panel-control-refresh>
+						                </panel-controls>
+
+						                <div style="height: 500px;" ng-grid="gridOptions" class="grid"></div>
+						            </panel>
+						        </div>
+						    </div>
+						    
+						</div> 
+					</tab>
+
+					<tab ng-click="onTabSelect('charts')" heading="Charts">
+						<div class="container-fluid" ng-controller="groupPatientsController">
+
+						    <div class="row">
+						        <div class="col-md-12">
+						            <panel panel-class="panel-primary" data-heading="Patients medication adherence data">
+						                <panel-controls>
+						                    <panel-control-collapse></panel-control-collapse>
+						  					<panel-control-refresh type="circular" is-loading="loadingPatients" ng-click="refreshPatients()"></panel-control-refresh>
+						                </panel-controls>
+
+						                <div style="height: 500px;" ng-grid="gridOptions"></div>
+						            </panel>
+						        </div>
+						    </div>
+						    
+						</div> 
+					</tab>
+
 				</tabset>
 				<div style="position:absolute;top:20px;right: 60px;">
 					<panel-controls>
