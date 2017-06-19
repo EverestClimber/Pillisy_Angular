@@ -50,13 +50,16 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
 
         console.log(' last monday\'s date was: '+lastMonday.toDate()+' last sunday\'s date was: '+lastSunday.toDate());
 
+        var intervalStartTime = moment(now.valueOf()).startOf('day').subtract(7,'days').valueOf();
+        var intervalEndTime   = moment(now.valueOf()).endOf('day').valueOf();
+
         //last week interval
         var interval = {
-            startTime:  lastMonday.valueOf(),
-            endTime:    lastSunday.valueOf(),
-            today:      now.valueOf,
-            startOfDay: moment(now).startOf('day').valueOf(),
-            endOfDay:   moment(now).endOf('day').valueOf()
+            intervalStartTime: intervalStartTime.valueOf(),
+            intervalEndTime:   intervalEndTime.valueOf(),
+            lastweekStartTime: lastMonday.valueOf(),
+            lastweekEndTime:   lastSunday.valueOf(),
+            today:             now.valueOf
         };
 
         return encodeURIComponent( JSON.stringify(interval) );
@@ -104,7 +107,7 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
 
         if (groupId){
             var request = 'fetch_group_patients';
-            var api     = '/v1/a/organization/group/'+groupId+'/patients?interval='+getInterval()+'&request='+request;
+            var api     = '/v1/a/organization/group/'+groupId+'/patients/drugs/adherence?interval='+getInterval()+'&request='+request;
             var data;
 
             $scope.loadingPatients = true;
@@ -138,15 +141,16 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
 
                             var obj = {
                                 "id":               patient.id,
-                                "name":             patient.name,
+                                "name":             patient.fullname,
                                 "status":           patient.status,
                                 "today":            patient.adherence_today,
-                                "interval":         70,//patient.adherence_interval,
-                                "all_time":         patient.adherence_all,
-                                "last_connected":   moment().format("YYYY-MM-DD  h:mm:ssa"),
-                                "last_opened":      moment().format("YYYY-MM-DD  h:mm:ssa"),
-                                "start_date":       moment().format("YYYY-MM-DD  h:mm:ssa"),
-                                "drug":             'Lipitor',
+                                "interval":         patient.adherence_interval,
+                                "all_time":         patient.adherence_alltime,
+                                "lastweek":         patient.adherence_lastweek,
+                                "last_connected":   getTimeAgoString( patient.last_connected ),
+                                "last_opened":      getTimeAgoString( patient.last_opened ), 
+                                "start_date":       moment(patient.startTime).format("YYYY-MM-DD"),
+                                "drug":             patient.drugName,
                                 "address1":         patient.address1,
                                 "address2":         patient.address2,
                                 "city":             patient.city,
@@ -155,8 +159,7 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
                                 "phone":            patient.phone,
                                 "phone_formatted":  getFormattedPhone(patient.phone),
                                 "phone2":           patient.phone2,
-                                "email":            patient.email,
-                                "drugs":            drugsStr,
+                                "email":            patient.email
                             };
 
                             largeLoad.push(obj);
@@ -189,7 +192,54 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
             $scope.setPagingData([], page, pageSize);
         }
     }
+
+    function getRandomIntInclusive(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
     
+    function getTimeAgoString(dateMs){
+        console.log('getTimeAgoString - dateMs: '+dateMs);
+
+        var str = 'N/A';
+
+        if (dateMs){
+            if (dateMs > 0){
+                var now  = moment();
+                var time = moment(dateMs);
+                var duration = moment.duration(now.diff(time));
+
+                var seconds = Math.round(duration.asSeconds());
+
+                if (seconds > 60){
+                    var minutes = Math.round(duration.asMinutes());
+
+                    if (minutes > 60){
+                        var hours = Math.round(duration.asHours());
+
+                        if (hours > 24){
+                            var days = Math.round(duration.asDays());
+
+                            str = days + ' days ago';
+                        }
+                        else{
+                            str = hours + ' hrs ago';
+                        }
+                    }
+                    else{
+                        str = minutes + ' mins ago';
+                    }
+                }
+                else{
+                    str = seconds + ' sec ago';
+                }
+            }
+        }
+
+        return str;
+    }
+
     function getPagedDataAsync(pageSize, page, searchText) {
         fireoffGroupDetailsFetch(pageSize, page, searchText);
     };
@@ -237,13 +287,28 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
         }
     };
 
+    $scope.getAdherenceClassName = function(value) {
+        value = value.replace(/\%/g,'');
+        value = parseFloat(value);
+
+        if (value >= 85){
+            return 'ok';
+        }
+        else if ( (value >=75) && (value < 85)){
+            return 'warning';
+        }
+        else{
+            return 'critical'
+        }
+    }
+
     $scope.mySelections = [];
 
     var rowTemplate     = '<div ng-click="openPatientRecord(row)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" '+
                           'ng-class="col.colIndex()" class="ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" '+
                           'ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
-    
-    var cellTemplate    = '<div class="ngCellText" ng-class="{ \'ok\' : row.getProperty(\'interval\') >= \'90\',  \'warning\' : (row.getProperty(\'interval\') >= \'60\') && (row.getProperty(\'interval\') < \'90\'), \'critical\' : row.getProperty(\'interval\') < \'60\'}" >{{ row.getProperty(col.field) }}</div>';
+   
+    var cellTemplate = '<div class="ngCellText" ng-class="getAdherenceClassName(row.getProperty(\'lastweek\'))">{{ row.getProperty(col.field) }}</div>';
 
     var removeTemplate  = '<div><input type="button" value="Remove" ng-click="removeRow($event, row.entity)" />';
     var messageTemplate = '<div><input type="button" value="{{ row.entity.phone_formatted }}" ng-click="$event.stopPropagation()"/>'+
@@ -255,13 +320,12 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
         columnDefs: [
             { field:'name',           displayName: 'Name' },
             { field:'drug',           displayName: 'Drugs' },
-            { field:'interval',       displayName: 'Last Week', cellTemplate: cellTemplate},
+            { field:'lastweek',       displayName: 'Last Week', cellTemplate: cellTemplate},
             { field:'all_time',       displayName: 'All time' },
             { field:'last_connected', displayName: 'Last connected' },
             { field:'last_opened',    displayName: 'Last opened' },
             { field:'start_date',     displayName: 'Start date' },
-            { field:'phone',          displayName: 'Mobile#', cellTemplate: messageTemplate },
-            { field:'remove',         displayName:'', cellTemplate: removeTemplate}
+            { field:'phone',          displayName: 'Mobile#', cellTemplate: messageTemplate }
         ],
         multiSelect:                false,
         enablePaging:               true,
