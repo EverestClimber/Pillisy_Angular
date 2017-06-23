@@ -15,13 +15,16 @@ app.controller('groupController', function ($scope, apiService, stateService, $r
         $location.path('/');
     }
     else{
-        $scope.group_visible    = true;
-        $scope.group            = pillsy.active_group;
-        $scope.patients_visible = true;
-        $scope.isAdmin          = $scope.group.isAdmin;
-        $scope.sendButtonText   = 'Send';
-        $scope.sendGroupId      = null;
-        $scope.sendPatient      = null;
+        $scope.group_visible        = true;
+        $scope.call_visible         = false;
+        $scope.sms_visible          = false;
+        $scope.group                = pillsy.active_group;
+        $scope.patients_visible     = true;
+        $scope.isAdmin              = $scope.group.isAdmin;
+        $scope.sendButtonText       = 'Send';
+        $scope.sendGroupId          = null;
+        $scope.sendPatient          = null;
+        $scope.message_patient_form = false;
 
         var groups = stateService.getUserGroups();
         $rootScope.$emit("my_groups_callback", {groups: groups});
@@ -104,6 +107,38 @@ app.controller('groupController', function ($scope, apiService, stateService, $r
         });
     }
 
+    function callPatient(patientPhone){
+
+        var request = 'call_patient';
+        var api     = '/v1/a/organization/group/'+ $scope.sendGroupId +'/patient/'+ $scope.callPatient.id +'/call';
+        var payload = {
+            message: message,
+            request: request
+        };
+
+        $scope.callPatientMsg = 'Please wait while a call is being placed to '+$scope.patient_to_call;
+
+        apiService.post(api, payload).then(function(result){
+
+            if (result){
+                var msg = result.msg;
+
+                if (msg == 'success'){
+
+                    var data = result.data;
+                }
+                else{
+                    console.log('apiService.post - error');
+
+                    $scope.callPatientMsg = 'Pillsy encountered an error while trying to call '+ $scope.callPatient.name +'. Please try again later.';
+                }
+            }
+            else{
+                console.log('apiService.post - error');
+            }
+        });
+    }
+
     $rootScope.$on("send_message_to_patient", function (event, data) {
 
         var patient = data.patient;
@@ -115,8 +150,28 @@ app.controller('groupController', function ($scope, apiService, stateService, $r
 
         $scope.sendGroupId          = data.groupId;
         $scope.group_visible        = false;
+        $scope.call_visible         = false;
+        $scope.sms_visible          = true;
         $scope.sendButtonText       = 'Send';
         $scope.message_patient_form = true;
+    });
+
+
+    $rootScope.$on("call_patient", function (event, data) {
+
+        var patient = data.patient;
+        
+        if (patient){
+            $scope.callPatient     = patient;
+            $scope.patient_to_call = patient.name;
+        }
+
+        $scope.sendGroupId   = data.groupId;
+        $scope.group_visible = false;
+        $scope.call_visible  = true;
+        $scope.sms_visible   = false;
+
+        callPatient(patient.phone);
     });
 
     $scope.updateGroup = function(key, value){

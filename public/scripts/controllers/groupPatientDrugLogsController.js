@@ -121,7 +121,6 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
                             obj.time     = moment(drugEvent.eventTime).format("h:mm:ss A");
                             obj.event    = drugEvent.eventValue; 
                             obj.platform = drugEvent.platform;
-                            obj.source   = drugEvent.source;
                             obj.method   = drugEvent.method;
                             
                             objs.push(obj);
@@ -185,7 +184,6 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
             { field:'time',     displayName: 'Time' },
             { field:'event',    displayName: 'Event' },
             { field:'platform', displayName: 'Platform' },
-            { field:'source',   displayName: 'Source' },
             { field:'method',   displayName: 'Method' }
         ],
         multiSelect:                false,

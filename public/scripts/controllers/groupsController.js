@@ -143,39 +143,31 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
 
     $scope.mySelections = [];
 
-    var rowTemplate = '<div ng-click="openGroupDetails(row)" '+ 
-                            'ng-style="{ \'cursor\': row.cursor }" '+ 
-                            'ng-repeat="col in renderedColumns" '+ 
-                            'ng-class="col.colIndex()" class="ngCell {{col.cellClass}}"> '+
-                            '<div class="ngVerticalBar" '+ 
-                                'ng-style="{height: rowHeight}" '+
-                                'ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;'+
-                            '</div>'+
-                            '<div ng-cell></div>'+
-                      '</div>';
+    var nameTemplate = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click="openGroupDetails(row)"/></div>'; 
 
     $scope.gridOptions = {
         data:                      'myData',
         columnDefs: [
-          	{ field:'name',        	      displayName: 'Name' },
+          	{ field:'name',               displayName: 'Name',    cellTemplate: nameTemplate },
           	{ field:'avg',      	      displayName: 'Avg.' },
           	{ field:'adherence_interval', displayName: 'Last 3 days' },
           	{ field:'patients', 	      displayName: 'Patients' },
           	{ field:'members',		      displayName: 'Members' },
         ],
         selectedItems:      		$scope.mySelections,
-        multiSelect:        		false,
-        enablePaging:       		true,
-        showFooter:         		true,
-        enableRowSelection: 		true, 
-        enableSelectAll:    		false,
+        multiSelect:                false,
+        enablePaging:               true,
+        showFooter:                 true,
+        enableRowSelection:         false, 
+        enableSelectAll:            false,
         enableRowHeaderSelection:   false,
-        noUnselect:         		true,
-        enableGridMenu:     		true,
-        totalServerItems:   		'totalServerItems',
-        pagingOptions:      		$scope.pagingOptions,
-        filterOptions:      		$scope.filterOptions,
-        rowTemplate:        		rowTemplate
+        noUnselect:                 false,
+        enableGridMenu:             true,
+        enableColumnResize:         true,
+        totalServerItems:           'totalServerItems',
+        pagingOptions:              $scope.pagingOptions,
+        filterOptions:              $scope.filterOptions,
+        enableCellSelection:        false
     };
 
     $scope.openGroupDetails = function(rowItem){

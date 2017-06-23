@@ -286,12 +286,12 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	   	}
 	};
 
-	var rowTemplate = '<div ng-click="onMedRowClick(row)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="col.colIndex()" class="ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
+	var nameTemplate = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click="onMedRowClick(row)"/></div>';
 
 	$scope.medsGridOptions = {
 	   	data: 'meds',
 	    columnDefs: [
-	    	{ field: 'name',      displayName: 'Name' }, 
+	    	{ field: 'name',      displayName: 'Name', cellTemplate: nameTemplate }, 
 	    	{ field: 'status',    displayName: 'Status' }, 
 	    	{ field: 'doseTime',  displayName: 'Dose Time(s)' }, 
 	    	{ field: 'doseTaken', displayName: 'Time(s) taken today' }, 
@@ -299,19 +299,19 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	    	{ field: 'average',   displayName: 'Average Taken' }, 
 	    	{ field: 'remaining', displayName: 'Remaining' }, 
 		],
-		multiSelect:        		false,
-        enablePaging:       		true,
-        showFooter:         		true,
-        enableRowSelection: 		true, 
-        enableSelectAll:    		false,
-        enableRowHeaderSelection: 	false,
-        noUnselect:         		true,
-        enableGridMenu:     		true,
+	    multiSelect:                false,
+        enablePaging:               true,
+        showFooter:                 true,
+        enableRowSelection:         false, 
+        enableSelectAll:            false,
+        enableRowHeaderSelection:   false,
+        noUnselect:                 false,
+        enableGridMenu:             true,
         enableColumnResize:         true,
-	    totalServerItems:   		'totalMeds',
-	    pagingOptions:      		$scope.pagingOptions,
-	    filterOptions:      		$scope.medsFilterOptions,
-	    rowTemplate: 				rowTemplate
+        totalServerItems:           'totalMeds',
+        pagingOptions:              $scope.pagingOptions,
+        filterOptions:              $scope.medsFilterOptions,
+        enableCellSelection:        false
 	};
 
 	$scope.medClick = function(med){

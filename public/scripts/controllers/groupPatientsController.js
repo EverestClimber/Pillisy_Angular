@@ -185,7 +185,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         $scope.setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
     }
 
-    getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+    //getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
 
     $scope.$watch('pagingOptions', function(newVal, oldVal) {
         if (newVal !== oldVal) {
@@ -198,6 +198,46 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
             getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
         }
     }, true);
+
+    $scope.$on('received_report_data', function (event, data) {
+        var cachedData = stateService.getGroupDetails($scope.groupId)
+        if (cachedData){
+
+            cachedData = fixData(cachedData);
+            $scope.setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
+        }
+    });
+
+    function fixData(data){
+
+        var seen = {};
+        data = data.filter(function(entry) {
+            var previous;
+
+            // Have we seen this id before?
+            if (seen.hasOwnProperty(entry.id)) {
+                // Yes, grab it and add this drug to it
+                previous = seen[entry.id];
+                previous.drug.push(entry.drug);
+
+                // Don't keep this entry, we've merged it into the previous one
+                return false;
+            }
+
+            // entry.data probably isn't an array; make it one for consistency
+            if (!Array.isArray(entry.drug)) {
+                entry.drug = [entry.drug];
+            }
+
+            // Remember that we've seen it
+            seen[entry.id] = entry;
+
+            // Keep this one, we'll merge any others that match into it
+            return true;
+        });
+
+        return data;
+    }
 
     $scope.openPatientRecord = function(rowItem) {
         console.log("openPatientRecord");
@@ -224,36 +264,34 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 
     $scope.mySelections = [];
 
-    var rowTemplate = '<div ng-click="openPatientRecord(row)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="col.colIndex()" class="ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
-    var removeTemplate  = '<div><input type="button" value="Remove" ng-click="removeRow($event, row.entity)" />';
-    var messageTemplate = '<div><input type="button" value="{{ row.entity.phone_formatted }}" ng-click="$event.stopPropagation()"/>'+
-                          '<input type="button" value="SMS" ng-click="messagePatient($event, row.entity)" /></div>'; 
-
+    var nameTemplate    = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click="openPatientRecord(row)"/></div>'; 
+    var removeTemplate  = '<div><input type="button" style="color: #2685ee" value="Remove" ng-click="removeRow($event, row.entity)" />';
+    var messageTemplate = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
 
     $scope.gridOptions = {
         data:             'myData',
         columnDefs: [
-            { field:'name',     displayName: 'Name' },
-            { field:'drugs',    displayName: 'Drugs' },
-            { field:'today',    displayName: 'Today' },
-            { field:'interval', displayName: 'Last 7 days' },
-            { field:'all_time', displayName: 'All time' },
-            { field:'phone',    displayName: 'Mobile#', cellTemplate: messageTemplate },
-            { field:'remove',   displayName:'', cellTemplate: removeTemplate}
+            { field:'name',       displayName: 'Name',    cellTemplate: nameTemplate },
+            { field:'drugs',      displayName: 'Drugs' },
+            //{ field:'today',    displayName: 'Today' },
+            //{ field:'interval', displayName: 'Last 7 days' },
+            //{ field:'all_time', displayName: 'All time' },
+            { field:'phone',      displayName: 'Mobile#', cellTemplate: messageTemplate },
+            { field:'remove',     displayName: '',        cellTemplate: removeTemplate },
         ],
         multiSelect:                false,
         enablePaging:               true,
         showFooter:                 true,
-        enableRowSelection:         true, 
+        enableRowSelection:         false, 
         enableSelectAll:            false,
         enableRowHeaderSelection:   false,
-        noUnselect:                 true,
+        noUnselect:                 false,
         enableGridMenu:             true,
         enableColumnResize:         true,
         totalServerItems:           'totalServerItems',
         pagingOptions:              $scope.pagingOptions,
         filterOptions:              $scope.filterOptions,
-        rowTemplate:                rowTemplate
+        enableCellSelection:        false
     };
 
     $scope.messagePatient = function($event, patient) {
@@ -265,6 +303,17 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         };
 
         $rootScope.$broadcast("send_message_to_patient", data);
+    }
+
+    $scope.callPatient = function($event, patient) {
+        $event.stopPropagation();
+
+        var data = {
+            patient: patient,
+            groupId: $scope.groupId
+        };
+
+        $rootScope.$broadcast("call_patient", data);
     }
 
     $scope.removeRow = function($event, patient) {

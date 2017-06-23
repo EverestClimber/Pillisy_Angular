@@ -31,8 +31,8 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
 
         $scope.totalServerItems = 0;
         $scope.pagingOptions = {
-            pageSizes: [25, 50, 100],
-            pageSize:  25,
+            pageSizes: [50, 100],
+            pageSize:  50,
             currentPage: 1
         };
     }
@@ -106,7 +106,7 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
         var groupId = $scope.groupId;
 
         if (groupId){
-            var request = 'fetch_group_patients';
+            var request = 'fetch_group_patients_report';
             var api     = '/v1/a/organization/group/'+groupId+'/patients/drugs/adherence?interval='+getInterval()+'&request='+request;
             var data;
 
@@ -176,6 +176,7 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
 
                         stateService.setGroupDetails($scope.groupId, largeLoad);
                         $scope.setPagingData(largeLoad, page, pageSize);
+                        $rootScope.$broadcast('received_report_data');
                     }
                     else{
                         console.log('groupPatientsController - apiService.get - error creating group: '+result.msg);
@@ -221,18 +222,22 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
                         if (hours > 24){
                             var days = Math.round(duration.asDays());
 
-                            str = days + ' days ago';
+                            var dayType = (days > 1) ? ' days ago' : ' day ago';
+                            str = days + dayType;
                         }
                         else{
-                            str = hours + ' hrs ago';
+                            var hourType = (hours > 1) ? ' hours ago' : ' hour ago';
+                            str = hours + hourType;
                         }
                     }
                     else{
-                        str = minutes + ' mins ago';
+                        var minuteType = (minutes > 1) ? ' minutes ago' : ' minute ago';
+                        str = minutes + minuteType;
                     }
                 }
                 else{
-                    str = seconds + ' sec ago';
+                    var secondType = (seconds > 1) ? ' seconds ago' : ' second ago';
+                    str = seconds + secondType;
                 }
             }
         }
@@ -292,54 +297,47 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
         value = parseFloat(value);
 
         if (value >= 85){
-            return 'ok';
+            return 'label label-success';
         }
         else if ( (value >=75) && (value < 85)){
-            return 'warning';
+            return 'label label-warning';
         }
         else{
-            return 'critical'
+            return 'label label-danger'
         }
     }
 
     $scope.mySelections = [];
 
-    var rowTemplate     = '<div ng-click="openPatientRecord(row)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" '+
-                          'ng-class="col.colIndex()" class="ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" '+
-                          'ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
-   
-    var cellTemplate = '<div class="ngCellText" ng-class="getAdherenceClassName(row.getProperty(\'lastweek\'))">{{ row.getProperty(col.field) }}</div>';
-
-    var removeTemplate  = '<div><input type="button" value="Remove" ng-click="removeRow($event, row.entity)" />';
-    var messageTemplate = '<div><input type="button" value="{{ row.entity.phone_formatted }}" ng-click="$event.stopPropagation()"/>'+
-                          '<input type="button" value="SMS" ng-click="messagePatient($event, row.entity)" /></div>'; 
-
+    var adherenceTemplate = '<div class="ngCellText"><span style="font-size: 12px; font-weight:bold" ng-class="getAdherenceClassName(row.getProperty(\'lastweek\'))">{{ row.getProperty(col.field) }}</span></div>';
+    var messageTemplate   = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;SMS</a></div>';
+    var nameTemplate      = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click="openPatientRecord(row)"/></div>'; 
 
     $scope.gridOptions = {
         data:             'myData',
         columnDefs: [
-            { field:'name',           displayName: 'Name' },
+            { field:'name',           displayName: 'Name',          cellTemplate: nameTemplate },
             { field:'drug',           displayName: 'Drugs' },
-            { field:'lastweek',       displayName: 'Last Week', cellTemplate: cellTemplate},
+            { field:'lastweek',       displayName: 'Last Week',     cellTemplate: adherenceTemplate },
             { field:'all_time',       displayName: 'All time' },
             { field:'last_connected', displayName: 'Last connected' },
             { field:'last_opened',    displayName: 'Last opened' },
             { field:'start_date',     displayName: 'Start date' },
-            { field:'phone',          displayName: 'Mobile#', cellTemplate: messageTemplate }
+            { field:'phone',          displayName: 'Mobile#',       cellTemplate: messageTemplate }
         ],
         multiSelect:                false,
         enablePaging:               true,
         showFooter:                 true,
-        enableRowSelection:         true, 
+        enableRowSelection:         false, 
         enableSelectAll:            false,
         enableRowHeaderSelection:   false,
-        noUnselect:                 true,
+        noUnselect:                 false,
         enableGridMenu:             true,
         enableColumnResize:         true,
         totalServerItems:           'totalServerItems',
         pagingOptions:              $scope.pagingOptions,
         filterOptions:              $scope.filterOptions,
-        rowTemplate:                rowTemplate
+        enableCellSelection:        false
     };
 
     $scope.messagePatient = function($event, patient) {

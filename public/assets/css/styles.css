@@ -83,15 +83,3 @@ input::-moz-placeholder, textarea::-moz-placeholder {
 input:-ms-input-placeholder, textarea:-ms-input-placeholder { 
     color:    #404040;
 }
-
-.critical {
-    background-color: #FF0000;
-}
-
-.warning {
-    background-color: #FFFF00;
-}
-
-.ok {
-    background-color: #00ff00;
-} 
