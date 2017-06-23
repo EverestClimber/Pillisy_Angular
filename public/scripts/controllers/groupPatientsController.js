@@ -254,7 +254,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         });
 
         data.forEach(function(entry) {
-            var drugs   = entry.drug.toString();
+            var drugs   = entry.drug.toString().replace(/\,/g, ' ');
             entry.drugs = drugs;
 
             delete entry.drug;
