@@ -269,6 +269,14 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
         }
     }, true);
 
+    $scope.$on('paging_options', function (event, data) {
+        getPagedDataAsync(data.pageSize, data.currentPage, data.filterText);
+    });
+
+    $scope.$on('filter_options', function (event, data) {
+        getPagedDataAsync(data.pageSize, data.currentPage, data.filterText);
+    });
+
     $scope.openPatientRecord = function(rowItem) {
         console.log("openPatientRecord");
 

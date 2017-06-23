@@ -88,7 +88,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         return phone;
     }
 
-    function fireoffGroupDetailsFetch(pageSize, page, searchText){
+    /*function fireoffGroupDetailsFetch(pageSize, page, searchText){
         var groupId = $scope.groupId;
 
         if (groupId){
@@ -173,7 +173,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         else{
             $scope.setPagingData([], page, pageSize);
         }
-    }
+    }*/
     
     function getPagedDataAsync(pageSize, page, searchText) {
         fireoffGroupDetailsFetch(pageSize, page, searchText);
@@ -183,23 +183,40 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         //get from cache
         var cachedData = stateService.getGroupDetails($scope.groupId)
         if (cachedData){
+            cachedData = fixData(cachedData);
             $scope.setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
         }
     }
 
     setDataFromCache();
 
-    //getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
-
     $scope.$watch('pagingOptions', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-            getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+            
+            var data = {
+                pageSize:    $scope.pagingOptions.pageSize,
+                currentPage: $scope.pagingOptions.currentPage,
+                filterText:  $scope.filterOptions.filterText
+            };
+
+            $rootScope.$broadcast('paging_options', data);
+
+            //getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
         }
     }, true);
 
     $scope.$watch('filterOptions', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-            getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+
+            var data = {
+                pageSize:    $scope.pagingOptions.pageSize,
+                currentPage: $scope.pagingOptions.currentPage,
+                filterText:  $scope.filterOptions.filterText
+            };
+
+            $rootScope.$broadcast('filter_options', data);
+
+            //getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
         }
     }, true);
 
@@ -211,6 +228,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 
         var seen = {};
         data = data.filter(function(entry) {
+
             var previous;
 
             // Have we seen this id before?

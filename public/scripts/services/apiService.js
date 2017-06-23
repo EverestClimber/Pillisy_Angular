@@ -10,7 +10,7 @@ app.factory('apiService', ['$http', 'configService',
         console.log('apiService');   
 
         var successCallback = function(response){
-            console.log('apiService - successCallback - data: '+JSON.stringify(response.data)); 
+            console.log('apiService - successCallback'); 
 
             return response.data;
         };
