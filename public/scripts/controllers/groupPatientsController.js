@@ -179,11 +179,15 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         fireoffGroupDetailsFetch(pageSize, page, searchText);
     };
 
-    //get from cache
-    var cachedData = stateService.getGroupDetails($scope.groupId)
-    if (cachedData){
-        $scope.setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
+    function setDataFromCache(){
+        //get from cache
+        var cachedData = stateService.getGroupDetails($scope.groupId)
+        if (cachedData){
+            $scope.setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
+        }
     }
+
+    setDataFromCache();
 
     //getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
 
@@ -200,12 +204,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
     }, true);
 
     $scope.$on('received_report_data', function (event, data) {
-        var cachedData = stateService.getGroupDetails($scope.groupId)
-        if (cachedData){
-
-            cachedData = fixData(cachedData);
-            $scope.setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
-        }
+        setDataFromCache();
     });
 
     function fixData(data){
@@ -218,7 +217,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
             if (seen.hasOwnProperty(entry.id)) {
                 // Yes, grab it and add this drug to it
                 previous = seen[entry.id];
-                previous.drug.push(entry.drug);
+                previous.drugs.push(entry.drug);
 
                 // Don't keep this entry, we've merged it into the previous one
                 return false;
@@ -226,12 +225,13 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 
             // entry.data probably isn't an array; make it one for consistency
             if (!Array.isArray(entry.drug)) {
-                entry.drug = [entry.drug];
+                entry.drugs = [entry.drug];
             }
 
             // Remember that we've seen it
             seen[entry.id] = entry;
 
+            entry.drugs = entry.drugs.toString();
             // Keep this one, we'll merge any others that match into it
             return true;
         });
