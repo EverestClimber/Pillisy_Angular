@@ -235,7 +235,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
             if (seen.hasOwnProperty(entry.id)) {
                 // Yes, grab it and add this drug to it
                 previous = seen[entry.id];
-                previous.drugs.push(entry.drug);
+                previous.drug.push(entry.drug);
 
                 // Don't keep this entry, we've merged it into the previous one
                 return false;
@@ -243,17 +243,23 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 
             // entry.data probably isn't an array; make it one for consistency
             if (!Array.isArray(entry.drug)) {
-                entry.drugs = [entry.drug];
+                entry.drug = [entry.drug];
             }
 
             // Remember that we've seen it
             seen[entry.id] = entry;
 
-            entry.drugs = entry.drugs.toString();
             // Keep this one, we'll merge any others that match into it
             return true;
         });
 
+        data.forEach(function(entry) {
+            var drugs   = entry.drug.toString();
+            entry.drugs = drugs;
+
+            delete entry.drug;
+        });
+        
         return data;
     }
 
