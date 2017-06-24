@@ -51,17 +51,21 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
         $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     };
     
-    function getFormattedPhone(phone){
+     function getFormattedPhone(phone){
+
+        if ( phone.charAt(0) === '+'){
+            phone = phone.slice(1);
+        }
 
         if ( phone.charAt(0) === '1'){
             phone = phone.slice(1);
         }
 
         String.prototype.insert = function (index, string) {
-        if (index > 0)
-            return this.substring(0, index) + string + this.substring(index, this.length);
-        else
-            return string + this;
+            if (index > 0)
+                return this.substring(0, index) + string + this.substring(index, this.length);
+            else
+                return string + this;
         };
 
         phone = phone.insert(0, '(');
@@ -70,7 +74,7 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
 
         return phone;
     }
-
+    
     function callPillsyService(pageSize, page, searchText){
         console.log('groupMembersController - callPillsySerice');
 
@@ -162,15 +166,16 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
         multiSelect:                false,
         enablePaging:               true,
         showFooter:                 true,
-        enableRowSelection:         true, 
+        enableRowSelection:         false, 
         enableSelectAll:            false,
         enableRowHeaderSelection:   false,
-        noUnselect:                 true,
+        noUnselect:                 false,
         enableGridMenu:             true,
         enableColumnResize:         true,
         totalServerItems:           'totalServerItems',
         pagingOptions:              $scope.pagingOptions,
         filterOptions:              $scope.filterOptions,
+        enableCellSelection:        false
     };
 
 });
