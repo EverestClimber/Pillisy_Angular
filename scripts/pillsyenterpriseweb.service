@@ -1,0 +1,13 @@
+[Unit]
+Description = Pillsy Enterprise Web App Service
+After       = pillsybackend.service
+
+[Service]
+Type      = forking
+User      = devops
+Group     = devops
+ExecStart = /home/devops/projects/Pillsy/PillsyEnterpriseWebApp/scripts/start_pillsyenterpriseweb_sevice.sh
+Restart   = always
+
+[Install]
+WantedBy = multi-user.target
