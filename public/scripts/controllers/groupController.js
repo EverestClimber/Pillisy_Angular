@@ -263,33 +263,6 @@ app.controller('groupController', function ($scope, apiService, stateService, $r
         });
     }
 
-    var rowTemplate = '<div ng-click="openPatientRecord(row)" ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="col.colIndex()" class="ngCell {{col.cellClass}}"><div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div><div ng-cell></div></div>';
-
-    $scope.myData = stateService.getGroupDetails($scope.group.id);
-
-    $scope.gridOptions = {
-        data:             'myData',
-        columnDefs: [
-            { field:'name',     displayName: 'Name' },
-            { field:'drugs',    displayName: 'Drugs' },
-            { field:'phone',    displayName: 'Phone#' },
-            { field: 'delete',  displayName: 'Delete'}
-        ],
-        multiSelect:                false,
-        enablePaging:               true,
-        showFooter:                 true,
-        enableRowSelection:         true, 
-        enableSelectAll:            false,
-        enableRowHeaderSelection:   false,
-        noUnselect:                 true,
-        enableGridMenu:             true,
-        enableColumnResize:         true,
-        totalServerItems:           'totalServerItems',
-        pagingOptions:              $scope.pagingOptions,
-        filterOptions:              $scope.filterOptions,
-        rowTemplate:                rowTemplate
-    };
-
 });
 
 app.filter('fromNow', function() {

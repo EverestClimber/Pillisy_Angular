@@ -201,7 +201,7 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
     }
     
     function getTimeAgoString(dateMs){
-        console.log('getTimeAgoString - dateMs: '+dateMs);
+        console.log('getTimeAgoString');
 
         var str = 'N/A';
 
@@ -318,7 +318,9 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
     $scope.mySelections = [];
 
     var adherenceTemplate = '<div class="ngCellText"><span style="font-size: 12px; font-weight:bold" ng-class="getAdherenceClassName(row.getProperty(\'lastweek\'))">{{ row.getProperty(col.field) }}</span></div>';
-    var messageTemplate   = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;SMS</a></div>';
+    //var messageTemplate   = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;SMS</a></div>';
+    var messageTemplate   = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
+
     var nameTemplate      = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click="openPatientRecord(row)"/></div>'; 
 
     $scope.gridOptions = {
@@ -357,6 +359,17 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
         };
 
         $rootScope.$broadcast("send_message_to_patient", data);
+    }
+
+    $scope.callPatient = function($event, patient) {
+        $event.stopPropagation();
+
+        var data = {
+            patient: patient,
+            groupId: $scope.groupId
+        };
+
+        $rootScope.$broadcast("call_patient", data);
     }
 
     $scope.removeRow = function($event, patient) {

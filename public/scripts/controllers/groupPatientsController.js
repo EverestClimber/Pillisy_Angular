@@ -291,9 +291,6 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         columnDefs: [
             { field:'name',       displayName: 'Name',    cellTemplate: nameTemplate },
             { field:'drugs',      displayName: 'Drugs' },
-            //{ field:'today',    displayName: 'Today' },
-            //{ field:'interval', displayName: 'Last 7 days' },
-            //{ field:'all_time', displayName: 'All time' },
             { field:'phone',      displayName: 'Mobile#', cellTemplate: messageTemplate },
             { field:'remove',     displayName: '',        cellTemplate: removeTemplate },
         ],

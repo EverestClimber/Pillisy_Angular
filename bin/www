@@ -7,8 +7,6 @@
  */
 
 'use strict';
-
-require('newrelic');
 var os      = require('os');
 var cluster = require('cluster');
  
