@@ -2,8 +2,9 @@
 *  @author  Chuks Onwuneme
 *  @version 1.0
 *  @package GroupPatientsReportsController AngularJS module
-*  @Copyright 2016 Pillsy, Inc.  
+*  @Copyright 2017 Pillsy, Inc.  
 */
+
 var app = angular.module('GroupPatientsReportsController', ['ngGrid','GroupDetails']);     //instantiates GroupPatientsReportsController module
 app.controller('groupPatientsReportsController', function ($scope, $filter, $http, $location, $rootScope, apiService, groupDetails, stateService) {
     'use strict';
