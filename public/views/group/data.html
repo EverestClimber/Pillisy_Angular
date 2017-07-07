@@ -1,10 +1,10 @@
-<div ng-controller="groupController">
+<div ng-controller="groupPatientsReportsController">
 	<div id="page-heading">
 	    <ol class="breadcrumb">
 	        <li><a href="/">My Groups</a></li>
 	        <li class="active">Group</li>
 	    </ol>
-		<h1 ng-show="group_visible">Group name: {{ group.name }} <br> Group Id: {{ group.identifier }}</h1> 
+		<h1 ng-show="group_visible">Group name: {{ group.name }} </h1> 
 		<h1 ng-show="sms_visible">Send SMS to {{ patient_to_send_sms }}</h1>
 		<h1 ng-show="call_visible">Calling {{ patient_to_call }}</h1>  
 	</div>
@@ -14,7 +14,7 @@
 			<div class="col-lg-12" style="position: relative;">
 				<tabset panel-tabs="true" panel-class="panel-default" style="position: relative;"> 
 					<tab ng-click="onTabSelect('patients')" heading="Patients">
-						<div class="container-fluid" ng-controller="groupPatientsController">
+						<div class="container-fluid">
 						    <div class="row">
 						        <div class="col-md-12">
 						            <panel panel-class="panel-primary" data-heading="Patients medication adherence data">
@@ -23,7 +23,26 @@
 						  					<panel-control-refresh type="circular" is-loading="loadingPatients" ng-click="refreshPatients()"></panel-control-refresh>
 						                </panel-controls>
 
-						                <div style="height: 500px;" ng-grid="gridOptions"></div>
+						                <div style="height: 500px;" ng-grid="patientsListDataGridOptions"></div>
+						            </panel>
+						        </div>
+						    </div>
+						    
+						</div> 
+					</tab>
+					
+					<tab ng-click="onTabSelect('reports')" heading="Reports">
+						<div class="container-fluid">
+
+						    <div class="row">
+						        <div class="col-md-12">
+						            <panel panel-class="panel-primary" data-heading="Patients medication adherence data">
+						                <panel-controls>
+						                    <panel-control-collapse></panel-control-collapse>
+						  					<panel-control-refresh type="circular" is-loading="loadingPatients" ng-click="refreshPatients()"></panel-control-refresh>
+						                </panel-controls>
+
+						                <div style="height: 500px;" ng-grid="patientsReportDataGridOptions" class="grid"></div>
 						            </panel>
 						        </div>
 						    </div>
@@ -87,25 +106,6 @@
 						    </div>
 						</div> 
 					</tab>	
-
-					<tab ng-click="onTabSelect('reports')" heading="Reports">
-						<div class="container-fluid" ng-controller="groupPatientsReportsController">
-
-						    <div class="row">
-						        <div class="col-md-12">
-						            <panel panel-class="panel-primary" data-heading="Patients medication adherence data">
-						                <panel-controls>
-						                    <panel-control-collapse></panel-control-collapse>
-						  					<panel-control-refresh type="circular" is-loading="loadingPatients" ng-click="refreshPatients()"></panel-control-refresh>
-						                </panel-controls>
-
-						                <div style="height: 500px;" ng-grid="gridOptions" class="grid"></div>
-						            </panel>
-						        </div>
-						    </div>
-						    
-						</div> 
-					</tab>
 
 					<!--<tab ng-click="onTabSelect('charts')" heading="Charts">
 						<div class="container-fluid" >

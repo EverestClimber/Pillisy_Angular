@@ -101,9 +101,21 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		};
 
 		getDataFromCache();
+
+		/*
+		//get from cache
+	    var cachedData = stateService.getPatientDetails($scope.activePatient.id);
+	    if (cachedData){
+	    	var patientData = preparePatientData(cachedData);
+	        setMedsPagingData(patientData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
+	    }
+
+	    //now make service call...
+		getMedsPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);*/
 	}
 
 	function getDataFromCache(){
+		//var cachedData = stateService.getPatientDetails($scope.activePatient.id);
 		var cachedData = stateService.getGroupDetails($scope.activeGroup.id);
 	    if (cachedData){
 	    	var patientData = preparePatientData(cachedData);
@@ -119,7 +131,8 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		});
 
 		if (filteredData){
-			
+			alert('filteredData: '+JSON.stringify(filteredData));
+
 			filteredData.forEach(function(patient){
 
 				var obj = {
@@ -231,8 +244,110 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	   	//setMultiBarChartData();
 	};
 
-	/*$scope.refreshMeds = function(){
+	$scope.refreshMeds = function(){
 	   	getMedsPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+	};
+
+	function getMedsPagedDataAsync(pageSize, page, searchText) {
+
+	   	/*var patientId = $scope.activePatient.id;
+	    var groupId   = $scope.activeGroup.id;
+
+	    if (patientId && groupId){
+		  	var api = '/v1/a/organization/group/'+groupId+'/patient/'+patientId+'/drugs/adherence?interval='+getInterval();
+		   	console.log('api is: '+api);
+		        
+		    $scope.loadingMeds = true;
+			apiService.get(api).then(function(result){
+              	$scope.loadingMeds = false;
+
+              	if (result){
+                	if (result.msg == 'success'){
+                  		console.log('apiService.get - successfully retrieved group patients: '+result);
+
+                  		var data = [];
+                  		result.data.forEach(function(drug){
+                  				
+	                    	var obj = {
+	                    		"id": 		   drug.id,
+	                      		"name":        drug.name,
+	                      		"status":      drug.status,
+	                     		"interval":    drug.interval,
+	                      		"average": 	   drug.average,
+	                      		"remaining":   drug.remaining,
+	                      		"quantity":    drug.quantity,
+	                      		"reminders":   drug.reminders
+	                    	};
+
+	                    	if (drug.todayDoses){
+	                    		var todayDoses = drug.todayDoses;
+	                    		
+	                    		if (todayDoses.length > 0){
+	                    			console.log('apiService.get - found doses, display...');
+
+	                    			var doseTime  = '';
+	                    			var doseTaken = '';
+	                    			var index = 0;
+
+	                    			todayDoses.forEach(function(todayDose){
+	                    				if (todayDose.doseTime){
+		                    				if ( (todayDose.doseTime != 'N/A') && (todayDose.doseTime != 'MISSED') && (todayDose.doseTime != '--')){
+		                    					todayDose.doseTime = moment(todayDose.doseTime).format("h:mm A")
+		                    				}
+		                    			}
+
+		                    			doseTime = doseTime + todayDose.doseTime;
+
+		                    			if (todayDose.doseTaken){
+		                    				if ((todayDose.doseTaken != 'N/A') && (todayDose.doseTaken != 'MISSED') && (todayDose.doseTaken != '--')){
+		                    					todayDose.doseTaken = moment(todayDose.doseTaken).format("h:mm:ss A")
+		                    				}
+		                    			}
+
+		                    			doseTaken = doseTaken + todayDose.doseTaken;
+		                    			index++;
+
+		                    			if (index < todayDoses.length){
+		                    				doseTime  = doseTime + '; ';
+		                    				doseTaken = doseTaken + '; ';
+		                    			}
+	                    			});
+
+	                    			obj.doseTime  = doseTime;
+	                    			obj.doseTaken = doseTaken;
+	                     		}
+	                     		else{
+	                     			console.log('apiService.get - there are no doses...');
+
+	                     			obj.doseTime  = 'N/A';
+	                     			obj.doseTaken = 'N/A';
+	                     		}
+	                    	}
+
+	                    	data.push(obj);
+                  		});
+
+                  		if (searchText) {
+							var ft = searchText.toLowerCase();
+                  			data = data.filter(function(item) {
+                    			return JSON.stringify(item).toLowerCase().indexOf(ft) !== -1;
+                  			});
+                  		}
+
+                  		stateService.setPatientDetails($scope.activePatient.id, data);
+                  		setMedsPagingData(data, page, pageSize);
+                	}
+                	else{
+                  		console.log('apiService.get - error retrieving patient meds: '+result.msg);
+
+                  		alert(result.msg);
+                	}
+              	}
+              	else{
+                	console.log('apiService.get - error - no result from server');
+              	}
+            });
+	    }*/
 	};
 
 	$scope.$watch('pagingOptions', function(newVal, oldVal) {
@@ -245,7 +360,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	   	if (newVal !== oldVal) {
 	       	getMedsPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.medsFilterOptions.filterText);
 	   	}
-	}, true);*/
+	}, true);
 
 	$scope.onMedRowClick = function(row) {
 	   	console.log("onMedRowClick");

@@ -1,14 +1,14 @@
 /** Pillsy
 *  @author  Chuks Onwuneme
 *  @version 1.0
-*  @package GroupPatientsController AngularJS module
+*  @package GroupPatientsReportsController AngularJS module
 *  @Copyright 2016 Pillsy, Inc.  
 */
-var app = angular.module('GroupPatientsController', ['ngGrid','GroupDetails']);     //instantiates GroupPatientsController module
-app.controller('groupPatientsController', function ($scope, $filter, $http, $location, $rootScope, apiService, groupDetails, stateService) {
+var app = angular.module('GroupPatientsReportsController', ['ngGrid','GroupDetails']);     //instantiates GroupPatientsReportsController module
+app.controller('groupPatientsReportsController', function ($scope, $filter, $http, $location, $rootScope, apiService, groupDetails, stateService) {
     'use strict';
 
-    console.log('groupPatientsController');
+    /*console.log('groupPatientsReportsController');
 
     var activeGroup = stateService.getActiveGroup();
 
@@ -31,21 +31,35 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 
         $scope.totalServerItems = 0;
         $scope.pagingOptions = {
-            pageSizes: [25, 50, 100],
-            pageSize:  25,
+            pageSizes: [50, 100],
+            pageSize:  50,
             currentPage: 1
         };
     }
 
     function getInterval(){
-        var now = new Date();
+        var now = moment();
 
+        //last sunday to last monday
+        //start week on Monday
+        moment().startOf('isoWeek');
+
+        //last Monday
+        var lastMonday = moment(now).isoWeekday(-6).startOf('day');
+        var lastSunday = moment(lastMonday).add(6, 'days').endOf('day');
+
+        console.log(' last monday\'s date was: '+lastMonday.toDate()+' last sunday\'s date was: '+lastSunday.toDate());
+
+        var intervalStartTime = moment(now.valueOf()).startOf('day').subtract(7,'days').valueOf();
+        var intervalEndTime   = moment(now.valueOf()).endOf('day').valueOf();
+
+        //last week interval
         var interval = {
-            startTime:  moment(now.getTime()).startOf('day').subtract(7,'days').valueOf(),
-            endTime:    moment(now.getTime()).endOf('day').valueOf(),
-            today:      now.getTime(),
-            startOfDay: moment(now.getTime()).startOf('day').valueOf(),
-            endOfDay:   moment(now.getTime()).endOf('day').valueOf()
+            intervalStartTime: intervalStartTime.valueOf(),
+            intervalEndTime:   intervalEndTime.valueOf(),
+            lastweekStartTime: lastMonday.valueOf(),
+            lastweekEndTime:   lastSunday.valueOf(),
+            today:             now.valueOf
         };
 
         return encodeURIComponent( JSON.stringify(interval) );
@@ -88,12 +102,12 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         return phone;
     }
 
-    /*function fireoffGroupDetailsFetch(pageSize, page, searchText){
+    function fireoffGroupDetailsFetch(pageSize, page, searchText){
         var groupId = $scope.groupId;
 
         if (groupId){
-            var request = 'fetch_group_patients';
-            var api     = '/v1/a/organization/group/'+groupId+'/patients?interval='+getInterval()+'&request='+request;
+            var request = 'fetch_group_patients_report';
+            var api     = '/v1/a/organization/group/'+groupId+'/patients/drugs/adherence?interval='+getInterval()+'&request='+request;
             var data;
 
             $scope.loadingPatients = true;
@@ -127,11 +141,16 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 
                             var obj = {
                                 "id":               patient.id,
-                                "name":             patient.name,
+                                "name":             patient.fullname,
                                 "status":           patient.status,
                                 "today":            patient.adherence_today,
                                 "interval":         patient.adherence_interval,
-                                "all_time":         patient.adherence_all,
+                                "all_time":         patient.adherence_alltime,
+                                "lastweek":         patient.adherence_lastweek,
+                                "last_connected":   getTimeAgoString( patient.last_connected ),
+                                "last_opened":      getTimeAgoString( patient.last_opened ), 
+                                "start_date":       moment(patient.startTime).format("YYYY-MM-DD"),
+                                "drug":             patient.drugName,
                                 "address1":         patient.address1,
                                 "address2":         patient.address2,
                                 "city":             patient.city,
@@ -140,8 +159,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
                                 "phone":            patient.phone,
                                 "phone_formatted":  getFormattedPhone(patient.phone),
                                 "phone2":           patient.phone2,
-                                "email":            patient.email,
-                                "drugs":            drugsStr,
+                                "email":            patient.email
                             };
 
                             largeLoad.push(obj);
@@ -158,6 +176,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
 
                         stateService.setGroupDetails($scope.groupId, largeLoad);
                         $scope.setPagingData(largeLoad, page, pageSize);
+                        $rootScope.$broadcast('received_report_data');
                     }
                     else{
                         console.log('groupPatientsController - apiService.get - error creating group: '+result.msg);
@@ -173,95 +192,90 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         else{
             $scope.setPagingData([], page, pageSize);
         }
-    }*/
+    }
+
+    function getRandomIntInclusive(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
     
+    function getTimeAgoString(dateMs){
+        console.log('getTimeAgoString');
+
+        var str = 'N/A';
+
+        if (dateMs){
+            if (dateMs > 0){
+                var now  = moment();
+                var time = moment(dateMs);
+                var duration = moment.duration(now.diff(time));
+
+                var seconds = Math.round(duration.asSeconds());
+
+                if (seconds > 60){
+                    var minutes = Math.round(duration.asMinutes());
+
+                    if (minutes > 60){
+                        var hours = Math.round(duration.asHours());
+
+                        if (hours > 24){
+                            var days = Math.round(duration.asDays());
+
+                            var dayType = (days > 1) ? ' days ago' : ' day ago';
+                            str = days + dayType;
+                        }
+                        else{
+                            var hourType = (hours > 1) ? ' hours ago' : ' hour ago';
+                            str = hours + hourType;
+                        }
+                    }
+                    else{
+                        var minuteType = (minutes > 1) ? ' minutes ago' : ' minute ago';
+                        str = minutes + minuteType;
+                    }
+                }
+                else{
+                    var secondType = (seconds > 1) ? ' seconds ago' : ' second ago';
+                    str = seconds + secondType;
+                }
+            }
+        }
+
+        return str;
+    }
+
     function getPagedDataAsync(pageSize, page, searchText) {
         fireoffGroupDetailsFetch(pageSize, page, searchText);
     };
 
-    function setDataFromCache(){
-        //get from cache
-        var cachedData = stateService.getGroupDetails($scope.groupId)
-        if (cachedData){
-            cachedData = fixData(cachedData);
-            $scope.setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
-        }
+    //get from cache
+    var cachedData = stateService.getGroupDetails($scope.groupId)
+    if (cachedData){
+        $scope.setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
     }
 
-    setDataFromCache();
+    getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
 
     $scope.$watch('pagingOptions', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-            
-            var data = {
-                pageSize:    $scope.pagingOptions.pageSize,
-                currentPage: $scope.pagingOptions.currentPage,
-                filterText:  $scope.filterOptions.filterText
-            };
-
-            $rootScope.$broadcast('paging_options', data);
-
-            //getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+            getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
         }
     }, true);
 
     $scope.$watch('filterOptions', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-
-            var data = {
-                pageSize:    $scope.pagingOptions.pageSize,
-                currentPage: $scope.pagingOptions.currentPage,
-                filterText:  $scope.filterOptions.filterText
-            };
-
-            $rootScope.$broadcast('filter_options', data);
-
-            //getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+            getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
         }
     }, true);
 
-    $scope.$on('received_report_data', function (event, data) {
-        setDataFromCache();
+    $scope.$on('paging_options', function (event, data) {
+        getPagedDataAsync(data.pageSize, data.currentPage, data.filterText);
     });
 
-    function fixData(data){
-
-        var seen = {};
-        data = data.filter(function(entry) {
-
-            var previous;
-
-            // Have we seen this id before?
-            if (seen.hasOwnProperty(entry.id)) {
-                // Yes, grab it and add this drug to it
-                previous = seen[entry.id];
-                previous.drug.push(entry.drug);
-
-                // Don't keep this entry, we've merged it into the previous one
-                return false;
-            }
-
-            // entry.data probably isn't an array; make it one for consistency
-            if (!Array.isArray(entry.drug)) {
-                entry.drug = [entry.drug];
-            }
-
-            // Remember that we've seen it
-            seen[entry.id] = entry;
-
-            // Keep this one, we'll merge any others that match into it
-            return true;
-        });
-
-        data.forEach(function(entry) {
-            var drugs   = entry.drug.toString().replace(/\,/g, ', ');
-            entry.drugs = drugs;
-
-            delete entry.drug;
-        });
-        
-        return data;
-    }
+    $scope.$on('filter_options', function (event, data) {
+        getPagedDataAsync(data.pageSize, data.currentPage, data.filterText);
+    });
 
     $scope.openPatientRecord = function(rowItem) {
         console.log("openPatientRecord");
@@ -286,19 +300,40 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         }
     };
 
+    $scope.getAdherenceClassName = function(value) {
+        value = value.replace(/\%/g,'');
+        value = parseFloat(value);
+
+        if (value >= 85){
+            return 'label label-success';
+        }
+        else if ( (value >=75) && (value < 85)){
+            return 'label label-warning';
+        }
+        else{
+            return 'label label-danger'
+        }
+    }
+
     $scope.mySelections = [];
 
-    var nameTemplate    = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click="openPatientRecord(row)"/></div>'; 
-    var removeTemplate  = '<div><input type="button" style="color: #2685ee" value="Remove" ng-click="removeRow($event, row.entity)" />';
-    var messageTemplate = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
+    var adherenceTemplate = '<div class="ngCellText"><span style="font-size: 12px; font-weight:bold" ng-class="getAdherenceClassName(row.getProperty(\'lastweek\'))">{{ row.getProperty(col.field) }}</span></div>';
+    //var messageTemplate   = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;SMS</a></div>';
+    var messageTemplate   = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
+
+    var nameTemplate      = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click="openPatientRecord(row)"/></div>'; 
 
     $scope.gridOptions = {
         data:             'myData',
         columnDefs: [
-            { field:'name',       displayName: 'Name',    cellTemplate: nameTemplate },
-            { field:'drugs',      displayName: 'Drugs' },
-            { field:'phone',      displayName: 'Mobile#', cellTemplate: messageTemplate },
-            { field:'remove',     displayName: '',        cellTemplate: removeTemplate },
+            { field:'name',           displayName: 'Name',          cellTemplate: nameTemplate },
+            { field:'drug',           displayName: 'Drugs' },
+            { field:'lastweek',       displayName: 'Last Week',     cellTemplate: adherenceTemplate },
+            { field:'all_time',       displayName: 'All time' },
+            { field:'last_connected', displayName: 'Last connected' },
+            { field:'last_opened',    displayName: 'Last opened' },
+            { field:'start_date',     displayName: 'Start date' },
+            { field:'phone',          displayName: 'Mobile#',       cellTemplate: messageTemplate }
         ],
         multiSelect:                false,
         enablePaging:               true,
@@ -404,7 +439,7 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         else{
             //some code
         }
-    };
+    };*/
 
 });
 
