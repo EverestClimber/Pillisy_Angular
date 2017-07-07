@@ -162,15 +162,16 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
         multiSelect:                false,
         enablePaging:               true,
         showFooter:                 true,
-        enableRowSelection:         true, 
+        enableRowSelection:         false, 
         enableSelectAll:            false,
         enableRowHeaderSelection:   false,
-        noUnselect:                 true,
+        noUnselect:                 false,
         enableGridMenu:             true,
         enableColumnResize:         true,
         totalServerItems:           'totalServerItems',
         pagingOptions:              $scope.pagingOptions,
         filterOptions:              $scope.filterOptions,
+        enableCellSelection:        false
     };
 
 });
