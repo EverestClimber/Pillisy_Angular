@@ -14,4 +14,4 @@
 # Description:       Pillsy Enterprise Web App service startup script
 ### END INIT INFO
 
-su - devops /home/devops/projects/Pillsy/PharmacyEnterpriseWebApp/scripts/start_pillsyenterpriseweb_service.sh
+su - devops /home/devops/projects/Pillsy/PillsyEnterpriseWebApp/scripts/start_pillsyenterpriseweb_service.sh
