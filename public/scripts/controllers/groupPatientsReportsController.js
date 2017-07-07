@@ -125,10 +125,7 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
             if (seen.hasOwnProperty(entry.id)) {
                 // Yes, grab it and add this drug to it
                 previous = seen[entry.id];
-
-                var drugs = JSON.parse('['+previous.drugs+']');
-                drugs.push(entry.drugName);
-                previous.drugs = drugs.toString();
+                previous.drugs.push(entry.drugName);
 
                 // Don't keep this entry, we've merged it into the previous one
                 return false;
@@ -141,9 +138,13 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
 
             // Remember that we've seen it
             seen[entry.id] = entry;
-
-            entry.drugs = entry.drugs.toString();
+            
             // Keep this one, we'll merge any others that match into it
+            return true;
+        });
+
+        data = data.filter(function(entry) {
+            entry.drugs = entry.drugs.join(', ');
             return true;
         });
 
