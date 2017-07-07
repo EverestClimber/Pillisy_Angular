@@ -150,7 +150,7 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
     }, true);
 
     $scope.membersGridOptions = {
-        data:                       'myData',
+        data:                           'myData',
         columnDefs: [
             { field: 'name',            displayName: 'Name' },
             { field: 'title',           displayName: 'Title' },
