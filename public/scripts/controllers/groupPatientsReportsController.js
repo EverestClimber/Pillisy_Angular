@@ -76,7 +76,7 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
             intervalEndTime:   intervalEndTime.valueOf(),
             lastweekStartTime: lastMonday.valueOf(),
             lastweekEndTime:   lastSunday.valueOf(),
-            today:             now.valueOf()
+            now:               now.valueOf()
         };
 
         return encodeURIComponent( JSON.stringify(interval) );
@@ -393,52 +393,33 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
                         console.log('groupPatientsController - apiService.get - successfully retrieved group patients: '+result);
 
                         var largeLoad = [];
-                        result.data.forEach(function(patient){
-
-                            var drugsStr = '';
-                            if (patient.drugs){
-                                if (patient.drugs.length > 0){
-                                
-                                    patient.drugs.forEach(function(drug){
-                                        if (drugsStr == ''){
-                                            drugsStr = drug;
-                                        }
-                                        else{
-                                            drugsStr = drugsStr + ', '+drug;
-                                        }
-                                    });
-                                }
-                                else{
-                                    drugsStr = 'N/A';
-                                }
-                            }
+                        result.data.forEach(function(drugData){
 
                             var obj = {
-                                "id":               patient.id,
-                                "name":             patient.fullname,
-                                "status":           patient.status,
-                                "today":            patient.adherence_today,
-                                "interval":         patient.adherence_interval,
-                                "all_time":         patient.adherence_alltime,
-                                "lastweek":         patient.adherence_lastweek,
-                                "last_connected":   getTimeAgoString( patient.last_connected ),
-                                "last_opened":      getTimeAgoString( patient.last_opened ), 
-                                "start_date":       moment(patient.startTime).format("YYYY-MM-DD"),
-                                "drugName":         patient.drugName,
-                                "drugId":           patient.drugId,
-                                "deviceId":         patient.deviceId,
-                                "drugReminders":    patient.reminders,
-                                "remaining":        patient.remaining,
-                                "todayDoses":       patient.todayDoses,
-                                "address1":         patient.address1,
-                                "address2":         patient.address2,
-                                "city":             patient.city,
-                                "state":            patient.state,
-                                "zip":              patient.zip,
-                                "phone":            patient.phone,
-                                "phone_formatted":  getFormattedPhone(patient.phone),
-                                "phone2":           patient.phone2,
-                                "email":            patient.email
+                                "id":               drugData.owner.id,
+                                "name":             drugData.owner.fullname,
+                                "address1":         drugData.owner.address1,
+                                "address2":         drugData.owner.address2,
+                                "city":             drugData.owner.city,
+                                "state":            drugData.owner.state,
+                                "zip":              drugData.owner.zip,
+                                "phone":            drugData.owner.phone,
+                                "status":           drugData.owner.status,
+                                "phone_formatted":  getFormattedPhone(drugData.owner.phone),
+                                "email":            drugData.owner.email,
+                                "today":            drugData.adherence_today,
+                                "interval":         drugData.adherence_interval,
+                                "all_time":         drugData.adherence_alltime,
+                                "lastweek":         drugData.adherence_lastweek,
+                                "last_connected":   getTimeAgoString( drugData.last_connected ),
+                                "last_opened":      getTimeAgoString( drugData.last_opened ), 
+                                "start_date":       moment(drugData.drug.startTime).format("YYYY-MM-DD"),
+                                "drugName":         drugData.drug.name,
+                                "drugId":           drugData.drug.id,
+                                "deviceId":         drugData.deviceId,
+                                "drugReminders":    drugData.drugReminders,
+                                "remaining":        drugData.drug.remaining,
+                                "todayDoses":       drugData.todayDoses
                             };
 
                             largeLoad.push(obj);
