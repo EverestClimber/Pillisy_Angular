@@ -193,13 +193,17 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
         $scope.submitted = true;
 
         var dataObj = {
-            'name':              $scope.drug.name,
-            'source':            'PillsyCap',
-            'pillsyCapId':       $scope.drug.pillsyCapId,
-            'initScheduleTimes': initScheduleTimes,   //reminders
-            'quantityPerDose':   $scope.drug.pills_dose,
-            'quantity':          $scope.drug.quantity,
-            'startTime':         getStartTime($scope.drug.start_date)
+            'name':                    $scope.drug.name,
+            'source':                  'PillsyCap',
+            'pillsyCapId':             $scope.drug.pillsyCapId,
+            'initScheduleTimes':       initScheduleTimes,   //reminders
+            'quantityPerDose':         $scope.drug.pills_dose,
+            'quantity':                $scope.drug.quantity,
+            'startTime':               getStartTime($scope.drug.start_date),
+            'locked':                  true,
+            'enableSMSReminders':      true,
+            'enableIVRReminders':      true,
+            'enablePushNoteReminders': true
         }; 
                     
         if ($scope.drug.pillsyHubId){
