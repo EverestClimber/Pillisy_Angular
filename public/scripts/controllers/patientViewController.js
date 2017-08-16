@@ -250,7 +250,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	$scope.onMedRowClick = function(row) {
 	   	console.log("onMedRowClick");
 
-	  	if (stateService.setActivePatientDrug(row.entity)){
+	   	if (stateService.setActivePatientDrug(row.entity)){
 	       	$location.path('/group/patient/med/data');
 	  	}
 	   	else{

@@ -38,6 +38,17 @@
 								</div>
 							</div>
 						</div>
+
+						<div class="form-group">
+							<div class="col-sm-12">
+								<span>RxNumber</span>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<input type="text" name="rxNumber" data-ng-model="drug.rxNumber" class="form-control" id="rxNumber" placeholder="Prescription number" required />
+								</div>
+							</div>
+						</div>
+
 						<div class="form-group">
 							<div class="col-md-12"> 
 								<span>*Refill Quantity (e.g. 15, 30, 90, etc)</span>
@@ -48,6 +59,7 @@
 								<span ng-show="createpatient.quantity.$invalid">Invalid entry</span>
 							</div>
 						</div>
+					
 						<div class="form-group">
 							<div class="col-sm-12">
 								<span>*Start Date</span>
@@ -57,6 +69,7 @@
 								</div>
 							</div>
 						</div>
+
 						<div class="form-group">
 							<div class="col-sm-12">
 								<span>Number of pills per dose</span>
@@ -67,6 +80,7 @@
 								<span ng-show="createpatient.pills_dose.$invalid">Invalid entry</span>
 							</div>
 						</div>
+
 						<div class="form-group">
 							<div class="col-sm-12">
 								<span>Number of doses per day</span>
@@ -76,6 +90,7 @@
 								</div>
 							</div>
 						</div>
+
 						<div class="form-group" ng-show="numDoses >= 0">
 							<div class="col-sm-12">
 								<span>Dose 1 reminder time </span>
@@ -85,6 +100,7 @@
 								</div>
 							</div>
 						</div>
+
 						<div class="form-group" ng-show="numDoses >= 2">
 							<div class="col-sm-12">
 								<span>Dose 2 reminder time </span>
@@ -94,6 +110,7 @@
 								</div>
 							</div>
 						</div>
+
 						<div class="form-group" ng-show="numDoses >= 3">
 							<div class="col-sm-12">
 								<span>Dose 3 reminder time </span>
@@ -103,6 +120,7 @@
 								</div>
 							</div>
 						</div>
+
 						<div class="form-group" ng-show="numDoses >= 4">
 							<div class="col-sm-12">
 								<span>Dose 4 reminder time </span>
@@ -112,24 +130,7 @@
 								</div>
 							</div>
 						</div>
-						<!--<div class="form-group">
-							<div class="col-sm-12">
-								<span>*Number of days of therapy</span>
-								<div class="input-group">
-									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input type="number" name="days_therapy" data-ng-model="drug.days_therapy" class="form-control" id="days_therapy" placeholder="Days of therapy" step="1" min="1" max="100"  ng-pattern="integerval" ng-init="drug.days_therapy=1"  required />
-								</div>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-12">
-								<span>*Therapy end date</span>
-								<div class="input-group">
-									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<input ui-date="dateOptions" name="end_date" data-ng-model="drug.end_date" class="form-control" id="end_date" placeholder="End date (MM-DD-YYYY)" required />
-								</div>
-							</div>
-						</div>-->
+
 						<div class="form-group">
 							<div class="col-sm-12">
 								<span>*PillsyCap identifier</span>

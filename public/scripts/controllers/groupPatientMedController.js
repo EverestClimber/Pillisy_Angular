@@ -66,14 +66,14 @@ app.controller('groupPatientMedController', function ($scope, $filter, $http, $l
                 });
             }
 
-            $scope.integerval  = /^\d*$/;
+            $scope.integerval  = /^\d*$/; 
         }
         catch(e){
             alert('error: '+e);
 
             $location.path('/');
         }
-    }
+    } 
 
     $scope.postDrug = function(key, value){
         var groupId   = $scope.activeGroup.id;

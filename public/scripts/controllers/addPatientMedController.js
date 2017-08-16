@@ -194,7 +194,7 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
 
         var dataObj = {
             'name':                    $scope.drug.name,
-            'source':                  'PillsyCap',
+            'rxNumber':                $scope.drug.rxNumber,
             'pillsyCapId':             $scope.drug.pillsyCapId,
             'initScheduleTimes':       initScheduleTimes,   //reminders
             'quantityPerDose':         $scope.drug.pills_dose,

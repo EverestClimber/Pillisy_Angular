@@ -76,7 +76,8 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
             intervalEndTime:   intervalEndTime.valueOf(),
             lastweekStartTime: lastMonday.valueOf(),
             lastweekEndTime:   lastSunday.valueOf(),
-            now:               now.valueOf()
+            now:               now.valueOf(),
+            timeZoneOffset:    now.toDate().getTimezoneOffset()
         };
 
         return encodeURIComponent( JSON.stringify(interval) );
