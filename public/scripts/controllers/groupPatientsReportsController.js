@@ -67,8 +67,8 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
 
         console.log(str);
 
-        var intervalStartTime = moment(now.valueOf()).startOf('day').subtract(3,'days').valueOf();
-        var intervalEndTime   = moment(now.valueOf()).endOf('day').valueOf();
+        var intervalStartTime = moment(now.valueOf()).subtract(3,'days').startOf('day');   //last three days
+        var intervalEndTime   = moment(now.valueOf());
 
         //last week interval
         var interval = {

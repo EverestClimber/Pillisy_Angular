@@ -189,11 +189,10 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
         var now = new Date();
 
         var interval = {
-        	startTime:  moment(now.getTime()).startOf('day').subtract(3,'days').valueOf(),
-            endTime:    moment(now.getTime()).endOf('day').valueOf(),
-            today:      now.getTime(),
-            startOfDay: moment(now.getTime()).startOf('day').valueOf(),
-            endOfDay:   moment(now.getTime()).endOf('day').valueOf()
+        	intervalStartTime:  moment(now.getTime()).subtract(3,'days').startOf('day').valueOf(),
+            intervalEndTime:    now.getTime(),
+            now:                now.getTime(),
+            timeZoneOffset:     now.getTimezoneOffset()
         };
 
         return encodeURIComponent( JSON.stringify(interval) );

@@ -35,11 +35,12 @@ app.controller('groupController', function ($scope, $filter, $http, $location, $
         var now = new Date();
 
         var interval = {
-            startTime:  moment(now.getTime()).startOf('day').subtract(3,'days').valueOf(),
-            endTime:    moment(now.getTime()).endOf('day').valueOf(),
-            today:      now.getTime(),
-            startOfDay: moment(now.getTime()).startOf('day').valueOf(),
-            endOfDay:   moment(now.getTime()).endOf('day').valueOf()
+            startTime:      moment(now.getTime()).subtract(3,'days').valueOf(),  //last three days,
+            endTime:        moment(now.getTime()).valueOf(),
+            today:          now.getTime(),
+            //startOfDay:     moment(now.getTime()).startOf('day').valueOf(),
+            //endOfDay:       moment(now.getTime()).endOf('day').valueOf(),
+            timeZoneOffset: now.getTimezoneOffset()
         };
 
         return encodeURIComponent( JSON.stringify(interval) );

@@ -88,13 +88,15 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
     function callPillsyService(pageSize, page, searchText){
         console.log('groupMembersController - callPillsySerice');
 
+        var now       = new Date();
         var startTime = moment($scope.datePicker.date.startDate).startOf('day');
         var endTime   = moment($scope.datePicker.date.endDate).endOf('day');
 
         var interval = {
-            startTime: startTime.valueOf(),
-            endTime:   endTime.valueOf(),
-            today:     new Date().getTime()
+            intervalStartTime: startTime.valueOf(),
+            intervalEndTime:   endTime.valueOf(),
+            now:               now.getTime(),
+            timeZoneOffset:    now.getTimezoneOffset()
         };
 
         interval = decodeURIComponent( JSON.stringify(interval) );

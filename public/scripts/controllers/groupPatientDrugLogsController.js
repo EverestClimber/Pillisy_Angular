@@ -89,10 +89,13 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
     function callPillsyService(pageSize, page, searchText){
         console.log('groupMembersController - callPillsySerice');
 
+        var now = new Date();
+
         var interval = {
-            startTime: moment($scope.logsDatePicker.date.startDate).startOf('day').valueOf(),
-            endTime:   moment($scope.logsDatePicker.date.endDate).endOf('day').valueOf(),
-            today:     new Date().getTime()
+            intervalStartTime:  moment($scope.logsDatePicker.date.startDate).startOf('day').valueOf(),
+            intervalEndTime:    moment($scope.logsDatePicker.date.endDate).endOf('day').valueOf(),
+            now:                now.getTime(),
+            timeZoneOffset:     now.getTimezoneOffset()
         };
 
         interval = decodeURIComponent( JSON.stringify(interval) );

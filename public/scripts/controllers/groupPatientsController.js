@@ -41,11 +41,10 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         var now = new Date();
 
         var interval = {
-            startTime:  moment(now.getTime()).startOf('day').subtract(7,'days').valueOf(),
-            endTime:    moment(now.getTime()).endOf('day').valueOf(),
-            today:      now.getTime(),
-            startOfDay: moment(now.getTime()).startOf('day').valueOf(),
-            endOfDay:   moment(now.getTime()).endOf('day').valueOf()
+            intervalStartTime: moment(now.getTime()).subtract(7,'days').startOf('day').valueOf(),  //7 day ago
+            intervalEndTime:   now.getTime(),
+            now:               now.getTime(),
+            timeZoneOffset:    now.getTimezoneOffset()
         };
 
         return encodeURIComponent( JSON.stringify(interval) );
