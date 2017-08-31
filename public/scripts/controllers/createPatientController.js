@@ -23,13 +23,9 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
     else{
         $scope.searchButtonText = 'Search';
         $scope.searchLoading    = false;
-        $scope.groupId          = pillsy.active_group.id;
-        $scope.groupName        = pillsy.active_group.name;
-        $scope.groupExtName     = pillsy.active_group.identifier;
+        $scope.group            = stateService.getCachedGroup( stateService.getActiveGroup() );
 
-        console.log('createPatientController - $scope.groupId: '+ $scope.groupId );
-        console.log('createPatientController - $scope.groupName: '+ $scope.groupName);
-        console.log('createPatientController - $scope.groupExtName: '+ $scope.groupExtName);
+        console.log('createPatientController - $scope.groupId: '+ $scope.group.id );
 
         toggleForm(true);
     }
@@ -50,6 +46,9 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
         else if (!patient.email){
             alert('Email required');
         }
+        else if (!patient.homeTimeZone){
+            alert('Timezone required');
+        }
         else{
             console.log('Passwords match, proceed with registration...');
 
@@ -57,22 +56,22 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
             $scope.submitted = true;
 
             var dataObj = {
-                'firstname':   patient.firstname,
-                'lastname':    patient.lastname,
-                'dob':   	   patient.dob,
-                'gender':      patient.gender,
-                'address1':    patient.address1,
-                'address2':    patient.address2,
-                'city':        patient.city,
-                'state':       patient.state,
-                'country':     patient.country,
-                'zip':  	   patient.zip,
-                'email':       patient.email,
-                'phone':       patient.phone,
-                'password':    'blablabla'
+                'firstname':    patient.firstname,
+                'lastname':     patient.lastname,
+                'dob':   	    patient.dob,
+                'gender':       patient.gender,
+                'address1':     patient.address1,
+                'address2':     patient.address2,
+                'city':         patient.city,
+                'state':        patient.state,
+                'country':      patient.country,
+                'zip':  	    patient.zip,
+                'email':        patient.email,
+                'phone':        patient.phone,
+                'homeTimeZone': patient.homeTimeZone
             };  
                 
-            var groupId = $scope.groupId;
+            var groupId = $scope.group.id;
             var api = '/v1/a/organization/group/'+groupId+'/patient';
             console.log('apiService.post - api is: '+api);
 
@@ -82,13 +81,13 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
                 if (result.msg == 'success'){
                     console.log('apiService.post - success');
 
-                    var patient = result.data.patient_info;
+                    var patient = result.data.patient;
 
                     if (stateService.setActivePatient(patient)){
-                        $location.path('/group/patient/addmed');
+                        $location.path('/patients/patient/addmed');
                     }
                     else{
-                        $location.path('/groups/mygroups');   
+                        $location.path('/');   
                     }
                 }
                 else{
@@ -106,7 +105,7 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
             alert('Email required');
         }
         else{
-            var groupId = $scope.groupId;
+            var groupId = $scope.group.id;
             var api = '/v1/a/organization/group/'+groupId+'/patient/groupInvitation';   //basically create a new groupInvitation for this patient to approve
 
             $scope.searchButtonText = 'Searching';

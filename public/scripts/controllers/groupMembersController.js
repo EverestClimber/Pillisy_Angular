@@ -51,7 +51,7 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
         $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     };
     
-     function getFormattedPhone(phone){
+    function getFormattedPhone(phone){
 
         if ( phone.charAt(0) === '+'){
             phone = phone.slice(1);

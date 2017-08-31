@@ -35,19 +35,6 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     };
 
-    function getInterval(){
-        var now = new Date();
-
-        var interval = {
-            intervalStartTime:  moment(now.getTime()).subtract(3,'days').startOf('day').valueOf(),
-            intervalEndTime:    now.getTime(),
-            now:                now.getTime(),
-            timeZoneOffset:     now.getTimezoneOffset()
-        };
-
-        return encodeURIComponent( JSON.stringify(interval) );
-    }
-
     function getPagedDataAsync(pageSize, page, searchText) {
         $scope.loadingGroups = true;
 
@@ -56,7 +43,7 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
 
             if (userId){
 	          	var request = 'get_organization_user_groups';  
-                var api     = '/v1/a/organization/user/groups?request='+request+'&interval='+getInterval();
+                var api     = '/v1/a/organization/user/groups';
 
         	    console.log('groupsController - apiService.get - api to call is: '+api);
 
@@ -72,31 +59,19 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
 
 	                  		groups.forEach(function(group){
                                 var obj = {
-                                    "id":                  group.id,
-                                    "name":                group.name,
-                                    "description":         group.description,
-                                    "identifier":          group.extName,
-                                    "avg":                 group.avg,
-                                    "adherence_interval":  group.adherence_interval,
-                                    "patients":            group.patients,
-                                    "members": 		       group.members,
-                                    "label":               group.name,
-                                    "isAdmin":             group.isAdmin,
-                                    "url":                 '/group/data',
-                                    "type":                'group'
+                                    "id":          group.id,
+                                    "name":        group.name,
+                                    "description": group.description,
+                                    "patients":    group.patients,
+                                    "members":     group.members,
+                                    "label":       group.name,
+                                    "isAdmin":     group.isAdmin,
+                                    "url":         '/group/data',
+                                    "type":        'group'
                                 };
 
                                 largeLoad.push(obj);
                             });
-
-                            if (searchText) {
-                                console.log('groupsController - using searchText...');
-
-                                var ft = searchText.toLowerCase();
-                                largeLoad = largeLoad.filter(function(item) {
-                                    return JSON.stringify(item).toLowerCase().indexOf(ft) !== -1;
-                                });
-                            }
 
                             $scope.setPagingData(largeLoad, page, pageSize);
                             stateService.setUserGroups(largeLoad);
@@ -147,11 +122,9 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
     $scope.gridOptions = {
         data:                      'myData',
         columnDefs: [
-          	{ field:'name',               displayName: 'Name',    cellTemplate: nameTemplate },
-          	{ field:'avg',      	      displayName: 'Avg.' },
-          	{ field:'adherence_interval', displayName: 'Last 3 days' },
-          	{ field:'patients', 	      displayName: 'Patients' },
-          	{ field:'members',		      displayName: 'Members' },
+          	{ field:'name',         displayName: 'Name',    cellTemplate: nameTemplate },
+          	{ field:'patients', 	displayName: 'Patients' },
+          	{ field:'members',		displayName: 'Org. Team' },
         ],
         selectedItems:      		$scope.mySelections,
         multiSelect:                false,
@@ -186,32 +159,15 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         $location.path('/groups/mygroups');
     };
 
-    $scope.types = [
-        //{ name: 'Clinical trials', desc: 'Patients activities in this group will be used in clinical trials.'},
-        { name: 'Monitor',  desc: 'This group will be used for monitoring adherence behavior of patients.'},
-        { name: 'Research', desc: 'This group will be used for research.'},
-        { name: 'Study',    desc: 'This group will be used for conducting studies.'},
-    ];
-
-    $scope.selected_type = $scope.types[0].name;
-    $scope.selected_desc = $scope.types[0].desc;
-
-    $scope.selectType = function(type){
-        $scope.selected_type = type.name;
-        $scope.selected_desc = type.desc;
-    };
-
     $scope.group = {
         name: '',
-        description: '',
-        type: ''
+        description: ''
     };
 
     $scope.submitCreate = function(){
         console.log('groupsController - submitCreate() - group is: '+JSON.stringify($scope.group));
         console.log('groupsController - groupname: '+ $scope.group.name);
         console.log('groupsController - groupdescription: '+ $scope.group.description);
-        console.log('groupsController - grouptype: '+ $scope.selected_type);
 
         $scope.loadingGroups = true;
 
@@ -226,16 +182,8 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
 
             return;
         }
-        else if (!$scope.selected_type){
-            console.log('groupsController - createNewGroup() - missing group type, return...');
-
-            return;
-        }
         else{
             console.log('groupsController - createNewGroup() - group fields ok, proceed...');
-
-            $scope.group.type     = $scope.selected_type;
-            $scope.group.interval = getInterval(); 
 
             var api = '/v1/a/organization/group';
             console.log('groupsController - apiService.post - api to call is: '+api);
@@ -250,18 +198,15 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
                         var group = result.data;
 
                         var obj = {
-                            "id":                  group.id,
-                            "name":                group.name,
-                            "description":         group.description,
-                            "identifier":          group.extName,
-                            "avg":                 group.avg,
-                            "adherence_interval":  group.adherence_interval,
-                            "patients":            group.patients,
-                            "members":             group.members,
-                            "label":               group.name,
-                            "isAdmin":             group.isAdmin,
-                            "url":                 '/group/data',
-                            "type":                'group'
+                            "id":          group.id,
+                            "name":        group.name,
+                            "description": group.description,
+                            "patients":    group.patients,
+                            "members":     group.members,
+                            "label":       group.name,
+                            "isAdmin":     group.isAdmin,
+                            "url":         '/group/data',
+                            "type":        'group'
                         };
 
                         var userGroups = stateService.getUserGroups();

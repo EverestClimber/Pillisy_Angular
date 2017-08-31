@@ -492,6 +492,60 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
         });
     }
 
+    $scope.submitDelete = function(){
+        var request = 'delete_organization_group'; 
+
+        var api = '/v1/a/organization/group/'+$scope.group.id;
+
+        var obj = {
+            group:   $scope.group.id,
+            request: request
+        };
+
+        apiService.delete(api, obj).then(function(result){
+            if (result.msg == 'success'){
+                console.log('apiService.post - success');
+
+                var group = result.data;
+
+                if (group){
+                    var userGroups = stateService.getUserGroups();
+
+                    if (userGroups){
+
+                        var index  = 0;
+                        var exists = false;
+                        userGroups.some(function(iGroup){
+                            if (iGroup.id == group.id){
+
+                                exists = true;
+                                return true;
+                            }
+
+                            index++;
+                        });
+
+                        if (exists){
+                            userGroups.splice( index, 1 );
+                            stateService.setUserGroups(userGroups);
+
+                            $rootScope.$emit("my_groups_callback", {groups: userGroups});
+                            $location.path('/groups/mygroups');
+                        }
+                    }
+                }
+                else{
+
+                }
+            }
+            else{
+                console.log('apiService.post - error');
+
+                alert(result.msg);
+            }
+        });
+    }
+
     $scope.updateGroup = function(key, value){
 
         var request = 'update_organization_group'; 
@@ -521,18 +575,15 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
                 var group = result.data;
 
                 var obj = {
-                    "id":                  group.id,
-                    "name":                group.name,
-                    "description":         group.description,
-                    "identifier":          group.extName,
-                    "avg":                 group.avg,
-                    "adherence_interval":  group.adherence_interval,
-                    "patients":            group.patients,
-                    "members":             group.members,
-                    "label":               group.name,
-                    "isAdmin":             group.isAdmin,
-                    "url":                 '/group/data',
-                    "type":                'group'
+                    "id":          group.id,
+                    "name":        group.name,
+                    "description": group.description,
+                    "patients":    group.patients,
+                    "members":     group.members,
+                    "label":       group.name,
+                    "isAdmin":     group.isAdmin,
+                    "url":         '/group/data',
+                    "type":        'group'
                 };
 
                 var userGroups = stateService.getUserGroups();

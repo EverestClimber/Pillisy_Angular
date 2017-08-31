@@ -11,25 +11,21 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
     var user = stateService.getUser();
 
     $scope.menu = [
-      	{
-            id:           'groups_header',
-            label:        'GROUPS',
-            iconClasses:  '',
-            separator:    true,
-      	}, 
-      	{
-            id:           'my_groups',
+        {
+            id:           'patients',
+            label:        'Patients',
+            iconClasses:  'fa fa-user',
+            separator:    false,
+            url:          '/patients/data'
+        }, 
+      	/*{
+            id:           'groups',
             label:        'My Groups',
             iconClasses:  'fa fa-group',
             separator:    false,
-            children:     []
-      	},   
-      	/*{
-            id:           'admin_header',
-            label:        'ADMIN', // This section should be made viewable only to admins
-            iconClasses:  'fa fa-wrench',
-            separator:    true
-      	}, 
+            children:     [],
+            url:          '/groups/mygroups',
+      	}, */  
       	{
             id:           'admin',
             label:        'Admin',
@@ -37,15 +33,11 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
             separator:    false,
             children: [
                 {
-                    label:  'Manage Organization',
-                      url:  '/admin/manageorganization'
+                    label:  'Manage Organizations',
+                    url:  '/admin/manageorganizations'
                 },
-                {
-                    label:  'License Info',
-                    url:    '/admin/licenseinfo'
-                }
             ]
-        },*/
+        },
 
       	/*{
         	label: 'Notifications',
@@ -87,6 +79,23 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
     $scope.selectedFromNavMenu = false;
 
     $scope.select = function(item) {
+
+        if (item.id == 'patients'){
+            
+        }
+
+        if (item.id == 'groups'){
+            if (item.children.length == 0){
+                
+            }
+            else{
+                
+            }
+        }
+
+        if (item.id == 'admin'){
+            
+        }
 
         if (item.type == 'group'){
             var pillsy = stateService.getPillsy();
@@ -233,7 +242,7 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
         console.log('groupsController - updateMyGroupsMenu');
 
         $scope.menu.forEach(function(menuItem){
-            if (menuItem.id == 'my_groups'){
+            if (menuItem.id == 'groups'){
                 var index = $scope.menu.indexOf(menuItem);
                 $scope.menu[index].children = groups;
             }

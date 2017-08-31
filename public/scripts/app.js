@@ -15,7 +15,7 @@ app.config(['$provide', '$routeProvider','$locationProvider', '$httpProvider','$
 
         $routeProvider
         .when('/', {
-            templateUrl: 'views/groups/mygroups.html'
+            templateUrl: 'views/patients/data.html'
         })
         .when('/:templateFile/', {
             templateUrl: function(param) {
@@ -25,6 +25,11 @@ app.config(['$provide', '$routeProvider','$locationProvider', '$httpProvider','$
         .when('/admin/:templateFile/', {
             templateUrl: function(param) {
                 return 'views/admin/' + param.templateFile + '.html';
+            }
+        })
+        .when('/admin/organization/:templateFile/', {
+            templateUrl: function(param) {
+                return 'views/admin/organization/' + param.templateFile + '.html';
             }
         })
         .when('/auth/:templateFile/', {
@@ -55,6 +60,25 @@ app.config(['$provide', '$routeProvider','$locationProvider', '$httpProvider','$
         .when('/group/patient/med/:templateFile/', {
             templateUrl: function(param) {
                 return 'views/group/patient/med/' + param.templateFile + '.html';
+            }
+        })
+        .when('/patients/:templateFile/', {
+            templateUrl: function(param) {
+                return 'views/patients/' + param.templateFile + '.html';
+            }
+        })
+        .when('/patients/patient/:templateFile/', {
+            templateUrl: function(param) {
+                return 'views/patients/patient/' + param.templateFile + '.html';
+            }
+        })
+        .when('/patients/patient/med/:templateFile/', {
+            templateUrl: function(param) {
+                var file = 'views/patients/patient/med/' + param.templateFile + '.html';
+
+                alert('file is: '+file);
+                
+                return file;
             }
         })
         .otherwise({

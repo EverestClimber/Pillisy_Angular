@@ -7,7 +7,7 @@
 var app = angular.module('GroupPatientMedController', []);     //instantiates GroupPatientMedController module
 app.config(['$routeProvider', function($routeProvider) {
     'use strict';
-    $routeProvider.when('/group/patient/med/', {
+    /*$routeProvider.when('/group/patient/med/', {
         templateUrl: 'views/group/patient/med/data.html',
             resolve: {
                 loadCalendar: ['$ocLazyLoad', function($ocLazyLoad) {
@@ -16,7 +16,7 @@ app.config(['$routeProvider', function($routeProvider) {
                     ]);
                 }]
             }
-        });
+        }); */
 }]);
 
 app.controller('groupPatientMedController', function ($scope, $filter, $http, $location, $rootScope, apiService, stateService) {
@@ -24,6 +24,8 @@ app.controller('groupPatientMedController', function ($scope, $filter, $http, $l
 
     //patient cache data
     $scope.activeGroup = stateService.getActiveGroup();
+
+    alert('$scope.activeGroup: '+$scope.activeGroup);
 
     if (!$scope.activeGroup){
         $location.path('/');
