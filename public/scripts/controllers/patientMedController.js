@@ -4,11 +4,11 @@
 *  @package GroupPatientMedController AngularJS module  
 */
 
-var app = angular.module('GroupPatientMedController', []);     //instantiates GroupPatientMedController module
+var app = angular.module('PatientMedController', []);     //instantiates GroupPatientMedController module
 app.config(['$routeProvider', function($routeProvider) {
     'use strict';
-    $routeProvider.when('/group/patient/med/', {
-        templateUrl: 'views/group/patient/med/data.html',
+    $routeProvider.when('/patients/patient/med/', {
+        templateUrl: 'views/patients/patient/med/data.html',
             resolve: {
                 loadCalendar: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load([
@@ -19,17 +19,19 @@ app.config(['$routeProvider', function($routeProvider) {
         }); 
 }]);
 
-app.controller('groupPatientMedController', function ($scope, $filter, $http, $location, $rootScope, apiService, stateService) {
+app.controller('patientMedController', function ($scope, $filter, $http, $location, $rootScope, apiService, stateService) {
     'use strict';
 
     //patient cache data
-    $scope.activeGroup = stateService.getActiveGroup();
+    $scope.activeGroup   = stateService.getActiveGroup();
+    $scope.activePatient = stateService.getActivePatient();
+    $scope.activeDrug    = stateService.getActivePatientDrug();
 
     if (!$scope.activeGroup){
         $location.path('/');
     }
     else{
-        try{
+        /*try{
 
             var groups = stateService.getUserGroups();
             $rootScope.$emit("my_groups_callback", {groups: groups});
@@ -72,7 +74,7 @@ app.controller('groupPatientMedController', function ($scope, $filter, $http, $l
             alert('error: '+e);
 
             $location.path('/');
-        }
+        }*/
     } 
 
     $scope.postDrug = function(key, value){

@@ -1,0 +1,183 @@
+
+<div ng-controller="patientViewController">
+    <style>
+            .round {
+                border-radius: 50%;
+                -webkit-border-radius: 50%;
+                -moz-border-radius: 50%;
+                border: 1px solid #5e5e5e;
+                margin-left: 20px;
+                margin-top: 20px;
+                margin-bottom: 40px;
+                overflow: hidden;
+                width: 120px;
+                height: 120px;
+            }
+            .round img {
+                display: block;
+                height: 120px;
+                width: 120px;
+                background-size: cover;
+                background-repeat: no-repeat;
+            }
+    </style>
+
+    <div id="page-heading">
+        <ol class="breadcrumb">
+            <li><a href="/">Patients</a></li>
+            <li class="active">Patient</li>
+        </ol>
+
+        <div class="col-xs-12">
+            <div style="float:left;" class="round">
+                <img ng-src="{{ activePatientImageUrl }}"/>
+            </div>
+            <div style="float:left; margin-left: 20px; margin-top: 30px; font-size: 13px">
+                <div>
+                    <p style="font-size: 20px">{{ activePatient.fullname }} </p>
+                </div>
+                <div>
+                    Location: {{ activePatientLocation }}
+                </div>
+                <div>
+                    Phone: {{ activePatient.phone_formatted }}
+                </div>
+                <div>
+                    Drugs: {{ activePatient.drugs }}
+                </div>
+            </div>
+
+            <style type="text/css">
+                .custom_panel {
+                    float:left; 
+                    margin-top: 20px;
+                    margin-bottom: 40px;
+                    margin-left: 20px;
+                    height: 120px; 
+                    background-color: white !important;
+                    border-radius: 3px;
+                    -webkit-border-radius: 3px;
+                    -moz-border-radius: 3px;
+                    border: 2px solid #ebebeb;
+                }
+            </style>
+
+            <div style="float:left; height: 120px;" class="col-xs-3">
+            </div>
+
+            <!--<div class="custom_panel">
+                    <div heading="Adherence" panel-class="panel-default" style="height: 80px;">
+                        <nvd3-sparkline-chart data="sparklineChartData" id="sparklineChartExampleId" height="120" margin="{left:30, top:20, bottom:20, right:50}" x="sparklineXFunction()" y="sparklineYFunction()">
+                            <svg></svg>
+                        </nvd3-sparkline-chart>
+                    </div>
+            </div>-->
+        </div>
+        
+        <div class="options">
+            <div class="btn-toolbar">
+                    
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <tabset panel-tabs="true" panel-class="panel-default">
+            <tab heading="Drugs">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <panel panel-class="panel-default" data-heading="" style="height: 100%;">
+                            <panel-controls>
+                                <div style="position:absolute;top:20px;right: 60px;">
+                                    <panel-controls>
+                                        <a href="/patients/patient/addmed" stye="text-align: right;"><i class="glyphicon glyphicon-plus"></i> ADD DRUG&nbsp;&nbsp;</a>
+                                    </panel-controls>
+                                </div>
+
+                                <panel-control-collapse></panel-control-collapse>
+                                <!--<panel-control-refresh type="circular" is-loading="loadingMeds" ng-click="refreshMeds()"></panel-control-refresh>-->
+                            </panel-controls>
+
+                            <div style="height: 300px;" ng-grid="medsGridOptions"/>
+                        </panel>
+                    </div>
+                </div>   
+            </tab> 
+
+            <tab heading="Profile">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <panel panel-class="panel-primary">
+                            <div action="" class="form-horizontal row-border">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">First Name</label>
+                                    <div class="col-sm-6 form-control-static" name="editableForm">
+                                        <a editable-text="activePatient.firstname" onaftersave="postPatientData('firstname', activePatient.firstname)">{{ activePatient.firstname || 'empty' }}</a>
+                                    </div>
+                                </div>
+                                    
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Last Name</label>
+                                    <div class="col-sm-6 form-control-static">
+                                        <a href="#" editable-text="activePatient.lastname" onaftersave="postPatientData('lastname', activePatient.lastname)">{{ activePatient.lastname || 'empty' }}</a>
+                                    </div>
+                                </div>
+                                    
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Address1</label>
+                                    <div class="col-sm-6 form-control-static">
+                                        <a href="#" editable-text="activePatient.address1" onaftersave="postPatientData('address1', activePatient.address1)">{{ activePatient.address1 || 'empty' }}</a>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Address2</label>
+                                    <div class="col-sm-6 form-control-static">
+                                        <a href="#" editable-text="activePatient.address2" onaftersave="postPatientData('address2', activePatient.address2)">{{ activePatient.address2 || 'empty' }}</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">City</label>
+                                    <div class="col-sm-6 form-control-static">
+                                        <a href="#" editable-text="activePatient.city" onaftersave="postPatientData('city', activePatient.city)">{{ activePatient.city || 'empty' }}</a>
+                                    </div>
+                                </div> 
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">State</label>
+                                    <div class="col-sm-6 form-control-static">
+                                        <a href="#" editable-text="activePatient.state" onaftersave="postPatientData('state', activePatient.state)">{{ activePatient.state || 'empty' }}</a>
+                                    </div>
+                                </div>    
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Zip</label>
+                                    <div class="col-sm-6 form-control-static">
+                                        <a href="#" editable-text="activePatient.zip" onaftersave="postPatientData('zip', activePatient.zip)">{{ activePatient.zip || 'empty' }}</a>
+                                    </div>
+                                </div>  
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Email</label>
+                                    <div class="col-sm-6 form-control-static" name="editableForm">
+                                        <a editable-text="activePatient.email" onaftersave="postPatientData('email', activePatient.email)">{{ activePatient.email || 'empty' }}</a>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Mobile#</label>
+                                    <div class="col-sm-6 form-control-static">
+                                        <a href="#" editable-text="activePatient.phone" onaftersave="postPatientData('phone', activePatient.phone)">{{ activePatient.phone || 'empty' }}</a>
+                                    </div>
+                                </div>
+
+                           </div>
+                        </panel>
+                    </div>
+                </div> 
+            </tab>
+        </tabset>
+    </div>
+</div>
+

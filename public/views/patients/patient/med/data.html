@@ -1,15 +1,15 @@
 
-<div ng-controller="groupPatientMedController">
+<div ng-controller="patientMedController">
     <div id="page-heading">
         <ol class="breadcrumb">
             <li><a href="/">Patients</a></li>
             <!--<li><a href="/group/data">{{ activeGroup.name }}</a></li> -->
-            <li><a href="/patients/patient/data">{{ activePatient.name }}</a></li>
+            <li><a href="/patients/patient/data">{{ activePatient.fullname }}</a></li>
             <li class="active">Drug History</li>
         </ol>
 
         <div>
-            <h1>Patient: {{ activePatient.name }} <br>Drug: {{ activeDrug.name }} </h1>
+            <h1>Patient: {{ activePatient.fullname }} <br>Drug: {{ activeDrug.name }} </h1>
         </div>
     </div>
 

@@ -9,6 +9,91 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
 	console.log('stateService...');
 
     //---------CACHING------------
+    this.getActivePatientDrugs = function(){
+        console.log('stateService - getPatientDrugs');
+
+        var drugs  = [];
+        var pillsy = this.getPillsy();
+
+        if (pillsy){
+            console.log('stateService - getPatientDrugs');
+
+            var activePatient = this.getActivePatient();
+
+            if (activePatient){
+
+                var organization = pillsy.organization;
+                if (organization){
+                    var patients = organization.patients;
+
+                    if (patients){
+                        patients.some(function(patient){
+                            if (patient.id == activePatient.id){
+                                drugs = patient.drugs;
+
+                                return true;
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        return drugs;
+    }
+
+    //single patient
+    this.setGroupPatientData = function(groupPatientData){
+        console.log('stateService - setGroupData...');
+
+        var pillsy = this.getPillsy();
+
+        if (pillsy){
+            console.log('stateService - setActiveGroup, got pillsy, set groupData');
+
+            var group        = groupPatientData.group;
+            var patient      = groupPatientData.patient;
+            var organization = pillsy.organization;
+
+            if (organization){
+                var patients = organization.patients;
+
+                if (patients){
+
+                    var exists = false;
+                    patients.some(function(iPatient){
+                        if (iPatient.id == patient.id){
+                            iPatient = patient;
+                            exists = true;
+                            return true;
+                        }
+                    });
+
+                    if (!exists){
+                        patients.push(patient);
+                    }
+
+                    organization.patients = patients;
+                }
+                else{
+                    organization.patients = [patient];
+                }
+            }
+            else{
+                //there was no organization object, so this is new...
+                organization = {
+                    patients: [patient],
+                    groups:   [group]
+                };
+            }
+
+            pillsy.organization = organization;
+            $window.sessionStorage.pillsy = JSON.stringify(pillsy);
+
+            return true;
+        }
+    }
+
     this.setGroupPatientsData = function(groupPatientsData){
         console.log('stateService - setGroupData...');
 
@@ -556,7 +641,6 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
             console.log('stateService - setActiveGroup, got pillsy, set active group');
 
             pillsy.active_group = group;
-
             $window.sessionStorage.pillsy = JSON.stringify(pillsy);
 
             return true;
@@ -610,6 +694,51 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
         return theGroup;
     };
 
+    this.removePatientFromGroup = function(patient, group){
+        var pillsy = this.getPillsy();
+        if (pillsy){
+           
+            if (group.type == 'master'){
+                //remove from all the groups
+                var organization = pillsy.organization;
+                if (organization){
+                    var patients = organization.patients;
+
+                    if (patients){
+
+                        var index = 0;
+                        var exists = false;
+                        patients.some(function(iPatient){
+                            if (iPatient.id == patient.id){
+                                exists = true;
+                                return true;
+                            }
+
+                            index++;
+                        });
+
+                        if (exists){
+                            patients.splice(index, 1);
+                        }
+
+                        organization.patients = patients;
+                    }
+                }
+            }
+            else{
+                //delete from group only
+            }
+
+            pillsy.organization = organization;
+            $window.sessionStorage.pillsy = JSON.stringify(pillsy);
+
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     //when a patient is clicked, this sets that patient as the actively opened patient within a group
     this.setActivePatient = function(patient){
         var pillsy = this.getPillsy();
@@ -617,8 +746,6 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
         if (pillsy){
            
             pillsy.active_patient = patient;
-
-            alert('active_patient is now: '+JSON.stringify(pillsy.active_patient));
             $window.sessionStorage.pillsy = JSON.stringify(pillsy);
 
             return true;
@@ -642,34 +769,14 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
 	this.setActivePatientDrug = function(drug){
         var pillsy = this.getPillsy();
 
-        try{
-            if (pillsy){
-                var activeGroup = this.getActiveGroup();
+        if (pillsy){
+           
+            pillsy.active_drug = drug;
+            $window.sessionStorage.pillsy = JSON.stringify(pillsy);
 
-                if (activeGroup){
-                    var activePatient = activeGroup.active_patient;
-
-                    if (activePatient){
-                        activePatient.active_drug     = drug;
-                        activeGroup.active_patient    = activePatient;
-                        pillsy.active_group           = activeGroup;
-                        $window.sessionStorage.pillsy = JSON.stringify(pillsy);
-
-                        return true;
-                    }
-                    else{
-                        return false;
-                    }
-                }
-                else{
-                    return false;
-                }
-            }
-            else{
-                return false;
-            }
+            return true;
         }
-        catch(e){
+        else{
             return false;
         }
     };
@@ -679,15 +786,7 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
         var pillsy = this.getPillsy();
 
         if (pillsy){
-            var activeGroup = this.getActiveGroup();
-
-            if (activeGroup){
-                var activePatient = activeGroup.active_patient;
-
-                if (activePatient){
-                    activePatientDrug = activePatient.active_drug;
-                }    
-            }
+            activePatientDrug = pillsy.active_drug;
         }
 
         return activePatientDrug;
@@ -802,7 +901,7 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
 
         $window.sessionStorage.pillsy = JSON.stringify(pillsy);
 
-        this.setActiveGroup(1);  //master group
+        this.setActiveGroup(data.masterGroup);  //master group
 
       	$rootScope.$emit("login_status_change", { isLoggedIn: true });
       	$location.path( "/" );

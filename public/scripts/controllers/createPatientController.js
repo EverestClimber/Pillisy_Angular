@@ -23,12 +23,12 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
     else{
         $scope.searchButtonText = 'Search';
         $scope.searchLoading    = false;
-        $scope.group            = stateService.getCachedGroup( stateService.getActiveGroup() );
-
-        console.log('createPatientController - $scope.groupId: '+ $scope.group.id );
+        $scope.group            = stateService.getCachedGroup( stateService.getActiveGroup().id );
 
         toggleForm(true);
     }
+
+    $scope.timeZones = ["America/New_York", "America/Chicago", "America/Denver", "America/Phoenix", "America/Los_Angeles", "America/Anchorage", "America/Adak", "Pacific/Honolulu"];
 
     $scope.dateOptions = { 
         dateFormat: 'mm-dd-yy',
@@ -81,6 +81,7 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
                 if (result.msg == 'success'){
                     console.log('apiService.post - success');
 
+                    stateService.setGroupPatientData(result.data);
                     var patient = result.data.patient;
 
                     if (stateService.setActivePatient(patient)){

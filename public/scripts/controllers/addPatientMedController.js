@@ -11,7 +11,7 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
     console.log('addPatientMedController');
 
     //patient cache data
-    $scope.activeGroup   = stateService.getCachedGroup( stateService.getActiveGroup() );
+    $scope.activeGroup   = stateService.getActiveGroup();
     $scope.activePatient = stateService.getActivePatient();
 
     if ( !$scope.activeGroup || !$scope.activePatient){
@@ -232,9 +232,8 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
                 if (result.msg == 'success'){
                     console.log('apiService.post - success');
 
-                    var patient = result.data;
-                    $rootScope.active_patient = patient;
-                    $location.path('/group/patient/data');
+                    stateService.setGroupPatientData(result.data);
+                    $location.path('/patients/patient/data');
                 }
                 else{
                     console.log('apiService.post - error');

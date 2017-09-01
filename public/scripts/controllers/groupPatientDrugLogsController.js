@@ -20,8 +20,8 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
     else{
         try{
 
-            $scope.activePatient = $scope.activeGroup.active_patient;
-            $scope.activeDrug    = $scope.activeGroup.active_patient.active_drug;
+            $scope.activePatient = stateService.getActivePatient();
+            $scope.activeDrug    = stateService.getActivePatientDrug();
 
             initVars();
         }

@@ -41,19 +41,31 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
 
     function displayDataFromCache(){
         //get from cache
-        var cachedData = stateService.getGroupPatients( stateService.getActiveGroup() );
-
+        var cachedData = stateService.getGroupPatients( stateService.getActiveGroup().id );
+        
         if (cachedData){
+            cachedData = formatCachedData(cachedData);
             setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
         }
     }
 
-    function setPagingData(listData, page, pageSize) {
+    function formatCachedData(cachedData){
 
-        listData.forEach(function(list){
-            list.drugs = list.drugs.join(', ');
+        cachedData.forEach(function(patient){
+            var drugs = patient.drugs;
+
+            var drugsArr = [];
+            drugs.forEach(function(drug){
+                drugsArr.push(drug.name);
+            });
+
+            patient.drugs = drugsArr.join(', ');
         });
 
+        return cachedData;
+    }
+
+    function setPagingData(listData, page, pageSize) {
         //for list
         $scope.organizationPatients         = listData.slice((page - 1) * pageSize, page * pageSize);
         $scope.totalServerPatientsListItems = listData.length;
@@ -66,7 +78,7 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
     function fetchPatients(pageSize, page){
 
         var request = 'fetch_organization_patients';
-        var api     = '/v1/a/organization/group/'+ stateService.getActiveGroup()+'/patients';
+        var api     = '/v1/a/organization/group/'+ stateService.getActiveGroup().id +'/patients';
         var data;
 
         $scope.loadingPatients = true;
@@ -107,7 +119,7 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
     $scope.removeRow = function($event, patient) {
 
         $event.stopPropagation();
-        var activeGroup = stateService.getCachedGroup( stateService.getActiveGroup() );
+        var activeGroup = stateService.getCachedGroup( stateService.getActiveGroup().id );
         var answer = confirm('You are about to remove '+patient.fullname+' from this organization. Are you sure?');
         
         if (answer){
@@ -122,41 +134,8 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
                 if (result){
                     if (result.msg == 'success'){
 
-                        var groupDetails = stateService.getGroupDetails($scope.groupId);
-
-                        if (groupDetails){
-                            if (groupDetails.length > 0){
-                                for (var i = groupDetails.length -1; i >= 0 ; i--){
-                                    if (groupDetails[i].id == patient.id){
-                                        groupDetails.splice(i, 1);
-
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                       
-                        var data = result.data;
-
-                        if (data.numPatients){
-                            var userGroups = stateService.getUserGroups();
-
-                            if (userGroups){
-                                if (userGroups.length > 0){
-                                    userGroups.some(function(group){
-                                        if (group.id == $scope.groupId){
-                                            group.patients = data.numPatients;
-                                            return true;
-                                        }
-                                    });
-
-                                    stateService.setUserGroups(userGroups);
-                                }
-                            }
-                        }
-
-                        stateService.setGroupDetails($scope.groupId, groupDetails);
-                        $scope.myData.splice($scope.myData.indexOf(patient), 1);
+                        stateService.removePatientFromGroup(patient, activeGroup);
+                        displayDataFromCache();
                     }
                     else{
                         console.log('groupPatientsController - apiService.get - error deleting patient from group: '+result.msg);
@@ -304,6 +283,29 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
         });
     }
 
+    $scope.openPatientRecord = function(rowItem) {
+        console.log("openPatientRecord");
+
+        var patient = rowItem.entity;
+
+        var nameArr = patient.fullname.split(', ');
+
+        if (nameArr.length > 0){
+            patient.lastname = nameArr[0];
+
+            if (nameArr.length == 2){
+                patient.firstname = nameArr[1];
+            }
+        }
+
+        if (stateService.setActivePatient(patient)){
+            $location.path('/patients/patient/data');
+        }
+        else{
+            //could not set group
+        }
+    };
+
     //Grid For patients list
     var removeTemplate  = '<div><input type="button" style="color: #2685ee" value="Remove" ng-click="removeRow($event, row.entity)" />';
     var messageTemplate = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
@@ -343,7 +345,7 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
     $scope.patientsReportDataGridOptions = {
         data:             'patientsReportData',
         columnDefs: [
-            { field:'name',           displayName: 'Name',          cellTemplate: iNameTemplate },
+            { field:'fullname',       displayName: 'Name',          cellTemplate: iNameTemplate },
             { field:'drugName',       displayName: 'Drugs' },
             { field:'lastweek',       displayName: 'Last Week',     cellTemplate: adherenceTemplate },
             { field:'all_time',       displayName: 'All time' },

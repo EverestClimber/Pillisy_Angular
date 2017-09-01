@@ -3,7 +3,6 @@
  *  @version 1.0
  *  @package Pillsy app main AngularJS module  
  */
-
 var app = angular.module('pillsyApp', ['Pillsy','theme.demos','AuthInterceptor','CsrfTokenInterceptor']);
 app.config(['$provide', '$routeProvider','$locationProvider', '$httpProvider','$cookiesProvider','localStorageServiceProvider',
     function($provide, $routeProvider, $locationProvider, $httpProvider, $cookiesProvider,localStorageServiceProvider) {
@@ -74,10 +73,7 @@ app.config(['$provide', '$routeProvider','$locationProvider', '$httpProvider','$
         })
         .when('/patients/patient/med/:templateFile/', {
             templateUrl: function(param) {
-                var file = 'views/patients/patient/med/' + param.templateFile + '.html';
-
-                alert('file is: '+file);
-                
+                var file = 'views/patients/patient/med/' + param.templateFile + '.html';  
                 return file;
             }
         })
