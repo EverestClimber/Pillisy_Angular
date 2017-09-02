@@ -46,25 +46,11 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 
 		var groups = stateService.getUserGroups();
         $rootScope.$emit("my_groups_callback", {groups: groups});
-
-	    $scope.trendsData = [];
-		$scope.multiBarChartData = [];
-		$scope.pieChartData = [];
-
-	    $scope.loadingTrendsChartData = false;
-		$scope.loadingMedsChartData   = false;
-		$scope.loadingMeds = false;
-
-		//----MEDS----
-		$scope.medsFilterOptions = {
-		   	filterText: '',
-		   	useExternalFilter: true
-		};
 		
 		$scope.totalMeds = 0;
 		$scope.pagingOptions = {
-		   	pageSizes: [5, 10, 20, 30],
-		   	pageSize: 5,
+		   	pageSizes: [10, 20, 30],
+		   	pageSize:   10,
 		    currentPage: 1
 		};
 
@@ -75,7 +61,6 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		var cachedData = stateService.getActivePatientDrugs();
 
 	    if (cachedData){
-	    	//cachedData = preparePatientData(cachedData);
 	        setMedsPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
 	    }
 	}
@@ -83,23 +68,26 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	/*function preparePatientData(cachedData){
 		var data = [];
 
-		var filteredData = cachedData.filter(function(data){
-			return (data.id == $scope.activePatient.id);
+		var filteredData = cachedData.filter(function(patient){
+			return (patient.id == $scope.activePatient.id);
 		});
 
-		if (filteredData){
+		if (filteredData.length > 0){
 			
-			filteredData.forEach(function(patient){
+			var patientData = filteredData[0];
+			var drugs       = patientData.drugs;
+
+			drugs.forEach(function(drug){
 
 				var obj = {
-	                "id": 		   patient.drugId,
-	                "name":        patient.drugName,
-	                "status":      patient.status,
-	                "interval":    patient.interval,
-	                "average": 	   patient.all_time,
-	                "remaining":   patient.remaining,
-	                "quantity":    patient.quantity,
-	                "reminders":   patient.drugReminders
+	                "id": 		  drug.id,
+	                "name":       drug.name,
+	                "status":     drug.status,
+	                "doseTimes":  drug.doseTimes,
+	                "todayTaken": drug.todayTaken,
+	                "interval":   drug.interval,
+	                "average":    drug.average,
+	                "remaining":  drug.remaining
 	          	};
 
 	            if (patient.todayDoses){

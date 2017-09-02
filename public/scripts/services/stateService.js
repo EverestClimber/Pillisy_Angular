@@ -61,16 +61,21 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
                 if (patients){
 
                     var exists = false;
+                    var index  = 0;
                     patients.some(function(iPatient){
                         if (iPatient.id == patient.id){
-                            iPatient = patient;
                             exists = true;
                             return true;
                         }
+
+                        index++;
                     });
 
                     if (!exists){
                         patients.push(patient);
+                    }
+                    else{
+                        patients[index] = patient;
                     }
 
                     organization.patients = patients;
@@ -469,6 +474,7 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
                 
                 var pDetails = pillsy.patient_details;
                 var exists = false;
+                var index  = 0;
 
                 pDetails.some(function(patient){
                     if (patient.id == patientId){
@@ -476,6 +482,8 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
                         exists = true;
                         return true;
                     }
+
+                    index++;
                 });
 
                 if (exists){

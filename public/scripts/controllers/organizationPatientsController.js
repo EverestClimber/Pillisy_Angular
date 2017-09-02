@@ -160,7 +160,7 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
     
     $scope.messagePatient = function($event, patient) {
         $event.stopPropagation();
- 
+
         if (patient){
             $scope.sendPatient         = patient;
             $scope.patient_to_send_sms = patient.fullname;
@@ -191,9 +191,11 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
     $scope.sendMessage = function(message){
 
         if (message){
-            var request = 'send_sms_to_patient';
-            var activeGroup = stateService.getCachedGroup( stateService.getActiveGroup() );
-            var api     = '/v1/a/organization/group/'+ activeGroup.id +'/patient/'+ $scope.sendPatient.id +'/sms';
+            
+            var request   = 'send_sms_to_patient';
+            var patientId = $scope.sendPatient.id;
+            var groupId   = stateService.getActiveGroup().id;
+            var api       = '/v1/a/organization/group/'+ groupId +'/patient/'+ patientId +'/sms';
             var payload = {
                 message: message,
                 request: request

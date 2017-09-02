@@ -47,6 +47,51 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
       	}*/
     ];
 
+    $rootScope.$on("login_status_change", function(event, data){
+        if ( data.isLoggedIn ){
+            var user = stateService.getUser();
+            if (user.role == 'super_user'){
+                var admin = {
+                    id:           'admin',
+                    label:        'Admin',
+                    iconClasses:  'fa fa-wrench',
+                    separator:    false,
+                    children: [
+                        {
+                            label:  'Manage Organizations',
+                            url:  '/admin/manageorganizations'
+                        },
+                    ]
+                };
+
+                $scope.menu.push(admin);
+            }
+        }
+        else{
+
+          $scope.menu = $scope.menu.filter(function( obj ) {
+              return obj.id !== 'admin';
+          });
+        }
+    });
+
+    /*if (user.role == 'super_user'){
+        var admin = {
+            id:           'admin',
+            label:        'Admin',
+            iconClasses:  'fa fa-wrench',
+            separator:    false,
+            children: [
+                {
+                    label:  'Manage Organizations',
+                    url:  '/admin/manageorganizations'
+                },
+            ]
+        };
+
+        $scope.menu.push(admin);
+    }*/
+
     restoreUserGroups();
 
     var setParent = function(children, parent) {

@@ -96,7 +96,7 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
         else if (!$scope.drug.end_date){
             alert('End date required');
         }*/
-        else if (!$scope.drug.pillsyCapId){
+        else if (!$scope.drug.deviceId){
             alert('PillsyCap identifier required');
         }
         else{
@@ -195,7 +195,7 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
         var dataObj = {
             'name':                    $scope.drug.name,
             'rxNumber':                $scope.drug.rxNumber,
-            'pillsyCapId':             $scope.drug.pillsyCapId,
+            'deviceId':                $scope.drug.deviceId,
             'initScheduleTimes':       initScheduleTimes,   //reminders
             'quantityPerDose':         $scope.drug.pills_dose,
             'quantity':                $scope.drug.quantity,
@@ -226,6 +226,7 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
 
         apiService.post(api,dataObj).then(function(result){
             $scope.createDrugLoading = false;
+
             if (result){
                 console.log('apiService.post - result is: '+JSON.stringify(result));
 
@@ -233,6 +234,20 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
                     console.log('apiService.post - success');
 
                     stateService.setGroupPatientData(result.data);
+
+                    var activePatient = result.data.patient;
+                    var drugs         = activePatient.drugs;
+                    var iDrugs        = [];
+
+                    drugs.forEach(function(drug){
+                        iDrugs.push(drug.name);
+                    });
+
+                    drugs = iDrugs.join(', ');
+                    activePatient.drugs = drugs;
+
+                    stateService.setActivePatient(activePatient);
+
                     $location.path('/patients/patient/data');
                 }
                 else{
