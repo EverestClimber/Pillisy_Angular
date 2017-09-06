@@ -7,6 +7,7 @@ var app = angular
     'daterangepicker',
     'ngAnimate',
     'cgBusy',
+    'angularMoment',
     //'inputDropdown',
     'as.sortable',
     'easypiechart',

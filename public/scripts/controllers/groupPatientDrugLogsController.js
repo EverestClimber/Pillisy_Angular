@@ -124,7 +124,7 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
                             obj.time     = moment(drugEvent.eventTime).format("h:mm:ss A");
                             obj.event    = drugEvent.eventValue; 
                             obj.platform = drugEvent.platform;
-                            obj.method   = drugEvent.method;
+                            obj.method   = drugEvent.method === 'AUTO' ? 'DEVICE' : 'MOBILE APP';
                             
                             objs.push(obj);
                         });

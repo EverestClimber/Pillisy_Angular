@@ -44,7 +44,6 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
         var cachedData = stateService.getGroupPatients( stateService.getActiveGroup().id );
         
         if (cachedData){
-            cachedData = formatCachedData(cachedData);
             setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
         }
     }
@@ -59,21 +58,83 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
                 drugsArr.push(drug.name);
             });
 
-            patient.drugs = drugsArr.join(', ');
+            patient.drugNames = drugsArr.join(', ');
         });
 
         return cachedData;
     }
 
-    function setPagingData(listData, page, pageSize) {
+    function setPagingData(cachedData, page, pageSize) {
+
         //for list
+        var listData                        = formatCachedData(cachedData);
         $scope.organizationPatients         = listData.slice((page - 1) * pageSize, page * pageSize);
         $scope.totalServerPatientsListItems = listData.length;
+
+        //for reports
+        var reportData  = [];
+        var tempListData = cachedData.slice((page - 1) * pageSize, page * pageSize);
+
+        tempListData.forEach(function(item){
+            var drugs = item.drugs;
+            if (drugs.length > 0){
+
+                drugs.forEach(function(drug){
+
+                    var obj = getItemObject(item);
+
+                    obj.drugId            = drug.id;
+                    obj.drugName          = drug.name;
+                    obj.drugRemaining     = drug.remaining;
+                    obj.drugLastConnected = drug.lastConnected;
+                    obj.drugLastOpened    = drug.lastOpened; 
+                    obj.drugStatus        = drug.status;
+                    obj.drugDoseTimes     = drug.doseTimes;
+                    obj.drugTodayTaken    = drug.todayTaken;
+                    obj.drugStartTime     = drug.startTime;
+
+                    reportData.push(obj);
+                });
+            }
+            else{
+                var obj = getItemObject(item);
+                obj.drugId            = 'N/A';
+                obj.drugName          = 'N/A';
+                obj.drugRemaining     = 'N/A';
+                obj.drugLastConnected = 'N/A';
+                obj.drugLastOpened    = 'N/A'; 
+                obj.drugStatus        = 'N/A';
+                obj.drugDoseTimes     = 'N/A';
+                obj.drugTodayTaken    = 'N/A';
+                obj.drugStartTime     = 'N/A';
+
+                reportData.push(obj);
+            }
+        });
+
+        //format for reports tab
+        //alert('tempListData: '+JSON.stringify(tempListData));
+
+        $scope.reportData = reportData;
+        $scope.totalServerPatientsReportItems = listData.length;
 
         if (!$scope.$$phase) {
             $scope.$apply();
         }
     };
+
+    function getItemObject(item){
+        var obj = {};
+        for (var key in item) {
+            if (item.hasOwnProperty(key)) {
+                if ( (key != 'drugNames') && (key != 'drugs') ){
+                    obj[key] = item[key];
+                }
+            }
+        }
+
+        return obj;
+    }
 
     function fetchPatients(pageSize, page){
 
@@ -163,7 +224,7 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
 
         if (patient){
             $scope.sendPatient         = patient;
-            $scope.patient_to_send_sms = patient.fullname;
+            $scope.patient_to_send_sms =  patient.firstname +' '+ patient.lastname;
         }
 
         $scope.org_patients_panel_visible = false;
@@ -171,21 +232,6 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
         $scope.sms_panel_visible          = true;
         $scope.sendButtonText             = 'Send';
         $scope.message_patient_form       = true;
-    }
-
-    $scope.callPatient = function($event, patient) {
-        $event.stopPropagation();
-
-        if (patient){
-            $scope.callPatient     = patient;
-            $scope.patient_to_call = patient.fullname;
-        }
-
-        $scope.org_patients_panel_visible = false;
-        $scope.call_panel_visible         = true;
-        $scope.sms_panel_visible          = false;
-
-        callPatient(patient.phone);
     }
 
     $scope.sendMessage = function(message){
@@ -217,14 +263,14 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
                         if (data.found){
                             if (data.hasPhone){
                                 if (data.smsSent){
-                                    output = 'Your SMS message was successfully sent to '+ $scope.sendPatient.name;
+                                    output = 'Your SMS message was successfully sent to '+ $scope.sendPatient.firstname;
                                 }
                                 else{
                                     output = 'Your SMS could not be sent. Please try again later';
                                 }
                             }
                             else{
-                                output = 'The patient, '+ $scope.sendPatient.name +', does not have a phone number associated with their account. Your SMS message was not sent.'
+                                output = 'The patient, '+ $scope.sendPatient.firstname +', does not have a phone number associated with their account. Your SMS message was not sent.'
                             }
                         }
                         else{
@@ -249,56 +295,59 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
         }
     }
 
-    function callPatient(patientPhone){
+    $scope.callPatient = function($event, patient){
         console.log('organizationGroupController - callPatient');
 
-        var request     = 'call_patient';
-        var activeGroup = stateService.getCachedGroup( stateService.getActiveGroup() );
-        var api     = '/v1/a/organization/group/'+ activeGroup.id +'/patient/'+ $scope.callPatient.id +'/call';
-        var payload = {
-            message: message,
-            request: request
-        };
+        $event.stopPropagation();
 
-        console.log('organizationGroupController - callPatient - api: '+api);
+        if (patient){
+            $scope.patient_to_call = patient.firstname +' '+ patient.lastname;
 
-        $scope.callPatientMsg = 'Please wait while a call is being placed to '+$scope.patient_to_call;
+            $scope.org_patients_panel_visible = false;
+            $scope.call_panel_visible         = true;
+            $scope.sms_panel_visible          = false;
 
-        apiService.post(api, payload).then(function(result){
+            var request     = 'call_patient';
+            var activeGroup = stateService.getCachedGroup( stateService.getActiveGroup().id );
+            var api     = '/v1/a/organization/group/'+ activeGroup.id +'/patient/'+ patient.id +'/call';
+            var payload = {
+                message: message,
+                request: request
+            };
 
-            if (result){
-                var msg = result.msg;
+            console.log('organizationGroupController - callPatient - api: '+api);
 
-                if (msg == 'success'){
+            $scope.callPatientMsg = 'Please wait while a call is being placed to '+patient.firstname;
 
-                    var data = result.data;
+            apiService.post(api, payload).then(function(result){
+
+                if (result){
+                    var msg = result.msg;
+
+                    if (msg == 'success'){
+
+                        var data = result.data;
+                    }
+                    else{
+                        console.log('apiService.post - error');
+
+                        $scope.callPatientMsg = 'Pillsy encountered an error while trying to call '+ patient.firstname +'. Please try again later.';
+                    }
                 }
                 else{
                     console.log('apiService.post - error');
-
-                    $scope.callPatientMsg = 'Pillsy encountered an error while trying to call '+ $scope.callPatient.fullname +'. Please try again later.';
                 }
-            }
-            else{
-                console.log('apiService.post - error');
-            }
-        });
+            });
+        }
+        else{
+            $scope.callPatientMsg = 'Pillsy encountered an error while trying to call '+ patient.firstname +'. Please try again later.';
+        }
     }
 
     $scope.openPatientRecord = function(rowItem) {
         console.log("openPatientRecord");
 
         var patient = rowItem.entity;
-
-        var nameArr = patient.fullname.split(', ');
-
-        if (nameArr.length > 0){
-            patient.lastname = nameArr[0];
-
-            if (nameArr.length == 2){
-                patient.firstname = nameArr[1];
-            }
-        }
 
         if (stateService.setActivePatient(patient)){
             $location.path('/patients/patient/data');
@@ -318,7 +367,7 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
         data:             'organizationPatients',
         columnDefs: [
             { field:'fullname',        displayName: 'Name',     cellTemplate: nameTemplate },
-            { field:'drugs',           displayName: 'Drugs' },
+            { field:'drugNames',       displayName: 'Drugs' },
             { field:'phone_formatted', displayName: 'Mobile#' , cellTemplate: messageTemplate },
             { field:'remove',          displayName: '',         cellTemplate: removeTemplate },
         ],
@@ -341,20 +390,20 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
     //REPORTS---------
     var adherenceTemplate = '<div class="ngCellText"><span style="font-size: 12px; font-weight:normal" ng-class="getAdherenceClassName(row.getProperty(\'lastweek\'))">{{ row.getProperty(col.field) }}</span></div>';
     var phoneTemplate     = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
-    var iNameTemplate     = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click="openPatientRecord(row)"/></div>'; 
+    var iNameTemplate     = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.fullname }}" ng-click="openPatientRecord(row)"/></div>'; 
 
     //Grid For Adherence report
-    $scope.patientsReportDataGridOptions = {
-        data:             'patientsReportData',
+    $scope.reportGridOptions = {
+        data:             'reportData',
         columnDefs: [
-            { field:'fullname',       displayName: 'Name',          cellTemplate: iNameTemplate },
-            { field:'drugName',       displayName: 'Drugs' },
-            { field:'lastweek',       displayName: 'Last Week',     cellTemplate: adherenceTemplate },
-            { field:'all_time',       displayName: 'All time' },
-            { field:'last_connected', displayName: 'Last connected' },
-            { field:'last_opened',    displayName: 'Last opened' },
-            { field:'start_date',     displayName: 'Start date' },
-            { field:'phone',          displayName: 'Mobile#',       cellTemplate: phoneTemplate }
+            { field:'fullname',          displayName: 'Name',          cellTemplate: iNameTemplate },
+            { field:'drugName',          displayName: 'Drugs' },
+            { field:'lastweek',          displayName: 'Last Week',     cellTemplate: adherenceTemplate },
+            { field:'all_time',          displayName: 'All time' },
+            { field:'drugLastConnected', displayName: 'Last connected' },
+            { field:'drugLastOpened',    displayName: 'Last opened' },
+            { field:'drugStartTime',     displayName: 'Start date' },
+            { field:'phone',             displayName: 'Mobile#',       cellTemplate: phoneTemplate }
         ],
         multiSelect:                false,
         enablePaging:               true,

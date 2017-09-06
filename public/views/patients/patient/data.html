@@ -34,16 +34,19 @@
             </div>
             <div style="float:left; margin-left: 20px; margin-top: 30px; font-size: 13px">
                 <div>
-                    <p style="font-size: 20px">{{ activePatient.fullname }} </p>
+                    <p style="font-size: 20px">{{ patient_name }} </p>
                 </div>
                 <div>
                     Location: {{ activePatientLocation }}
                 </div>
                 <div>
+                    Timezone: {{ activePatientTimeZone }}
+                </div>
+                <div>
                     Phone: {{ activePatient.phone_formatted }}
                 </div>
                 <div>
-                    Drugs: {{ activePatient.drugs }}
+                    Drugs: {{ activePatient.drugNames }}
                 </div>
             </div>
 

@@ -21,7 +21,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	  	$location.path('/');
 	}
 	else{
-		
+
 		configService.retrieveConfigs()
         .then(function(configs){
             
@@ -30,6 +30,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	}
 
 	function initData(configs){
+		$scope.patient_name          = $scope.activePatient.firstname + " " + $scope.activePatient.lastname;
 		$scope.activePatientImageUrl = configs.awsBucket + "/users/"+ $scope.activePatient.id +"/profile/profile.jpg";
 		$scope.activePatientPhone    = $scope.activePatient.phone_formatted;
 
@@ -39,6 +40,13 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 			if ($scope.activePatient.state){
 				$scope.activePatientLocation = $scope.activePatientLocation + ', ' + $scope.activePatient.state;
 			}
+		}
+		else{
+			$scope.activePatientLocation = 'N/A';
+		}
+
+		if ($scope.activePatient.currentTimeZone){
+			$scope.activePatientTimeZone = $scope.activePatient.timeZone;
 		}
 		else{
 			$scope.activePatientLocation = 'N/A';

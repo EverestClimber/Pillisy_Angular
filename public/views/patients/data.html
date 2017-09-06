@@ -3,7 +3,6 @@
 		<ol class="breadcrumb">
 			<li class="active">Patients</li>
 		</ol>
-		<h1></h1>
 		<h1 ng-show="sms_panel_visible">Send SMS to {{ patient_to_send_sms }}</h1>
 		<h1 ng-show="call_panel_visible">Calling {{ patient_to_call }}</h1>
 	</div>
@@ -42,7 +41,7 @@
 						  					<panel-control-refresh type="circular" is-loading="loadingPatients" ng-click="refreshPatients()"></panel-control-refresh>
 						                </panel-controls>
 
-						                <div style="height: 500px;" ng-grid="patientsReportDataGridOptions" class="grid"></div>
+						                <div style="height: 500px;" ng-grid="reportGridOptions" class="grid"></div>
 						            </panel>
 						        </div>
 						    </div>
@@ -67,7 +66,7 @@
 	<div class="container-fluid" ng-show="sms_panel_visible">
 		<panel panel-class="panel" is-loading="loading">
 			<div class="col-sm-4" ng-show="message_patient_form">
-				Please enter a message that would be sent to {{ patient_to_send_sms }} via SMS. This is one-way only.<br><br>
+				You can send an SMS message to {{ patient_to_send_sms }} here. However, you will not be able to receive a response - this is one-way only.<br><br>
 				<form name="messagepatient" ng-submit="sendMessage(message)" class="form-horizontal" style="margin-bottom: 0px !important;">
 					<div class="form-group">
 						<div class="col-sm-12">

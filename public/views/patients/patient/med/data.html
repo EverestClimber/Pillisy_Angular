@@ -3,7 +3,6 @@
     <div id="page-heading">
         <ol class="breadcrumb">
             <li><a href="/">Patients</a></li>
-            <!--<li><a href="/group/data">{{ activeGroup.name }}</a></li> -->
             <li><a href="/patients/patient/data">{{ activePatient.fullname }}</a></li>
             <li class="active">Drug History</li>
         </ol>
@@ -38,7 +37,7 @@
                         </div> 
                     </tab>
 
-                    <tab heading="Logs">
+                    <tab heading="Events">
                         <div class="container-fluid" ng-controller="groupPatientDrugLogsController">
                             <div class="row">
                               <div class="col-md-12">
