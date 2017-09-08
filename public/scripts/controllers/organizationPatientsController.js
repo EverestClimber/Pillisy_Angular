@@ -92,6 +92,8 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
                     obj.drugDoseTimes     = drug.doseTimes;
                     obj.drugTodayTaken    = drug.todayTaken;
                     obj.drugStartTime     = drug.startTime;
+                    obj.lastWeekAdherence = drug.lastWeekAdherence;
+                    obj.averageAdherence  = drug.averageAdherence;
 
                     reportData.push(obj);
                 });
@@ -107,6 +109,8 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
                 obj.drugDoseTimes     = 'N/A';
                 obj.drugTodayTaken    = 'N/A';
                 obj.drugStartTime     = 'N/A';
+                obj.lastWeekAdherence = 'N/A';
+                obj.averageAdherence  = 'N/A';
 
                 reportData.push(obj);
             }
@@ -357,6 +361,26 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
         }
     };
 
+    $scope.getAdherenceClassName = function(value) {
+
+        if (value === 'N/A'){
+            return;
+        }
+
+        value = value.replace(/\%/g,'');
+        value = parseFloat(value);
+
+        if (value >= 85){
+            return 'label label-success';
+        }
+        else if ( (value >= 75) && (value < 85)){
+            return 'label label-warning';
+        }
+        else{
+            return 'label label-danger'
+        }
+    }
+
     //Grid For patients list
     var removeTemplate  = '<div><input type="button" style="color: #2685ee" value="Remove" ng-click="removeRow($event, row.entity)" />';
     var messageTemplate = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
@@ -388,7 +412,7 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
 
 
     //REPORTS---------
-    var adherenceTemplate = '<div class="ngCellText"><span style="font-size: 12px; font-weight:normal" ng-class="getAdherenceClassName(row.getProperty(\'lastweek\'))">{{ row.getProperty(col.field) }}</span></div>';
+    var adherenceTemplate = '<div class="ngCellText"><span style="font-size: 12px; font-weight:normal" ng-class="getAdherenceClassName(row.getProperty(\'lastWeekAdherence\'))">{{ row.getProperty(col.field) }}</span></div>';
     var phoneTemplate     = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
     var iNameTemplate     = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.fullname }}" ng-click="openPatientRecord(row)"/></div>'; 
 
@@ -398,8 +422,8 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
         columnDefs: [
             { field:'fullname',          displayName: 'Name',          cellTemplate: iNameTemplate },
             { field:'drugName',          displayName: 'Drugs' },
-            { field:'lastweek',          displayName: 'Last Week',     cellTemplate: adherenceTemplate },
-            { field:'all_time',          displayName: 'All time' },
+            { field:'lastWeekAdherence', displayName: 'Last Week',     cellTemplate: adherenceTemplate },
+            { field:'averageAdherence',  displayName: 'Average' },
             { field:'drugLastConnected', displayName: 'Last connected' },
             { field:'drugLastOpened',    displayName: 'Last opened' },
             { field:'drugStartTime',     displayName: 'Start date' },

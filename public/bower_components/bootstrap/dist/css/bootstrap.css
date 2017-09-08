@@ -4930,11 +4930,11 @@ a.label:focus {
   background-color: #286090;
 }
 .label-success {
-  background-color: #5cb85c;
+  background-color: #81C04D;
 }
 .label-success[href]:hover,
 .label-success[href]:focus {
-  background-color: #449d44;
+  background-color: #68a139;
 }
 .label-info {
   background-color: #5bc0de;
