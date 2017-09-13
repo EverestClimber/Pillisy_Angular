@@ -3,94 +3,78 @@
 *  @version 1.0
 *  @package NavigationController AngularJS module  
 */
-   
+
 var app = angular.module('NavigationController', []);  //instantiates NavigationController module
 app.controller('navigationController', function ($scope, $filter, $location, $timeout, $route, $rootScope, stateService, apiService) {
     'use strict';
 
     var user = stateService.getUser();
 
-    $scope.menu = [
-        {
-            id:           'patients',
-            label:        'Patients',
-            iconClasses:  'fa fa-user',
-            separator:    false,
-            url:          '/patients/data'
-        }, 
-      	/*{
-            id:           'groups',
-            label:        'My Groups',
-            iconClasses:  'fa fa-group',
-            separator:    false,
-            children:     [],
-            url:          '/groups/mygroups',
-      	}, */  
-      	{
-            id:           'admin',
-            label:        'Admin',
-            iconClasses:  'fa fa-wrench',
-            separator:    false,
-            children: [
-                {
-                    label:  'Manage Organizations',
-                    url:  '/admin/manageorganizations'
-                },
-            ]
-        },
-
-      	/*{
-        	label: 'Notifications',
-        	iconClasses: 'glyphicon glyphicon-globe',
-        	html: '<span class="badge badge-danger">5</span>',
-        	url: '#/notifications'
-      	}*/
-    ];
+    if (user){
+    	buildNavigationMenu();
+    }
+    else{
+    	$scope.menu = null;
+    }
 
     $rootScope.$on("login_status_change", function(event, data){
         if ( data.isLoggedIn ){
-            var user = stateService.getUser();
-            if (user.role == 'super_user'){
-                var admin = {
-                    id:           'admin',
-                    label:        'Admin',
-                    iconClasses:  'fa fa-wrench',
-                    separator:    false,
-                    children: [
-                        {
-                            label:  'Manage Organizations',
-                            url:  '/admin/manageorganizations'
-                        },
-                    ]
-                };
-
-                $scope.menu.push(admin);
-            }
+            buildMenu();
         }
         else{
-
-          $scope.menu = $scope.menu.filter(function( obj ) {
-              return obj.id !== 'admin';
-          });
+          	$scope.menu = $scope.menu.filter(function( obj ) {
+              	return obj.id !== 'admin';
+          	});
         }
     });
 
-    /*if (user.role == 'super_user'){
-        var admin = {
-            id:           'admin',
-            label:        'Admin',
-            iconClasses:  'fa fa-wrench',
-            separator:    false,
-            children: [
-                {
-                    label:  'Manage Organizations',
-                    url:  '/admin/manageorganizations'
-                },
-            ]
-        };
+    function buildNavigationMenu(argument) {
+    	buildMenu();
+    }
 
-        $scope.menu.push(admin);
-    }*/
+    function buildMenu(){
+    	 var menu = [];
+
+       	var patients = {
+          	id:           'patients',
+          	label:        'Patients',
+          	iconClasses:  'fa fa-user',
+          	separator:    false,
+          	url:          '/patients/data'
+      	};
+
+      	menu.push(patients);
+
+      	var team = {
+          	id:           'team',
+          	label:        'Team members',
+          	iconClasses:  'fa fa-user',
+          	separator:    false,
+          	url:          '/team/data'
+      	};
+
+      	menu.push(team);
+
+      	if (user.role == 'super_user'){
+
+          	var admin = {
+              	id:           'admin',
+              	label:        'Admin',
+              	iconClasses:  'fa fa-wrench',
+              	separator:    false,
+              	children: [
+                  	{
+                      	label:  'Manage Organizations',
+                      	url:  '/admin/manageorganizations'
+                  	},
+              	]
+          	};
+
+          	menu.push(admin);
+      	}
+
+      	$scope.menu = menu;
+    }
 
     restoreUserGroups();
 
@@ -233,7 +217,7 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
       	});
     };
 
-    highlight($scope.menu[0]);
+    //highlight($scope.menu[0]);
 
     // $scope.searchQuery = '';
     $scope.$watch('searchQuery', function(newVal, oldVal) {
@@ -307,4 +291,3 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
         }
     }
 });
-

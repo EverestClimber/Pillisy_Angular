@@ -17,6 +17,7 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
         $scope.sms_panel_visible          = false;
         $scope.org_patients_panel_visible = true;
         $scope.patients_tab_visible       = true;
+        checkSuperUser();
 
         $scope.pagingOptions = {
             pageSizes: [50, 100],
@@ -37,7 +38,19 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
                 $scope.patients_tab_visible = false;
                 break;
         }
+
+        checkSuperUser();
     };
+
+    function checkSuperUser(){
+        var user = stateService.getUser();
+        if ( (user.role == 'super_user') && ($scope.patients_tab_visible) ){
+            $scope.patients_tab_visible_is_super_user = true;
+        }
+        else{
+            $scope.patients_tab_visible_is_super_user = false;
+        }
+    }
 
     function displayDataFromCache(){
         //get from cache

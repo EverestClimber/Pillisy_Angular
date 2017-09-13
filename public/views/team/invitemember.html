@@ -1,0 +1,53 @@
+
+<div ng-controller="inviteMemberController">
+	<div id="page-heading">
+	    <ol class="breadcrumb">
+	        <li><a href="/team/data">Team members</a></li>
+	        <li class="active">Invite member</li>
+	    </ol>
+
+		<h1>Invite member</h1>  
+	</div>
+
+	<div class="container-fluid">
+		<panel panel-class="panel" is-loading="loading" data-heading="Invite a team member to your organization">
+			<div class="col-sm-4">
+				<div ng-show="invite_member_form">
+					Please enter a valid email to invite a member of your organization to create an account on Pillsy. <br><br>
+					<form ng-submit="searchUser(user)" class="form-horizontal" style="margin-bottom: 0px !important;">
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
+									<input type="email" name="email" ng-model="user.email" class="form-control" id="email" placeholder="Email" required />
+								</div>
+							</div>
+						</div>
+
+						<div class="panel-footer">
+							<div class="pull-right">
+								<a href="/team/data" class="btn btn-default">Cancel</a>
+								<button type="submit" class="btn btn-primary" ng-disabled="searchLoading"> 
+							        <span ng-show="searchButtonText == 'Inviting'"><i class="glyphicon glyphicon-refresh glyphicon-spin"></i></span>
+							        {{ searchButtonText }}
+							    </button>
+							</div>
+						</div>
+						<br>
+					</form>
+				</div>
+
+				<div ng-show="invite_member_status">{{ serverMsg }}<br><br>
+					<form class="form-horizontal" style="margin-bottom: 0px !important;">
+						<div class="panel-footer">
+							<div class="pull-right">
+								<a href="/team/data" class="btn btn-default">OK</a>
+							</div>
+						</div>
+					</form>
+				</div>
+
+			</div>
+		</panel>
+	</div>
+</div>

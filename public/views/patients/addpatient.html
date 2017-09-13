@@ -76,6 +76,28 @@
 							<div class="col-sm-12">
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-home"></i></span>
+									<!--<input type="" name="" type="text" name="homeTimeZone" ng-model="user.homeTimeZone" class="form-control" id="homeTimeZone" placeholder="Patient's time zone"/>-->
+									<angucomplete-alt
+									  	id="homeTimeZone"
+									  	minlength="0"
+									  	ng-model="user.homeTimeZone"
+									  	placeholder="Patient's time zone"
+									  	pause="100"
+									  	selected-object="user.homeTimeZone"
+									  	local-data="timeZones"
+									  	title-field="tz"
+									  	description-field="description"
+									  	input-class="form-control form-control-small"
+									  	match-class="highlight"/>
+								</div>
+								<span>*Required</span>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-home"></i></span>
 									<input type="text" name="address1" ng-model="user.address1" class="form-control" id="address1" placeholder="Address1" />
 								</div>
 							</div>
@@ -123,16 +145,6 @@
 									<span class="input-group-addon"><i class="fa fa-home"></i></span>
 									<input type="text" name="zip" ng-model="user.zip" class="form-control" id="zip" placeholder="Zip"/>
 								</div>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<div class="col-sm-12">
-								<div class="input-group">
-									<span class="input-group-addon"><i class="fa fa-home"></i></span>
-									<input type="" name="" type="text" name="homeTimeZone" ng-model="user.homeTimeZone" class="form-control" id="homeTimeZone" placeholder="Patient's time zone"/>
-								</div>
-								<span>*Required</span>
 							</div>
 						</div>
 

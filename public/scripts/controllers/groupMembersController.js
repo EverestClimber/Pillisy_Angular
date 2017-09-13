@@ -4,7 +4,7 @@
 *  @package GroupMembersController AngularJS module  
 */
 
-var app = angular.module('GroupMembersController', ['ngGrid']);     //instantiates GroupMembersController module
+var app = angular.module('GroupMembersController', ['ngGrid','xeditable']);     //instantiates GroupMembersController module
 app.controller('groupMembersController', function ($scope, $filter, $http, $location, $rootScope, apiService, stateService) {
     'use strict';
 
@@ -21,8 +21,6 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
     function initVars(){
 
         $scope.groupId      = pillsy.active_group.id;
-        $scope.groupName    = pillsy.active_group.name;
-        $scope.groupExtName = pillsy.active_group.identifier;
 
         $scope.filterOptions = {
             filterText: '',
@@ -97,6 +95,7 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
                         result.data.forEach(function(member){
 
                             var obj = {
+                                "id":               member.id,
                                 "name":             member.name,
                                 "title":            member.title,
                                 "phone":            member.phone,
@@ -153,16 +152,122 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
         }
     }, true);
 
+    $scope.handleEditMemberStatus = function(member){
+    
+        var user = stateService.getUser();
+
+        if (user.id == member.id){
+            //alert('Cannot change your account');       
+        }
+        else{
+            var dataObj = {
+                'status':  member.status,
+                'groupId': $scope.groupId
+            };  
+
+            callUpdate(dataObj, member.id);
+        }
+    }
+
+    $scope.handleEditMemberRole = function(member){
+
+        var user = stateService.getUser();
+
+        if (user.id == member.id){
+            //alert('Cannot change your account');       
+        }
+        else{
+            var dataObj = {
+                'type':    member.role,
+                'groupId': $scope.groupId
+            };  
+
+            callUpdate(dataObj, member.id);
+        }
+    }
+
+    function callUpdate(dataObj, memberId){
+        console.log('orgUserProfileController - callUpdate');
+
+        var api = '/v1/a/organization/user/'+memberId;
+
+        apiService.put(api, dataObj).then(function(result){
+            console.log('orgUserProfileController - apiService.put - result is: '+JSON.stringify(result));
+
+            if (result.msg == 'success'){
+                console.log('orgUserProfileController - apiService.put - success');
+
+                var pillsyObj  = JSON.parse($window.sessionStorage.pillsy);
+                pillsyObj.user = result.data;
+
+                $window.sessionStorage.pillsy = JSON.stringify(pillsyObj);
+                initUser();
+            }
+            else{
+                console.log('orgUserProfileController - apiService.put - error: '+result.msg);
+
+                //$scope.editableForm.$setError(result.msg, 'bla bla bla');
+                initUser();
+            }
+        });
+    }
+
+    function getColumnDefs(){
+        var columnDefs = [];
+        var user = stateService.getUser();
+
+        if ((user.role == 'org_admin') || (user.role == 'super_user')){
+            columnDefs = [
+                { field: 'name',            displayName: 'Name' },
+                { field: 'title',           displayName: 'Title' },
+                { field: 'formatted_phone', displayName: 'Phone' },
+                { field: 'email',           displayName: 'Email'},
+                { field: 'status',          displayName: 'Status', cellTemplate: statusCellTemplate },
+                { field: 'role',            displayName: 'Role',   cellTemplate: roleCellTemplate }
+            ];
+        }
+        else{
+            columnDefs = [
+                { field: 'name',            displayName: 'Name' },
+                { field: 'title',           displayName: 'Title' },
+                { field: 'formatted_phone', displayName: 'Phone' },
+                { field: 'email',           displayName: 'Email'},
+                { field: 'status',          displayName: 'Status' },
+                { field: 'role',            displayName: 'Role' }
+            ];
+        }
+
+        return columnDefs;
+    }
+
+    $scope.status = 'status';
+    $scope.role   = 'role';
+
+    $scope.statuses = [
+        {value: 'pending',     text: 'pending'},
+        {value: 'active',      text: 'active'},
+        {value: 'suspended',   text: 'suspended'},
+        {value: 'deactivated', text: 'deactivated'}
+    ];
+
+    $scope.roles = [
+        {value: 'member', text: 'member'},
+        {value: 'admin',  text: 'admin'}
+    ];
+
+    var statusCellTemplate = '<div style="display: flex; align-items: center;">'+
+        '&nbsp;&nbsp;<a href="#" onaftersave="handleEditMemberStatus(myData[ row.rowIndex ])" '+
+        'editable-select="myData[ row.rowIndex ].status" e-ng-options="s.value as s.text for s in statuses">{{ myData[ row.rowIndex ].status }} </a>'+
+        '</div>';
+
+    var roleCellTemplate = '<div style="display: flex; align-items: center;">'+
+        '&nbsp;&nbsp;<a href="#" onaftersave="handleEditMemberRole(myData[ row.rowIndex ])" editable-select="myData[ row.rowIndex ].role" '+
+        'e-ng-options="s.value as s.text for s in roles">{{ myData[ row.rowIndex ].role }} </a>'+
+        '</div>';    
+
     $scope.membersGridOptions = {
-        data:                           'myData',
-        columnDefs: [
-            { field: 'name',            displayName: 'Name' },
-            { field: 'title',           displayName: 'Title' },
-            { field: 'formatted_phone', displayName: 'Phone' },
-            { field: 'email',           displayName: 'Email'},
-            { field: 'status',          displayName: 'Status'},
-            { field: 'role',            displayName: 'Role'}
-        ],
+        data:                       'myData',
+        columnDefs:                 getColumnDefs(),
         multiSelect:                false,
         enablePaging:               true,
         showFooter:                 true,
@@ -175,13 +280,8 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
         totalServerItems:           'totalServerItems',
         pagingOptions:              $scope.pagingOptions,
         filterOptions:              $scope.filterOptions,
-        enableCellSelection:        false
+        enableCellSelection:        false,
+        cellEditableCondition:      'row.getProperty(\'id\') == stateService.getUser().id'
     };
 
-});
-
-app.filter('fromNow', function() {
-    return function(dateString) {
-        return moment(dateString).fromNow()
-    };
 });

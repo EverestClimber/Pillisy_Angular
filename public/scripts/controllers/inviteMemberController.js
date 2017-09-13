@@ -21,7 +21,7 @@ app.controller('inviteMemberController', function ($scope, $filter, $location, a
         $location.path('/');
     }
     else{
-        $scope.searchButtonText = 'Search';
+        $scope.searchButtonText = 'Invite';
         $scope.searchLoading    = false;
         $scope.groupId          = pillsy.active_group.id;
         $scope.groupName        = pillsy.active_group.name;
@@ -40,30 +40,29 @@ app.controller('inviteMemberController', function ($scope, $filter, $location, a
         }
         else{
             var groupId = $scope.groupId;
-            var api = '/v1/a/organization/group/'+groupId+'/member/groupInvitation';  
+            var api = '/v1/a/organization/group/'+groupId+'/member/invitation';  
 
-            $scope.searchButtonText = 'Searching';
+            $scope.searchButtonText = 'Sending...';
             $scope.searchLoading    = true;
 
             apiService.post(api, user).then(function(result){
-                $scope.searchButtonText = 'Search';
+                $scope.searchButtonText = 'Invite';
                 $scope.searchLoading    = false;
 
                 if (result.msg == 'success'){
-                    console.log('apiService.post - success - found user, email/sms sent');
+                    console.log('apiService.post - success - found user, email sent');
 
                     var inviteStatus = result.data.status; 
                     switch(inviteStatus){
                         case 0:
-                            $scope.serverMsg = 'The person you are searching for does not exist on the Pillsy platform. '+
-                                               'Try searching again with a valid organization email.';
+                            $scope.serverMsg = 'The email you entered is not valid for your organization.';
                             break;
                         case 1:
                             $scope.serverMsg = 'An invitation has been sent to the user.';
                             break;
                             
                         case 2:
-                            $scope.serverMsg = 'The user you tried to invite is already a member of your group.';
+                            $scope.serverMsg = 'The user you tried to invite is already a member of your organization.';
                             break;
                     }
                 }

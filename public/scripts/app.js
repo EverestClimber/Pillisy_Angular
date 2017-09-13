@@ -77,6 +77,16 @@ app.config(['$provide', '$routeProvider','$locationProvider', '$httpProvider','$
                 return file;
             }
         })
+        .when('/team/:templateFile/', {
+            templateUrl: function(param) {
+                return 'views/team/' + param.templateFile + '.html';
+            }
+        })
+        .when('/team/member/:templateFile/', {
+            templateUrl: function(param) {
+                return 'views/team/member' + param.templateFile + '.html';
+            }
+        })
         .otherwise({
             redirectTo: '/'
         });

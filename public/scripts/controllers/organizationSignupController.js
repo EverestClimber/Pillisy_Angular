@@ -254,7 +254,7 @@ app.controller('organizationSignupController', function ($scope, $http, $theme, 
                 'title':      $scope.title,
                 'email':      $scope.email_register,
                 'phone':      $scope.phone,
-                'password':   $scope.password_register,
+                'password':   $scope.password_register
             };  
                     
             var api = '/v1/n/organization/register';
@@ -268,9 +268,7 @@ app.controller('organizationSignupController', function ($scope, $http, $theme, 
                 if (result.msg == 'success'){
                     console.log('apiService.post - success');
 
-                    $scope.result_message = 'An activation email has been sent to you. Please check your '+
-                                            'email in a few minutes for futther instructions to activate your '+
-                                            'account and complete your registration.';
+                    $scope.result_message = 'An email has been sent to your organization admin for approval. Upon approval, you will be able to log into your account.';
                 }
                 else{
                     console.log('apiService.post - error');

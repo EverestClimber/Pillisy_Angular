@@ -28,7 +28,16 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
         toggleForm(true);
     }
 
-    $scope.timeZones = ["America/New_York", "America/Chicago", "America/Denver", "America/Phoenix", "America/Los_Angeles", "America/Anchorage", "America/Adak", "Pacific/Honolulu"];
+    //https://www.timeanddate.com/time/zone/usa
+    $scope.timeZones = [
+        {tz: "America/New_York",    description: 'Eastern Time Zone'},
+        {tz: "America/Chicago",     description: 'Central Time Zone'}, 
+        {tz: "America/Denver",      description: 'Mountain Time Zone'}, 
+        {tz: "America/Phoenix",     description: 'Mountain Time Zone'}, 
+        {tz: "America/Los_Angeles", description: 'Pacific Time Zone'}, 
+        {tz: "America/Anchorage",   description: 'Alaska Time Zone'},
+        {tz: "America/Adak",        description: 'Hawaii-Aleutian Time Zone'}
+    ];
 
     $scope.dateOptions = { 
         dateFormat: 'mm-dd-yy',
@@ -68,7 +77,7 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
                 'zip':  	    patient.zip,
                 'email':        patient.email,
                 'phone':        patient.phone,
-                'homeTimeZone': patient.homeTimeZone
+                'homeTimeZone': patient.homeTimeZone.title
             };  
                 
             var groupId = $scope.group.id;

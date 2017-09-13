@@ -1,0 +1,27 @@
+<div id="page-heading">
+    <ol class="breadcrumb">
+        <li class="active">Find Group</li>
+    </ol>
+
+    <h1>Find a Group</h1>
+</div>
+
+<div class="container-fluid" ng-controller="tablesAdvancedController">
+    <div class="row">
+      <div class="col-md-12">
+      
+            <panel panel-class="panel-primary" data-heading="Find and Join a Group">     
+
+                <div class="input-icon right mb10">
+                    <i class="fa fa-search"></i>
+                    <input type="text" ng-model="filterOptions.filterText" class="form-control" placeholder="Search Filter">
+                </div>
+
+                <div style="height: 800px;" ng-grid="gridOptions"></div>
+
+            </panel>
+
+        </div>
+    </div>
+
+</div> <!-- container-fluid -->

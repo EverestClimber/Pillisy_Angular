@@ -4,7 +4,7 @@
 *  @package OrgUserProfileController AngularJS module  
 */
 
-var app = angular.module('OrgUserProfileController', ['xeditable'/*, 'StateService'*/]);     //instantiates OrgUserProfileController module
+var app = angular.module('OrgUserProfileController', ['xeditable']);     //instantiates OrgUserProfileController module
 app.controller('orgUserProfileController', function ($scope, $filter, $window, $rootScope, apiService, stateService) {
 	'use strict';
 
@@ -63,7 +63,7 @@ app.controller('orgUserProfileController', function ($scope, $filter, $window, $
 
     	var user = stateService.getUser();
 
-		$scope.user = {
+		  $scope.user = {
 	      	firstname:  user.firstname,
 	      	lastname:   user.lastname,
 	      	email:      user.email,
@@ -76,7 +76,8 @@ app.controller('orgUserProfileController', function ($scope, $filter, $window, $
     function callUpdate(dataObj){
     	console.log('orgUserProfileController - callUpdate');
 
-    	var api = '/v1/a/organization/user';
+      var user = stateService.getUser();
+    	var api = '/v1/a/organization/user/'+user.id;
 
     	apiService.put(api, dataObj).then(function(result){
           	console.log('orgUserProfileController - apiService.put - result is: '+JSON.stringify(result));
