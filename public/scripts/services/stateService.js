@@ -9,6 +9,41 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
 	console.log('stateService...');
 
     //---------CACHING------------
+    this.setActiveGroupMembers = function(members){
+        var pillsy = this.getPillsy();
+
+        if (pillsy){
+            console.log('stateService - setActiveGroup, got pillsy, set groupData');
+
+            var activeGroup = this.getActiveGroup();
+
+            if (activeGroup){
+                activeGroup.members = members;
+            }
+
+            this.setActiveGroup(activeGroup);
+        }
+    }
+
+    this.getActiveGroupMembers = function(){
+        var pillsy = this.getPillsy();
+        var members = [];
+
+        if (pillsy){
+            console.log('stateService - setActiveGroup, got pillsy, set groupData');
+
+            var activeGroup = this.getActiveGroup();
+
+            if (activeGroup){
+                if (activeGroup.members){
+                    members = activeGroup.members
+                }
+            }
+        }
+
+        return members;
+    }
+
     this.getActivePatientDrugs = function(){
         console.log('stateService - getPatientDrugs');
 
@@ -980,6 +1015,29 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
         phone = phone.insert(4, ') ');
         phone = phone.insert(9, '-');
 
+        return phone;
+    }
+
+    this.formatUSPhone = function(phone){
+
+        if (phone){
+            phone = phone.replace(/\(/g, '');  //remove ( prefix
+            phone = phone.replace(/\)/g, '');  //remove ) prefix  
+            phone = phone.replace(/\./g, '');  //remove .
+            phone = phone.replace(/\,/g, '');  //remove , 
+            phone = phone.replace(/\-/g, '');  //remove -
+            phone = phone.replace(/\s/g, '');  //remove all spaces
+
+            if (phone.charAt(0) != '+'){
+                phone = '+'+phone;
+            }
+
+            if (phone.charAt(1) != '1'){
+
+                phone = phone.substring(0, 1) + '1' + phone.substring(1, phone.length);
+            }
+        }
+        
         return phone;
     }
 });

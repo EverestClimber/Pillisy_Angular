@@ -8,6 +8,7 @@ var app = angular
     'ngAnimate',
     'cgBusy',
     'angularMoment',
+    'ngLodash',
     //'inputDropdown',
     'as.sortable',
     'easypiechart',

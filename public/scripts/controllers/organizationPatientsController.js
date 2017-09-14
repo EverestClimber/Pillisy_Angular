@@ -6,7 +6,7 @@
 */
 
 var app = angular.module('OrganizationPatientsController', ['ngGrid','GroupDetails']);     //instantiates OrganizationPatientsController module
-app.controller('organizationPatientsController', function ($scope, $filter, $http, $location, $rootScope, apiService, groupDetails, stateService) {
+app.controller('organizationPatientsController', function ($scope, $filter, $http, $location, $rootScope, apiService, groupDetails, stateService, lodash) {
     'use strict';
 
     init();
@@ -20,14 +20,33 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
         checkSuperUser();
 
         $scope.pagingOptions = {
-            pageSizes: [50, 100],
-            pageSize:  100,
+            pageSizes: ['25', '50', '100'],
+            pageSize:  '100',
             currentPage: 1
         };
+
+        $scope.filterOptions = {
+            filterText: '',
+            useExternalFilter: true
+        };
+
+        $scope.totalServerPatientsReportItems = 0;
 
         displayDataFromCache();
         fetchPatients($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     }
+
+    $scope.$watch('pagingOptions', function(newVal, oldVal) {
+        if (newVal !== oldVal) {
+            fetchPatients($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+        }
+    }, true);
+
+    $scope.$watch('filterOptions', function(newVal, oldVal) {
+        if (newVal !== oldVal) {
+            fetchPatients($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+        }
+    }, true);
 
     $scope.onTabSelect = function(tab){
         switch(tab){
@@ -80,8 +99,11 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
     function setPagingData(cachedData, page, pageSize) {
 
         //for list
-        var listData                        = formatCachedData(cachedData);
-        $scope.organizationPatients         = listData.slice((page - 1) * pageSize, page * pageSize);
+        var listData = formatCachedData(cachedData);
+        var patients = listData.slice((page - 1) * pageSize, page * pageSize);
+
+        $scope.organizationPatients = lodash.sortBy(patients, 'fullname');
+
         $scope.totalServerPatientsListItems = listData.length;
 
         //for reports
@@ -129,11 +151,10 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
             }
         });
 
-        //format for reports tab
-        //alert('tempListData: '+JSON.stringify(tempListData));
-
-        $scope.reportData = reportData;
+        //reports tab
+        $scope.reportData = lodash.sortBy(reportData, 'fullname');
         $scope.totalServerPatientsReportItems = listData.length;
+        $scope.currentPage = page;
 
         if (!$scope.$$phase) {
             $scope.$apply();
@@ -166,7 +187,7 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
 
             if (result){
                 if (result.msg == 'success'){
-                    console.log('groupPatientsController - fetchPatients - successfully retrieved group patients: '+JSON.stringify(result));
+                    console.log('groupPatientsController - fetchPatients - successfully retrieved group patients');
 
                     /*
                     var obj = {

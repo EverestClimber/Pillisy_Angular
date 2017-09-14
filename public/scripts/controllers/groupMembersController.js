@@ -5,7 +5,7 @@
 */
 
 var app = angular.module('GroupMembersController', ['ngGrid','xeditable']);     //instantiates GroupMembersController module
-app.controller('groupMembersController', function ($scope, $filter, $http, $location, $rootScope, apiService, stateService) {
+app.controller('groupMembersController', function ($scope, $filter, $http, $location, $rootScope, apiService, stateService, lodash) {
     'use strict';
 
     var pillsy = stateService.getPillsy();
@@ -20,7 +20,8 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
 
     function initVars(){
 
-        $scope.groupId      = pillsy.active_group.id;
+        $scope.groupId = pillsy.active_group.id;
+        $scope.totalServerItems = 0;
 
         $scope.filterOptions = {
             filterText: '',
@@ -29,16 +30,19 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
 
         $scope.totalServerItems = 0;
         $scope.pagingOptions = {
-            pageSizes:   [25, 50, 100],
-            pageSize:    25,
+            pageSizes:   ['25', '50', '100'],
+            pageSize:    '25',
             currentPage: 1
         };
+
+        var pagedData = stateService.getActiveGroupMembers();
+        $scope.myData = lodash.sortBy(pagedData, 'name');
     }
 
     $scope.setPagingData = function(data, page, pageSize) {
         var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
 
-        $scope.myData = pagedData;
+        $scope.myData = lodash.sortBy(pagedData, 'name');
         $scope.totalServerItems = data.length;
         if (!$scope.$$phase) {
             $scope.$apply();
@@ -116,6 +120,7 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
                             });
                         }
 
+                        stateService.setActiveGroupMembers(members);
                         $scope.setPagingData(members, page, pageSize);
                     }
                     else{

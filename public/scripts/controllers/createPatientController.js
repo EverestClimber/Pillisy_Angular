@@ -76,10 +76,14 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
                 'country':      patient.country,
                 'zip':  	    patient.zip,
                 'email':        patient.email,
-                'phone':        patient.phone,
+                'phone':        stateService.formatUSPhone(patient.phone),
                 'homeTimeZone': patient.homeTimeZone.title
             };  
                 
+            if (dataObj.dob){
+                dataObj.dob = moment(dataObj.dob).valueOf();
+            }
+            
             var groupId = $scope.group.id;
             var api = '/v1/a/organization/group/'+groupId+'/patient';
             console.log('apiService.post - api is: '+api);

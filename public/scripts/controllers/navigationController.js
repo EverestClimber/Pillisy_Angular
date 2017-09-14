@@ -8,9 +8,46 @@ var app = angular.module('NavigationController', []);  //instantiates Navigation
 app.controller('navigationController', function ($scope, $filter, $location, $timeout, $route, $rootScope, stateService, apiService) {
     'use strict';
 
+    $scope.menu = [
+        {
+            id:           'patients',
+            label:        'Patients',
+            iconClasses:  'fa fa-user',
+            separator:    false,
+            url:          '/patients/data'
+        },
+        {
+            id:           'team',
+            label:        'Team members',
+            iconClasses:  'fa fa-user',
+            separator:    false,
+            url:          '/team/data'
+        }
+    ];
+
     var user = stateService.getUser();
 
     if (user){
+        if (user.role == 'super_user'){
+
+            var admin = {
+                id:           'admin',
+                label:        'Admin',
+                iconClasses:  'fa fa-wrench',
+                separator:    false,
+                children: [
+                    {
+                        label:  'Manage Organizations',
+                        url:  '/admin/manageorganizations'
+                    },
+                ]
+            };
+
+            $scope.push(admin);
+        }
+    }
+
+    /*if (user){
     	buildNavigationMenu();
     }
     else{
@@ -76,7 +113,7 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
       	$scope.menu = menu;
     }
 
-    restoreUserGroups();
+    restoreUserGroups();*/
 
     var setParent = function(children, parent) {
       	angular.forEach(children, function(child) {

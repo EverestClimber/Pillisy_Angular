@@ -253,7 +253,7 @@ app.controller('organizationSignupController', function ($scope, $http, $theme, 
                 'lastname':   $scope.lastname,
                 'title':      $scope.title,
                 'email':      $scope.email_register,
-                'phone':      $scope.phone,
+                'phone':      stateService.formatUSPhone($scope.phone),
                 'password':   $scope.password_register
             };  
                     
