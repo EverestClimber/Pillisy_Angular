@@ -254,7 +254,8 @@ app.controller('organizationSignupController', function ($scope, $http, $theme, 
                 'title':      $scope.title,
                 'email':      $scope.email_register,
                 'phone':      stateService.formatUSPhone($scope.phone),
-                'password':   $scope.password_register
+                'password':   $scope.password_register,
+                'subdomain':  getSubdomain()
             };  
                     
             var api = '/v1/n/organization/register';

@@ -11,84 +11,94 @@
 		
 		<div cg-busy="{promise:createOrgProgressPromise,message: createOrgProgressMessage, backdrop: createOrgProgressBackdrop}">
 			<form name="create" class="form-horizontal row-border">
-				<div class="form-group">
-					<label class="col-sm-3 control-label">Organization Name</label>
-					<div class="col-sm-6">
-						<input type="text" data-ng-model="organization.org_name" class="form-control" placeholder="E.g. Acme Inc." required />
+				<!--<div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Demo Group</label>
+						<div class="col-sm-6">
+							<input type="checkbox" value="1" ng-model="myRating" name="demo" class="checkbox">
+						</div>
 					</div>
-				</div>
-				
-				<div class="form-group">
-					<label class="col-sm-3 control-label">Organization Domain</label>
-					<div class="col-sm-6">
-						<input type="text" data-ng-model="organization.org_domains" class="form-control" placeholder="acme.com" required />
-					</div>
-					<!--<div class="col-sm-3"><p class="help-block">Type a description that will enable other people in your organization to find your group.</p></div>-->
-				</div>
+				</div>-->
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label">Organization Type</label>
-					<div class="col-sm-6">
-						<input type="text" data-ng-model="organization.org_type" class="form-control" placeholder="E.g. Pharmacy, Hospital, etc" required />
+				<div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Organization Name</label>
+						<div class="col-sm-6">
+							<input type="text" data-ng-model="organization.org_name" class="form-control" placeholder="E.g. Acme Inc." required />
+						</div>
 					</div>
-				</div>
+					
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Organization Domain</label>
+						<div class="col-sm-6">
+							<input type="text" data-ng-model="organization.org_domains" class="form-control" placeholder="acme.com" required />
+						</div>
+						<!--<div class="col-sm-3"><p class="help-block">Type a description that will enable other people in your organization to find your group.</p></div>-->
+					</div>
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label">Organization Support URL</label>
-					<div class="col-sm-6">
-						<input type="text" data-ng-model="organization.org_support_url" class="form-control" placeholder="www.acme.com/support" />
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Organization Type</label>
+						<div class="col-sm-6">
+							<input type="text" data-ng-model="organization.org_type" class="form-control" placeholder="E.g. Pharmacy, Hospital, etc" required />
+						</div>
 					</div>
-				</div>
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label">Organization Support Phone</label>
-					<div class="col-sm-6">
-						<input type="text" data-ng-model="organization.org_support_phone" class="form-control" placeholder="E.g. 1 (800) 123-4567" required />
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Organization Support URL</label>
+						<div class="col-sm-6">
+							<input type="text" data-ng-model="organization.org_support_url" class="form-control" placeholder="www.acme.com/support" />
+						</div>
 					</div>
-				</div>
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label">Organization Support Email</label>
-					<div class="col-sm-6">
-						<input type="text" data-ng-model="organization.org_support_email" class="form-control" placeholder="E.g. support@acme.com" required />
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Organization Support Phone</label>
+						<div class="col-sm-6">
+							<input type="text" data-ng-model="organization.org_support_phone" class="form-control" placeholder="E.g. 1 (800) 123-4567" required />
+						</div>
 					</div>
-				</div>
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label">Admin Firstname</label>
-					<div class="col-sm-6">
-						<input type="text" data-ng-model="organization.firstname" class="form-control" placeholder="Firstname" required />
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Organization Support Email</label>
+						<div class="col-sm-6">
+							<input type="text" data-ng-model="organization.org_support_email" class="form-control" placeholder="E.g. support@acme.com" required />
+						</div>
 					</div>
-				</div>
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label">Admin Lastname</label>
-					<div class="col-sm-6">
-						<input type="text" data-ng-model="organization.lastname" class="form-control" placeholder="Lastname" required />
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Admin Firstname</label>
+						<div class="col-sm-6">
+							<input type="text" data-ng-model="organization.firstname" class="form-control" placeholder="Firstname" required />
+						</div>
 					</div>
-				</div>
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label">Admin Title</label>
-					<div class="col-sm-6">
-						<input type="text" data-ng-model="organization.title" class="form-control" placeholder="Title" required />
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Admin Lastname</label>
+						<div class="col-sm-6">
+							<input type="text" data-ng-model="organization.lastname" class="form-control" placeholder="Lastname" required />
+						</div>
 					</div>
-				</div>
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label">Admin Phone</label>
-					<div class="col-sm-6">
-						<input type="text" data-ng-model="organization.phone" class="form-control" placeholder="Phone" required />
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Admin Title</label>
+						<div class="col-sm-6">
+							<input type="text" data-ng-model="organization.title" class="form-control" placeholder="Title" required />
+						</div>
 					</div>
-				</div>
 
-				<div class="form-group">
-					<label class="col-sm-3 control-label">Admin Email</label>
-					<div class="col-sm-6">
-						<input type="text" data-ng-model="organization.email" class="form-control" placeholder="Email" required />
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Admin Phone</label>
+						<div class="col-sm-6">
+							<input type="text" data-ng-model="organization.phone" class="form-control" placeholder="Phone" required />
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Admin Email</label>
+						<div class="col-sm-6">
+							<input type="text" data-ng-model="organization.email" class="form-control" placeholder="Email" required />
+						</div>
 					</div>
 				</div>
-			
 				<div class="panel-footer">
 					<div class="row">
 						<div class="col-sm-6 col-sm-offset-3">

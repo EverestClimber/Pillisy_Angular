@@ -22,8 +22,8 @@ app.controller('manageOrganizationsController', function ($scope, $theme, $locat
 
     $scope.totalServerItems = 0;
     $scope.pagingOptions = {
-        pageSizes: [25, 50, 100],
-        pageSize: 25,
+        pageSizes: ['25', '50', '100'],
+        pageSize: '25',
         currentPage: 1
     };
 

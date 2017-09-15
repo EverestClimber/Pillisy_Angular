@@ -8,55 +8,52 @@ var app = angular.module('NavigationController', []);  //instantiates Navigation
 app.controller('navigationController', function ($scope, $filter, $location, $timeout, $route, $rootScope, stateService, apiService) {
     'use strict';
 
-    $scope.menu = [
-        {
-            id:           'patients',
-            label:        'Patients',
-            iconClasses:  'fa fa-user',
-            separator:    false,
-            url:          '/patients/data'
-        },
-        {
-            id:           'team',
-            label:        'Team members',
-            iconClasses:  'fa fa-user',
-            separator:    false,
-            url:          '/team/data'
-        }
-    ];
+    buildNavigationMenu();
 
-    var user = stateService.getUser();
+    function buildNavigationMenu(){
+	    $scope.menu = [
+	        {
+	            id:           'patients',
+	            label:        'Patients',
+	            iconClasses:  'fa fa-user',
+	            separator:    false,
+	            url:          '/patients/data'
+	        },
+	        {
+	            id:           'team',
+	            label:        'Team members',
+	            iconClasses:  'fa fa-user',
+	            separator:    false,
+	            url:          '/team/data'
+	        }
+	    ];
 
-    if (user){
-        if (user.role == 'super_user'){
+	    var user = stateService.getUser();
 
-            var admin = {
-                id:           'admin',
-                label:        'Admin',
-                iconClasses:  'fa fa-wrench',
-                separator:    false,
-                children: [
-                    {
-                        label:  'Manage Organizations',
-                        url:  '/admin/manageorganizations'
-                    },
-                ]
-            };
+	    if (user){
+	        if (user.role == 'super_user'){
+	          
+	            var admin = {
+	                id:           'admin',
+	                label:        'Admin',
+	                iconClasses:  'fa fa-wrench',
+	                separator:    false,
+	                children: [
+	                    {
+	                        label:  'Manage Organizations',
+	                        url:  '/admin/manageorganizations'
+	                    },
+	                ]
+	            };
 
-            $scope.push(admin);
-        }
-    }
-
-    /*if (user){
-    	buildNavigationMenu();
-    }
-    else{
-    	$scope.menu = null;
-    }
+	            $scope.menu.push(admin);
+	        }
+	    }
+	}
 
     $rootScope.$on("login_status_change", function(event, data){
         if ( data.isLoggedIn ){
-            buildMenu();
+            buildNavigationMenu();
         }
         else{
           	$scope.menu = $scope.menu.filter(function( obj ) {
@@ -64,56 +61,6 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
           	});
         }
     });
-
-    function buildNavigationMenu(argument) {
-    	buildMenu();
-    }
-
-    function buildMenu(){
-    	 var menu = [];
-
-       	var patients = {
-          	id:           'patients',
-          	label:        'Patients',
-          	iconClasses:  'fa fa-user',
-          	separator:    false,
-          	url:          '/patients/data'
-      	};
-
-      	menu.push(patients);
-
-      	var team = {
-          	id:           'team',
-          	label:        'Team members',
-          	iconClasses:  'fa fa-user',
-          	separator:    false,
-          	url:          '/team/data'
-      	};
-
-      	menu.push(team);
-
-      	if (user.role == 'super_user'){
-
-          	var admin = {
-              	id:           'admin',
-              	label:        'Admin',
-              	iconClasses:  'fa fa-wrench',
-              	separator:    false,
-              	children: [
-                  	{
-                      	label:  'Manage Organizations',
-                      	url:  '/admin/manageorganizations'
-                  	},
-              	]
-          	};
-
-          	menu.push(admin);
-      	}
-
-      	$scope.menu = menu;
-    }
-
-    restoreUserGroups();*/
 
     var setParent = function(children, parent) {
       	angular.forEach(children, function(child) {
