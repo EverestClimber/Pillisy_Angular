@@ -387,7 +387,7 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
 
         var patient = rowItem.entity;
 
-        if (stateService.setActivePatient(patient)){
+        if (stateService.setActivePatient(patient)){  //has drugNames
             $location.path('/patients/patient/data');
         }
         else{

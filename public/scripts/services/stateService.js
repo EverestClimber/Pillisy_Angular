@@ -77,6 +77,61 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
         return drugs;
     }
 
+    this.addNewDrugToPatient = function(drug, patientId){
+        console.log('stateService - addNewDrugToPatient...');
+
+        var pillsy = this.getPillsy();
+        var patient = null;
+
+        if (pillsy){
+            console.log('stateService - setActiveGroup, got pillsy, set groupData');
+
+            var organization = pillsy.organization;
+
+            if (organization){
+                var patients = organization.patients;
+
+                if (patients){
+                    var index   = 0;
+                    var exists  = false;
+        
+                    patients.some(function(iPatient){
+                        if (iPatient.id == patientId){
+                            patient = iPatient;
+                            return true;
+                        }
+
+                        index++;
+                    });
+
+                    if (patient){
+                        var drugs = patient.drugs;
+                        if (drugs){
+                            drugs.push(drug);
+                        }
+                        else{
+                            drugs = [drug];
+                        }
+
+                        patient.drugs         = drugs;
+                        patients[index]       = patient;
+                        organization.patients = patients;
+
+                        pillsy.organization = organization;
+                        $window.sessionStorage.pillsy = JSON.stringify(pillsy);
+                    }
+                }
+            }
+        }
+
+        if (patient){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     //single patient
     this.setGroupPatientData = function(groupPatientData){
         console.log('stateService - setGroupData...');

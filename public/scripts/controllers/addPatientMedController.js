@@ -233,21 +233,25 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
                 if (result.msg == 'success'){
                     console.log('apiService.post - success');
 
-                    stateService.setGroupPatientData(result.data);
-
-                    var activePatient = result.data.patient;
+                    var drug          = result.data;
+                    var activePatient = stateService.getActivePatient();
                     var drugs         = activePatient.drugs;
-                    var iDrugs        = [];
+                    drugs.push(drug);
 
-                    drugs.forEach(function(drug){
-                        iDrugs.push(drug.name);
-                    });
-
-                    drugs = iDrugs.join(', ');
                     activePatient.drugs = drugs;
 
-                    stateService.setActivePatient(activePatient);
+                    var drugNames = [];
 
+                    drugs.map(function(iDrug){
+                        drugNames.push(iDrug.name);
+                    });
+
+                    drugNames = drugNames.join(', ');
+                    
+                    activePatient.drugNames = drugNames;
+
+                    stateService.addNewDrugToPatient(drug, activePatient.id);
+                    stateService.setActivePatient(activePatient);
                     $location.path('/patients/patient/data');
                 }
                 else{

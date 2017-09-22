@@ -95,7 +95,16 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
                     console.log('apiService.post - success');
 
                     stateService.setGroupPatientData(result.data);
-                    var patient = result.data.patient;
+                    var patient   = result.data.patient;
+                    var drugs     = patient.drugs;
+                    var drugNames = [];
+
+                    drugs.map(function(drug){
+                        drugNames.push(drug.name);
+                    });
+
+                    drugNames = drugNames.join(', ');
+                    patient.drugNames = drugNames;
 
                     if (stateService.setActivePatient(patient)){
                         $location.path('/patients/patient/addmed');

@@ -21,7 +21,6 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	  	$location.path('/');
 	}
 	else{
-
 		configService.retrieveConfigs()
         .then(function(configs){
             
@@ -45,25 +44,41 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 			$scope.activePatientLocation = 'N/A';
 		}
 
-		if ($scope.activePatient.currentTimeZone){
+		if ($scope.activePatient.timeZone){
 			$scope.activePatientTimeZone = $scope.activePatient.timeZone;
 		}
 		else{
 			$scope.activePatientLocation = 'N/A';
 		}
 
-		var groups = stateService.getUserGroups();
-        $rootScope.$emit("my_groups_callback", {groups: groups});
-		
-		$scope.totalMeds = 0;
 		$scope.pagingOptions = {
-		   	pageSizes: [10, 20, 30],
-		   	pageSize:   10,
-		    currentPage: 1
-		};
+            pageSizes: ['10', '20', '30'],
+            pageSize:  '20',
+            currentPage: 1
+        };
+
+        $scope.filterOptions = {
+            filterText: '',
+            useExternalFilter: true
+        };
+
+        $scope.totalMeds = 0;
 
 		getDataFromCache();
 	}
+
+	$scope.$watch('pagingOptions', function(newVal, oldVal) {
+        if (newVal !== oldVal) {
+        	console.log('changed to pageSize: '+ $scope.pagingOptions.pageSize)
+            //fetchPatients($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+        }
+    }, true);
+
+    $scope.$watch('filterOptions', function(newVal, oldVal) {
+        if (newVal !== oldVal) {
+            //fetchPatients($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+        }
+    }, true);
 
 	function getDataFromCache(){
 		var cachedData = stateService.getActivePatientDrugs();
@@ -73,118 +88,9 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	    }
 	}
 
-	/*function preparePatientData(cachedData){
-		var data = [];
-
-		var filteredData = cachedData.filter(function(patient){
-			return (patient.id == $scope.activePatient.id);
-		});
-
-		if (filteredData.length > 0){
-			
-			var patientData = filteredData[0];
-			var drugs       = patientData.drugs;
-
-			drugs.forEach(function(drug){
-
-				var obj = {
-	                "id": 		  drug.id,
-	                "name":       drug.name,
-	                "status":     drug.status,
-	                "doseTimes":  drug.doseTimes,
-	                "todayTaken": drug.todayTaken,
-	                "interval":   drug.interval,
-	                "average":    drug.average,
-	                "remaining":  drug.remaining
-	          	};
-
-	            if (patient.todayDoses){
-	                var todayDoses = patient.todayDoses;
-	                    		
-	                if (todayDoses.length > 0){
-	                    console.log('apiService.get - found doses, display...');
-
-	                    var doseTime  = '';
-	                    var doseTaken = '';
-	                    var index = 0;
-
-	                    todayDoses.forEach(function(todayDose){
-	                    	if (todayDose.doseTime){
-		                    	if ( (todayDose.doseTime != 'N/A') && (todayDose.doseTime != 'MISSED') && (todayDose.doseTime != '--')){
-		                    		todayDose.doseTime = moment(todayDose.doseTime).format("h:mm A")
-		                    	}
-		                    }
-
-		                    doseTime = doseTime + todayDose.doseTime;
-
-		                    if (todayDose.doseTaken){
-		                    	if ((todayDose.doseTaken != 'N/A') && (todayDose.doseTaken != 'MISSED') && (todayDose.doseTaken != '--')){
-		                    		todayDose.doseTaken = moment(todayDose.doseTaken).format("h:mm:ss A")
-		                    	}
-		                    }
-
-		                    doseTaken = doseTaken + todayDose.doseTaken;
-		                    index++;
-
-		                    if (index < todayDoses.length){
-		                    	doseTime  = doseTime + '; ';
-		                    	doseTaken = doseTaken + '; ';
-		                    }
-	                    });
-
-	                    obj.doseTime  = doseTime;
-	                    obj.doseTaken = doseTaken;
-	                }
-	                else{
-	                    console.log('apiService.get - there are no doses...');
-
-	                    obj.doseTime  = 'N/A';
-	                    obj.doseTaken = 'N/A';
-	                }
-	            }
-
-	            data.push(obj);
-			});
-		}
-
-		return data;
-	}*/
-
-	function getInterval(){
-        var now = new Date();
-
-        var interval = {
-        	intervalStartTime:  moment(now.getTime()).subtract(3,'days').startOf('day').valueOf(),
-            intervalEndTime:    now.getTime(),
-            now:                now.getTime(),
-            timeZoneOffset:     now.getTimezoneOffset()
-        };
-
-        return encodeURIComponent( JSON.stringify(interval) );
-    }
-
-    /*function getPercentValue(value, total){
-    	var percent;
-
-    	if (total > 0){
-            if (value > 0){
-                var numY = (value / total) * 100;
-                percent = (Math.round( numY * 10 ) / 10) + '%';
-            }
-            else{
-                percent = '0%';
-            }
-        }
-        else{
-            percent = 'N/A';
-        }
-
-        return percent;
-    };*/
-
 	function setMedsPagingData(data, page, pageSize) {
-	   	var pagedData    = data.slice((page - 1) * pageSize, page * pageSize);
 
+	   	var pagedData    = data.slice((page - 1) * pageSize, page * pageSize);
 	   	$scope.meds      = pagedData;
 	   	$scope.totalMeds = data.length;
 
@@ -192,23 +98,6 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	        $scope.$apply();
 	   	}
 	};
-
-	$scope.refreshMeds = function(){
-		$scope.loadingMeds = false;
-	   	//getMedsPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
-	};
-
-	/*$scope.$watch('pagingOptions', function(newVal, oldVal) {
-	   	if (newVal !== oldVal) {
-	        getMedsPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.medsFilterOptions.filterText);
-	   	}
-	}, true);
-
-	$scope.$watch('medsFilterOptions', function(newVal, oldVal) {
-	   	if (newVal !== oldVal) {
-	       	getMedsPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.medsFilterOptions.filterText);
-	   	}
-	}, true);*/
 
 	$scope.onMedRowClick = function(row) {
 	   	console.log("onMedRowClick");
@@ -277,7 +166,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 								}
 							}
 
-							var nameArr = $scope.activePatient.name.split(', ');
+							/*var nameArr = $scope.activePatient.name.split(', ');
 
 							if (nameArr.length > 0){
 								$scope.activePatient.lastname = nameArr[0];
@@ -285,8 +174,9 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 								if (nameArr.length == 2){
 								    $scope.activePatient.firstname = nameArr[1];
 								}
-							}
-                  				
+							}*/
+
+							$scope.patient_name = $scope.activePatient.firstname + " " + $scope.activePatient.lastname;
 		                  	stateService.setActivePatient($scope.activePatient);
 		               	}
 		          	}

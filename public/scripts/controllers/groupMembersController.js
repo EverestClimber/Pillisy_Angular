@@ -5,7 +5,7 @@
 */
 
 var app = angular.module('GroupMembersController', ['ngGrid','xeditable']);     //instantiates GroupMembersController module
-app.controller('groupMembersController', function ($scope, $filter, $http, $location, $rootScope, apiService, stateService, lodash) {
+app.controller('groupMembersController', function ($window, $scope, $filter, $http, $location, $rootScope, apiService, stateService, lodash) {
     'use strict';
 
     var pillsy = stateService.getPillsy();
@@ -202,17 +202,10 @@ app.controller('groupMembersController', function ($scope, $filter, $http, $loca
             if (result.msg == 'success'){
                 console.log('orgUserProfileController - apiService.put - success');
 
-                var pillsyObj  = JSON.parse($window.sessionStorage.pillsy);
-                pillsyObj.user = result.data;
-
-                $window.sessionStorage.pillsy = JSON.stringify(pillsyObj);
-                initUser();
+                var member = result.data;
             }
             else{
                 console.log('orgUserProfileController - apiService.put - error: '+result.msg);
-
-                //$scope.editableForm.$setError(result.msg, 'bla bla bla');
-                initUser();
             }
         });
     }
