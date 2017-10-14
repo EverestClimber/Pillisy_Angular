@@ -10,6 +10,13 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
 
 	var user = stateService.getUser();
 
+    if (user.role == 'org_user'){
+        $scope.is_group_admin = false;
+    }
+    else{
+        $scope.is_group_admin = true;
+    }
+
   	$scope.filterOptions = {
         filterText: '',
         useExternalFilter: true
@@ -24,6 +31,11 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
 
     $scope.setPagingData = function(data, page, pageSize) {
         var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
+
+        pagedData = pagedData.filter(function(group){
+            return group.group_type != 'master';
+        });
+
         $scope.myData = pagedData;
         $scope.totalServerItems = data.length;
         if (!$scope.$$phase) {
@@ -55,11 +67,12 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
                             console.log('groupsController - apiService.get - successfully retrieved groups: '+JSON.stringify(result));
 
 	                  		var largeLoad = [];
-	                  		var groups = result.data;
+	                  		var groups    = result.data;
 
 	                  		groups.forEach(function(group){
                                 var obj = {
                                     "id":          group.id,
+                                    "group_type":  group.type,
                                     "name":        group.name,
                                     "description": group.description,
                                     "patients":    group.patients,
@@ -123,8 +136,8 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
         data:                      'myData',
         columnDefs: [
           	{ field:'name',         displayName: 'Name',    cellTemplate: nameTemplate },
-          	{ field:'patients', 	displayName: 'Patients' },
-          	{ field:'members',		displayName: 'Org. Team' },
+          	{ field:'patients', 	displayName: 'Number of Patients' },
+          	{ field:'members',		displayName: 'Number of team members' },
         ],
         selectedItems:      		$scope.mySelections,
         multiSelect:                false,

@@ -13,9 +13,12 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 
     var d3 = $window.d3;
 
+    var pillsy = stateService.getPillsy();
+
     //patient cache data
-    $scope.activeGroup   = stateService.getActiveGroup();
-    $scope.activePatient = stateService.getActivePatient();
+    $scope.activeGroup        = stateService.getActiveGroup();
+    $scope.activePatient 	  = stateService.getActivePatient();
+    $scope.organizationGroups = pillsy.organizationGroups;
 
 	if ( !$scope.activeGroup || !$scope.activePatient){
 	  	$location.path('/');
@@ -84,6 +87,20 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		var cachedData = stateService.getActivePatientDrugs();
 
 	    if (cachedData){
+	    	cachedData.forEach(function(data){
+	    		var drugReminders = data.drugReminders;
+	    		var doseTimes     = [];
+
+	    		if (drugReminders.length > 0){
+
+	    			drugReminders.forEach(function(drugReminder){
+						doseTimes.push( drugReminder.doseTimeStr );	    				
+	    			});
+	    		}
+
+	    		data['doseTimes'] = doseTimes.join(';');
+	    	});
+
 	        setMedsPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
 	    }
 	}
@@ -166,16 +183,6 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 								}
 							}
 
-							/*var nameArr = $scope.activePatient.name.split(', ');
-
-							if (nameArr.length > 0){
-								$scope.activePatient.lastname = nameArr[0];
-
-								if (nameArr.length == 2){
-								    $scope.activePatient.firstname = nameArr[1];
-								}
-							}*/
-
 							$scope.patient_name = $scope.activePatient.firstname + " " + $scope.activePatient.lastname;
 		                  	stateService.setActivePatient($scope.activePatient);
 		               	}
@@ -194,6 +201,32 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		   	alert('Server error');
 		}	
 	}
+
+	$scope.updatePatientGroup = function(groups){
+
+		var patientGroups = [];
+
+		groups.forEach(function(id){
+			angular.forEach($scope.organizationGroups, function(obj){
+				if (id == obj.id){
+					patientGroups.push(obj);
+				}
+			});
+		});
+
+		$scope.activePatient.groups = patientGroups;
+		$scope.showGroups();
+	};
+
+  	$scope.showGroups = function() {
+
+    	var selected = [];
+    	angular.forEach($scope.activePatient.groups, function(s){
+			selected.push(s.name);
+    	});
+
+    	return selected.length ? selected.join(', ') : 'Not set';
+  	};
 
 })
 .filter('fromNow', function() {

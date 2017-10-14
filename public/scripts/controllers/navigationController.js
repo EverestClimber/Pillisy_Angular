@@ -11,45 +11,78 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
     buildNavigationMenu();
 
     function buildNavigationMenu(){
-	    $scope.menu = [
-	        {
-	            id:           'patients',
-	            label:        'Patients',
-	            iconClasses:  'fa fa-user',
-	            separator:    false,
-	            url:          '/patients/data'
-	        },
-	        {
-	            id:           'team',
-	            label:        'Team members',
-	            iconClasses:  'fa fa-user',
-	            separator:    false,
-	            url:          '/team/data'
-	        }
-	    ];
 
-	    var user = stateService.getUser();
+        var user = stateService.getUser();
 
-	    if (user){
-	        if (user.role == 'super_user'){
-	          
-	            var admin = {
-	                id:           'admin',
-	                label:        'Admin',
-	                iconClasses:  'fa fa-wrench',
-	                separator:    false,
-	                children: [
-	                    {
-	                        label:  'Manage Organizations',
-	                        url:  '/admin/manageorganizations'
-	                    },
-	                ]
-	            };
+        if (user){
+            if (user.role == 'org_user'){
+                  $scope.menu = [{
+                      id:           'groups',
+                      label:        'Groups',
+                      iconClasses:  'fa fa-group',
+                      separator:    false,
+                      children:     [],
+                      url:          '/groups/data',
+                  }];
+            }
+            else{
+                $scope.menu = [
+                    {
+                        id:           'patients',
+                        label:        'All Patients',
+                        iconClasses:  'fa fa-user',
+                        separator:    false,
+                        url:          '/patients/data'
+                    },
+                    {
+                        id:           'groups',
+                        label:        'Groups',
+                        iconClasses:  'fa fa-group',
+                        separator:    false,
+                        children:     [],
+                        url:          '/groups/data',
+                    },
+                    {
+                        id:           'team',
+                        label:        'Team members',
+                        iconClasses:  'fa fa-user',
+                        separator:    false,
+                        url:          '/team/data'
+                    }
+                ];
+            }
 
-	            $scope.menu.push(admin);
-	        }
-	    }
-	}
+            if (user.role == 'super_user'){
+              
+                var admin = {
+                    id:           'admin',
+                    label:        'Admin',
+                    iconClasses:  'fa fa-wrench',
+                    separator:    false,
+                    children: [
+                        {
+                            label:  'Manage Organizations',
+                            url:    '/admin/manageorganizations'
+                        },
+                    ]
+                };
+
+                $scope.menu.push(admin);
+            }
+        }
+        else{
+            $scope.menu = [
+                {
+                    id:           'groups',
+                    label:        'Groups',
+                    iconClasses:  'fa fa-group',
+                    separator:    false,
+                    children:     [],
+                    url:          '/groups/data',
+                }
+            ];
+        }
+  	}
 
     $rootScope.$on("login_status_change", function(event, data){
         if ( data.isLoggedIn ){
@@ -117,6 +150,7 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
 
                 var group = {
                     "id":                  item.id,
+                    "group_type":          item.group_type,
                     "name":                item.name,
                     "description":         item.description,
                     "identifier":          item.identifier,
@@ -253,6 +287,10 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
 
     function updateMyGroupsMenu(groups){
         console.log('groupsController - updateMyGroupsMenu');
+
+        groups = groups.filter(function(group){
+            return group.group_type != 'master';
+        });
 
         $scope.menu.forEach(function(menuItem){
             if (menuItem.id == 'groups'){

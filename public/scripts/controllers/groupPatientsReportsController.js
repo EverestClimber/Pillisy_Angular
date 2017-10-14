@@ -5,7 +5,7 @@
 *  @Copyright 2017 Pillsy, Inc.  
 */
 
-var app = angular.module('GroupPatientsReportsController', ['ngGrid','GroupDetails']);     //instantiates GroupPatientsReportsController module
+var app = angular.module('GroupPatientsReportsController', ['ngGrid','ui.grid','ui.grid.edit','ui.grid.exporter','ui.grid.autoFitColumns','GroupDetails']);     //instantiates GroupPatientsReportsController module
 app.controller('groupPatientsReportsController', function ($scope, $filter, $http, $location, $rootScope, apiService, groupDetails, stateService) {
     'use strict';
 
@@ -244,6 +244,9 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
     });
 
     $scope.openPatientRecord = function(rowItem) {
+
+        alert(rowItem);
+        
         console.log("openPatientRecord");
 
         var patient = rowItem.entity;
@@ -316,22 +319,25 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
         callPatient(patient.phone);
     }
 
-    var adherenceTemplate = '<div class="ngCellText"><span style="font-size: 12px; font-weight:normal" ng-class="getAdherenceClassName(row.getProperty(\'lastweek\'))">{{ row.getProperty(col.field) }}</span></div>';
+    //var adherenceTemplate = '<div class="ngCellText"><span style="font-size: 12px; font-weight:normal" ng-class="getAdherenceClassName(row.getProperty(\'lastweek\'))">{{ row.getProperty(col.field) }}</span></div>';
+    var adherenceTemplate = '<div class="ngCellText"><span style="font-size: 12px; font-weight:normal" ng-class="getAdherenceClassName(row.getProperty(\'lastweek\'))">{{ grid.appScope.getProperty(col.field) }}</span></div>';
     var messageTemplate   = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
+    var nameTemplate1     = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click=\"grid.appScope.openPatientRecord(row)\"/></div>';
+    //var nameTemplate1     = '<div ng-click=\"grid.appScope.openPatientRecord(row)\"/>{{ row.entity.name }}</div>'; 
     var nameTemplate      = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click="openPatientRecord(row)"/></div>'; 
 
     //Grid For Adherence report
     $scope.patientsReportDataGridOptions = {
-        data:             'patientsReportData',
+        //data:             'patientsReportData',
         columnDefs: [
-            { field:'name',           displayName: 'Name',          cellTemplate: nameTemplate },
+            { field:'name',           displayName: 'Name',          cellTemplate: nameTemplate1 },
             { field:'drugName',       displayName: 'Drugs' },
-            { field:'lastweek',       displayName: 'Last Week',     cellTemplate: adherenceTemplate },
-            { field:'all_time',       displayName: 'All time' },
-            { field:'last_connected', displayName: 'Last connected' },
-            { field:'last_opened',    displayName: 'Last opened' },
-            { field:'start_date',     displayName: 'Start date' },
-            { field:'phone',          displayName: 'Mobile#',       cellTemplate: messageTemplate }
+            { field:'lastweek',       displayName: 'Last Week',     cellTemplate: adherenceTemplate},
+            { field:'all_time',       displayName: 'All time'},
+            { field:'last_connected', displayName: 'Last connected'},
+            { field:'last_opened',    displayName: 'Last opened'},
+            { field:'start_date',     displayName: 'Start date'},
+            { field:'phone',          displayName: 'Mobile#',       cellTemplate: messageTemplate}
         ],
         multiSelect:                false,
         enablePaging:               true,
@@ -347,6 +353,10 @@ app.controller('groupPatientsReportsController', function ($scope, $filter, $htt
         filterOptions:              $scope.filterOptions,
         enableCellSelection:        false
     };
+
+    $timeout(function () { 
+        $patientsReportDataGridOptions.data = $scope.patientsReportData; 
+    }, 100);
 
     //Grid For patients list
     var removeTemplate  = '<div><input type="button" style="color: #2685ee" value="Remove" ng-click="removeRow($event, row.entity)" />';

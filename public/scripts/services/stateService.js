@@ -992,9 +992,10 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
       	console.log('stateService...loginSuccessCallback - setting loggedInUser to: '+JSON.stringify(data));
 
         var pillsy = {
-            user:        data.user,
-            token:       data.token,
-            tokenExpiry: data.tokenExpiry
+            user:               data.user,
+            organizationGroups: data.organizationGroups,
+            token:              data.token,
+            tokenExpiry:        data.tokenExpiry
         };
 
         $window.sessionStorage.pillsy = JSON.stringify(pillsy);

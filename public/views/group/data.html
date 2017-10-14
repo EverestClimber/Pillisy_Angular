@@ -1,0 +1,194 @@
+<div ng-controller="groupPatientsReportsController">
+	<div id="page-heading">
+	    <ol class="breadcrumb">
+	        <li><a href="/groups/mygroups">My Groups</a></li>
+	        <li class="active">Group</li>
+	    </ol>
+		<h1 ng-show="group_visible">Group name: {{ group.name }} </h1>
+		<h1 ng-show="sms_visible">Send SMS to {{ patient_to_send_sms }}</h1>
+		<h1 ng-show="call_visible">Calling {{ patient_to_call }}</h1>  
+	</div>
+
+	<div class="container-fluid" ng-show="group_visible">
+		<div class="row">
+			<div class="col-lg-12" style="position: relative;">
+				<tabset panel-tabs="true" panel-class="panel-default" style="position: relative;"> 
+					<!--<tab ng-click="onTabSelect('patients')" heading="Patients">
+						<div class="container-fluid">
+						    <div class="row">
+						        <div class="col-md-12">
+						            <panel panel-class="panel-primary" data-heading="Patients medication adherence data">
+						                <panel-controls>
+						                    <panel-control-collapse></panel-control-collapse>
+						  					<panel-control-refresh type="circular" is-loading="loadingPatients" ng-click="refreshPatients()"></panel-control-refresh>
+						                </panel-controls>
+
+						                <div style="height: 500px;" ng-grid="patientsListDataGridOptions"></div>
+						            </panel>
+						        </div>
+						    </div>
+						    
+						</div> 
+					</tab>-->
+					
+					<tab ng-click="onTabSelect('reports')" heading="Reports">
+						<div class="container-fluid">
+
+						    <div class="row">
+						        <div class="col-md-12">
+						            <panel panel-class="panel-primary" data-heading="Patients medication adherence data">
+						                <panel-controls>
+						                    <panel-control-collapse></panel-control-collapse>
+						  					<panel-control-refresh type="circular" is-loading="loadingPatients" ng-click="refreshPatients()"></panel-control-refresh>
+						                </panel-controls>
+
+						                <div style="height: 500px;" ng-grid="patientsReportDataGridOptions" class="grid"></div>
+						            </panel>
+						        </div>
+						    </div>
+						    
+						</div> 
+					</tab>
+					
+					<tab ng-click="onTabSelect('members')" heading="Org. Team">
+						<div class="container-fluid" ng-controller="groupMembersController">
+						    <div class="row">
+						      	<div class="col-md-12">
+						            <panel panel-class="panel-primary" data-heading="Members of your organzation with access to this group">
+						                <panel-controls>
+						                    <panel-control-collapse></panel-control-collapse>
+						  					<panel-control-refresh type="circular" is-loading="loadingMembers" ng-click="refreshMembers()"></panel-control-refresh>
+						                </panel-controls>
+
+						                <div style="height: 500px;" ng-grid="membersGridOptions"></div>
+						            </panel>
+						        </div>
+						    </div>
+						</div> 
+					</tab>
+
+					<tab pane-changed="paneChanged(selectedPane)" ng-show="isAdmin" heading="Manage Group"> 
+						<div class="container-fluid">
+						    <div class="row">
+						      	<div class="col-md-12">
+						            <panel panel-class="panel-primary" data-heading="">
+						                
+								        <div action="" class="form-horizontal row-border">
+							
+								            <div class="form-group">
+								                <label class="col-sm-3 control-label">Group Name</label>
+								                <div class="col-sm-6 form-control-static" name="editableForm">
+								                    <a editable-text="group.name" onaftersave="updateGroup('name', group.name)">{{ group.name || 'empty' }}</a>
+								                </div>
+								            </div>
+								                
+								            <div class="form-group">
+								                <label class="col-sm-3 control-label">Group Description</label>
+								                <div class="col-sm-6 form-control-static">
+								                    <a editable-text="group.description" onaftersave="updateGroup('description', group.description)">{{ group.description || 'empty' }}</a>
+								                </div>
+								            </div>
+								              
+								             <div class="panel-footer">
+												<div class="row">
+													<div class="col-sm-6 col-sm-offset-3">
+														<div class="btn-toolbar">
+															<!--<button class="btn-default btn" ng-click="cancelCreate()">Remove Group</button>
+															<button data-ng-disabled="progress.active()" ng-click="submitCreate()" class="btn-primary btn">Submit</button> -->
+															<button data-ng-disabled="progress.active()" ng-click="submitDelete()" class="btn-default btn">Delete Group</button>
+														</div>
+													</div>
+												</div>
+											</div> 
+								        </div>
+
+								        <br><br>
+						            </panel>
+						        </div>
+						    </div>
+						</div> 
+					</tab>	
+
+					<!--<tab ng-click="onTabSelect('charts')" heading="Charts">
+						<div class="container-fluid" >
+
+						    <div class="row">
+						        <div class="col-md-12">
+						            <panel panel-class="panel-primary" data-heading="Patients medication adherence data">
+						                <panel-controls>
+						                    <panel-control-collapse></panel-control-collapse>
+						  					<panel-control-refresh type="circular" is-loading="loadingPatients" ng-click="refreshPatients()"></panel-control-refresh>
+						                </panel-controls>
+
+						                <div style="height: 500px;" ng-grid="gridOptions"></div>
+						            </panel>
+						        </div>
+						    </div>
+						    
+						</div> 
+					</tab>-->
+
+				</tabset>
+				<div style="position:absolute;top:20px;right: 60px;">
+					<panel-controls>
+						<a ng-show="patients_visible" href="/group/invitepatient" stye="text-align: right;"><i class="glyphicon glyphicon-plus"></i> INVITE EXISTING PATIENT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+						<a ng-show="patients_visible" href="/group/addpatient" stye="text-align: right;"><i class="glyphicon glyphicon-plus"></i> ADD NEW PATIENT</a>
+						<a ng-hide="patients_visible" href="/group/invitemember" stye="text-align: right;"><i class="glyphicon glyphicon-plus"></i> INVITE MEMBER</a>
+					</panel-controls>
+				</div>
+			</div>
+		</div>
+	</div> <!-- container-fluid -->
+
+	<div class="container-fluid" ng-show="sms_visible">
+		<panel panel-class="panel" is-loading="loading">
+			<div class="col-sm-4" ng-show="message_patient_form">
+				Please enter a message that would be sent to {{ patient_to_send_sms }} via SMS. This is one-way only.<br><br>
+				<form name="messagepatient" ng-submit="sendMessage(message)" class="form-horizontal" style="margin-bottom: 0px !important;">
+					<div class="form-group">
+						<div class="col-sm-12">
+							<textarea rows="10" type="text" name="message" ng-model="message" class="form-control" id="message" placeholder="Message" />
+						</div>
+					</div>
+
+					<div class="panel-footer">
+						<div class="pull-right">
+							<a href="/group/data" class="btn btn-default">Cancel</a>
+							<button type="submit" class="btn btn-primary" ng-disabled="searchLoading"> 
+								<span ng-show="sendButtonText == 'Sending'"><i class="glyphicon glyphicon-refresh glyphicon-spin"></i></span>
+									{{ sendButtonText }}
+							</button>
+						</div>
+					</div>
+					<br>
+				</form>
+			</div>
+
+			<div class="col-sm-4" ng-show="!message_patient_form">{{ serverMsg }}<br><br>
+				<form name="createpatient" class="form-horizontal" style="margin-bottom: 0px !important;">
+					<div class="panel-footer">
+						<div class="pull-right">
+							<a href="/group/data" class="btn btn-default">OK</a>
+						</div>
+					</div>
+				</form>
+			</div>
+
+		</panel>
+	</div>
+
+	<div class="container-fluid" ng-show="call_visible">
+		<panel panel-class="panel" is-loading="loading">
+			<div class="col-sm-4">{{ callPatientMsg }}.<br><br>
+				<form name="createpatient" class="form-horizontal" style="margin-bottom: 0px !important;">
+					<div class="panel-footer">
+						<div class="pull-right">
+							<a href="/group/data" class="btn btn-default">OK</a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</panel>
+	</div>
+
+</div>

@@ -84,6 +84,23 @@
                                                 </div>
                                             </div>
 
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">SMS Reminders</label>
+                                                <div class="col-sm-6 form-control-static">
+                                                    <a href="#" editable-checkbox="activeDrug.enableSMSReminders" e-title="Enable?" onaftersave="postDrug('reminder1_time', activeDrug.enableSMSReminders)">
+                                                        {{ activeDrug.enableSMSReminders && 'Enabled' || 'Disabled' }}
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                           <div class="form-group">
+                                                <label class="col-sm-3 control-label">Phone Call Reminders</label>
+                                                <div class="col-sm-6 form-control-static">
+                                                    <a href="#" editable-checkbox="activeDrug.enableIVRReminders" e-title="Enable?" onaftersave="postDrug('reminder1_time', activeDrug.enableIVRReminders)">
+                                                        {{ activeDrug.enableIVRReminders && 'Enabled' || 'Disabled' }}
+                                                    </a>
+                                                </div>
+                                            </div>
                                             <!--<div class="form-group">
                                                 <label class="col-sm-3 control-label">Start date</label>
                                                 <div class="col-sm-6 form-control-static">
@@ -94,25 +111,25 @@
                                             <div class="form-group" ng-show="activeDrug.numDoses >= 0">
                                                 <label class="col-sm-3 control-label">Dose 1 reminder time</label>
                                                 <div class="col-sm-6 form-control-static">
-                                                    <a href="#" editable-time="activeDrug.reminder1.initScheduleTime" onaftersave="postDrug('reminder1_time', activeDrug.reminder1.initScheduleTime)">{{ activeDrug.reminder1.initScheduleTime || 'empty' }} </a>
+                                                    <a href="#" editable-time="initScheduleTime" onaftersave="postReminder(activeDrug.reminder1.id, initScheduleTime)">{{ activeDrug.reminder1.doseTimeStr || 'empty' }} </a>
                                                 </div>
                                             </div>
                                             <div class="form-group" ng-show="activeDrug.numDoses >= 2">
                                                 <label class="col-sm-3 control-label">Dose 2 reminder time</label>
                                                 <div class="col-sm-6 form-control-static">
-                                                    <a href="#" editable-time="activeDrug.reminder2.initScheduleTime" onaftersave="postDrug('reminder2_time', activeDrug.reminder2.initScheduleTime)">{{ activeDrug.reminder2.initScheduleTime || 'empty' }}</a>
+                                                    <a href="#" editable-time="activeDrug.reminder2.initScheduleTime" onaftersave="postReminder('reminder2_time', activeDrug.reminder2.initScheduleTime)">{{ activeDrug.reminder2.doseTimeStr || 'empty' }}</a>
                                                 </div>
                                             </div>
                                             <div class="form-group" ng-show="activeDrug.numDoses >= 3">
                                                 <label class="col-sm-3 control-label">Dose 3 reminder time</label>
                                                 <div class="col-sm-6 form-control-static">
-                                                    <a href="#" editable-time="activeDrug.reminder3.initScheduleTime" onaftersave="postDrug('reminder3_time', activeDrug.reminder3.initScheduleTime)">{{ activeDrug.reminder3.initScheduleTime || 'empty' }}</a>
+                                                    <a href="#" editable-time="activeDrug.reminder3.initScheduleTime" onaftersave="postReminder('reminder3_time', activeDrug.reminder3.initScheduleTime)">{{ activeDrug.reminder3.doseTimeStr || 'empty' }}</a>
                                                 </div>
                                             </div>
                                             <div class="form-group" ng-show="activeDrug.numDoses >= 4">
                                                 <label class="col-sm-3 control-label">Dose 4 reminder time</label>
                                                 <div class="col-sm-6 form-control-static">
-                                                    <a href="#" editable-time="activeDrug.reminder4.initScheduleTime" onaftersave="postDrug('reminder4_time', activeDrug.reminder4.initScheduleTime)">{{ activeDrug.reminder4.initScheduleTime || 'empty' }}</a>
+                                                    <a href="#" editable-time="activeDrug.reminder4.initScheduleTime" onaftersave="postReminder('reminder4_time', activeDrug.reminder4.initScheduleTime)">{{ activeDrug.reminder4.doseTimeStr || 'empty' }}</a>
                                                 </div>
                                             </div>    
                                         </div>

@@ -175,6 +175,13 @@
                                     </div>
                                 </div>
 
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Groups</label>
+                                    <div class="col-sm-6 form-control-static">
+                                        <a href="#" editable-select="activePatient.groups" onaftersave="updatePatientGroup(activePatient.groups)" e-multiple e-ng-options="s.id as s.name for s in groups">{{ showGroups() }}</a>
+                                    </div>
+                                </div>
+
                            </div>
                         </panel>
                     </div>

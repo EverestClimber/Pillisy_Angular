@@ -1,7 +1,7 @@
 <div ng-controller="organizationPatientsController">
 	<div id="page-heading">
 		<ol class="breadcrumb">
-			<li class="active">Patients</li>
+			<li class="active">All Patients</li>
 		</ol>
 		<h1 ng-show="sms_panel_visible">Send SMS to {{ patient_to_send_sms }}</h1>
 		<h1 ng-show="call_panel_visible">Calling {{ patient_to_call }}</h1>
@@ -41,7 +41,8 @@
 						  					<panel-control-refresh type="circular" is-loading="loadingPatients" ng-click="refreshPatients()"></panel-control-refresh>
 						                </panel-controls>
 
-						                <div style="height: 500px;" ng-grid="reportGridOptions" class="grid"></div>
+						                <!--<div style="height: 500px;" ng-grid="reportGridOptions" class="grid"></div>-->
+						                <div class="gridStyle" ui-grid="reportGridOptions" ui-grid-edit ui-grid-exporter ui-grid-auto-fit-columns ></div>
 						            </panel>
 						        </div>
 						    </div>

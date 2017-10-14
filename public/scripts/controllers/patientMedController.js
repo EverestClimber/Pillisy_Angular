@@ -25,7 +25,28 @@ app.controller('patientMedController', function ($scope, $filter, $http, $locati
     //patient cache data
     $scope.activeGroup   = stateService.getActiveGroup();
     $scope.activePatient = stateService.getActivePatient();
-    $scope.activeDrug    = stateService.getActivePatientDrug();
+    var activeDrug       = stateService.getActivePatientDrug();
+
+    var numDoses  = 0;
+    var drugReminders = activeDrug.drugReminders;
+
+    if (drugReminders){
+        activeDrug['numDoses'] = drugReminders.length;
+
+        var i = 1;
+        drugReminders.forEach(function(drugReminder){
+            activeDrug['reminder'+i] = drugReminder; 
+            i++;
+        });
+
+    }
+    else{
+        activeDrug['numDoses'] = 0;
+    }
+
+    $scope.activeDrug = activeDrug;
+
+    //alert('active drug: '+JSON.stringify($scope.activeDrug));
 
     if (!$scope.activeGroup){
         $location.path('/');
@@ -77,12 +98,45 @@ app.controller('patientMedController', function ($scope, $filter, $http, $locati
         }*/
     } 
 
-    $scope.postDrug = function(key, value){
+    $scope.postReminder = function(id, value){
+
+        alert('id: '+id+" , value: "+value);
+
+        /*var activeDrug    = $scope.activeDrug;
+        var drugReminders = activeDrug.drugReminders;
+        var drugReminder  = null;
+
+        var index = 0;
+        drugReminders.some(function(iDrugReminder){
+            if (iDrugReminder.id == id){
+                drugReminder = iDrugReminder
+                return true;
+            }
+
+            index++;
+        }); 
+
+        if (drugReminder){
+
+            //in moment
+            var drugReminderTodayLocalTime = nowLocalTimeTmp.set({
+                'hours':        drugReminderLocalTime.get('hours'),
+                'minutes':      drugReminderLocalTime.get('minutes'), 
+                'seconds':      drugReminderLocalTime.get('seconds'),
+                'milliseconds': drugReminderLocalTime.get('milliseconds')
+            });
+        }*/
+    }
+
+    //$scope.postDrug = function(key, value){
+    $scope.postDrug = function(value){
         var groupId   = $scope.activeGroup.id;
         var patientId = $scope.activePatient.id;
         var drugId    = $scope.activeDrug.id;
 
-        var obj = {};
+        alert(value);
+
+        /*var obj = {};
 
         switch(key){
             case 'reminder1_time':
@@ -125,7 +179,7 @@ app.controller('patientMedController', function ($scope, $filter, $http, $locati
             case 'quantity':
                 obj.quantity = value;
                 break;
-        }
+        }*/
 
         var api = '/v1/a/organization/group/'+groupId+'/patient/'+ patientId +'/drug/'+drugId;
         

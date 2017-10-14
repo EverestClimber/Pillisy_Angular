@@ -9,14 +9,35 @@ var app = angular.module('OrganizationPatientsController', ['ngGrid','GroupDetai
 app.controller('organizationPatientsController', function ($scope, $filter, $http, $location, $rootScope, apiService, groupDetails, stateService, lodash) {
     'use strict';
 
-    init();
+    var user = stateService.getUser();
+
+    if (user.role == 'org_user'){
+        $location.path('/groups/data');
+    }
+    else{ //org_admin or super_user
+        init();
+    }
 
     function init(){
+
+        var pillsy = stateService.getPillsy();
+        var organizationGroups  = pillsy.organizationGroups;
+
+        if (organizationGroups){
+            organizationGroups.some(function(group){
+                if (group.type == 'master'){
+
+                    stateService.setActiveGroup(group);
+                    return true;
+                }
+            });
+        }
 
         $scope.call_panel_visible         = false;
         $scope.sms_panel_visible          = false;
         $scope.org_patients_panel_visible = true;
         $scope.patients_tab_visible       = true;
+
         checkSuperUser();
 
         $scope.pagingOptions = {
@@ -172,6 +193,47 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
         }
 
         return obj;
+    }
+
+    function fetchOrganizationPatients(pageSize, page){
+
+        var request = 'fetch_organization_patients';
+        var api     = '/v1/a/organization/group/'+ stateService.getActiveGroup().id +'/patients';
+        var data;
+
+        $scope.loadingPatients = true;
+        
+        apiService.get(api).then(function(result){
+            $scope.loadingPatients = false;
+
+            if (result){
+                if (result.msg == 'success'){
+                    console.log('groupPatientsController - fetchPatients - successfully retrieved group patients');
+
+                    /*
+                    var obj = {
+                        organizationGroup: organizationGroup,
+                        patients:          patients
+                    };*/
+
+                    var data = result.data;
+
+                    //set the data to cache
+                    stateService.setGroupPatientsData(data);
+
+                    //display data from cache
+                    displayDataFromCache();
+                }
+                else{
+                    console.log('groupPatientsController - fetchPatients - error creating group: '+result.msg);
+
+                    alert(result.msg);
+                }
+            }
+            else{
+                console.log('groupPatientsController - fetchPatients - error - no result from server');
+            }
+        });
     }
 
     function fetchPatients(pageSize, page){
