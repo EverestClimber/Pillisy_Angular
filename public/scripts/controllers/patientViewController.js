@@ -13,12 +13,19 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 
     var d3 = $window.d3;
 
-    var pillsy = stateService.getPillsy();
+    var user = stateService.getUser();
+
+    if (user.role == 'org_user'){
+        $scope.is_admin = false;
+    }
+    else{
+    	$scope.is_admin = true;
+    }
 
     //patient cache data
     $scope.activeGroup        = stateService.getActiveGroup();
     $scope.activePatient 	  = stateService.getActivePatient();
-    $scope.organizationGroups = pillsy.organizationGroups;
+    $scope.organizationGroups = getOrganizationGroups();   //doesnt include master group
 
 	if ( !$scope.activeGroup || !$scope.activePatient){
 	  	$location.path('/');
@@ -55,8 +62,8 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		}
 
 		$scope.pagingOptions = {
-            pageSizes: ['10', '20', '30'],
-            pageSize:  '20',
+            pageSizes: ['25', '50', '100'],
+            pageSize:  '100',
             currentPage: 1
         };
 
@@ -68,6 +75,25 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
         $scope.totalMeds = 0;
 
 		getDataFromCache();
+	}
+
+	function getOrganizationGroups(){
+
+		var groups = [];
+		var pillsy = stateService.getPillsy();
+
+		if (pillsy){
+			groups = pillsy.organizationGroups;
+
+			//don't show the master group on the list
+			if (groups.length > 0){
+				groups = groups.filter(function(group){
+					return group.type != 'master';
+				});
+			}
+		}
+
+		return groups;
 	}
 
 	$scope.$watch('pagingOptions', function(newVal, oldVal) {
@@ -202,31 +228,75 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		}	
 	}
 
-	$scope.updatePatientGroup = function(groups){
+	$scope.updatePatientGroup = function(groupIds){
 
 		var patientGroups = [];
 
-		groups.forEach(function(id){
+		groupIds.forEach(function(groupId){
 			angular.forEach($scope.organizationGroups, function(obj){
-				if (id == obj.id){
-					patientGroups.push(obj);
+				if (groupId == obj.id){
+					var group = {
+						id:   obj.id,
+						name: obj.name,
+						type: obj.type
+					};
+
+					patientGroups.push(group);
 				}
 			});
 		});
 
 		$scope.activePatient.groups = patientGroups;
 		$scope.showGroups();
+
+		updatePatientGroupsForOrganization();
 	};
 
   	$scope.showGroups = function() {
-
     	var selected = [];
     	angular.forEach($scope.activePatient.groups, function(s){
-			selected.push(s.name);
+    		if (s.type != 'master'){
+				selected.push(s.name);
+			}
     	});
 
     	return selected.length ? selected.join(', ') : 'Not set';
   	};
+
+  	function updatePatientGroupsForOrganization(){
+
+  		var activePatient = $scope.activePatient;
+  		var groups        = activePatient.groups;
+
+  		var patientGroups = {
+  			groups: groups
+  		};
+
+  		var api = '/v1/a/organization/patient/'+ activePatient.id +'/groups';
+			
+		apiService.put(api, patientGroups).then(function(result){
+		    $scope.progress = false;
+
+		  	if (result){
+		      	if (result.msg == 'success'){
+		          	console.log('apiService.get - successfully updated patient\'s '+groups);
+
+		          	var data      = result.data;
+		          	var patientId = data.patientId;
+		          	var groups    = data.groups;
+
+		          	$scope.activePatient.groups = groups;
+		          	stateService.setPatientGroups(patientId, groups);
+		      	}
+		       	else{
+		          	alert(result.msg);
+		      	}
+		    }
+		    else{
+		       	alert('Server error');
+		    } 	
+		});
+  	}
 
 })
 .filter('fromNow', function() {

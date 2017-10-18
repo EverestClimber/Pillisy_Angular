@@ -1,6 +1,6 @@
 <div id="page-heading">
 	<ol class="breadcrumb">
-        <li><a href="/">My Groups</a></li>
+        <li><a href="/groups/data">Groups</a></li>
         <li class="active">Create Group</li>
     </ol>
 	<h1>Create Group</h1>
@@ -22,31 +22,9 @@
 				<div class="col-sm-6">
 					<textarea type="text" data-ng-model="group.description" class="form-control autosize" required />
 				</div>
-				<div class="col-sm-3"><p class="help-block">Type a description that will enable other people in your organization to find your group.</p></div>
+				<!--<div class="col-sm-3"><p class="help-block">Type a description that will enable other people in your organization to find your group.</p></div>-->
 			</div>
 
-			<!--<div class="form-group">
-				<label class="col-sm-3 control-label">Group Type</label>
-				<div class="col-sm-6">
-					<div class="dropdown">
-	                    <button class="btn btn-sm btn-default " data-toggle="dropdown">
-	                        <span style="margin-left: 5px">
-	                        	{{selected_type}}
-	                        </span>
-	                        <span style="margin-left: 2px">
-	                            <b class="caret"/>
-	                        </span>
-	                    </button>
-		                <ul class="dropdown-menu" dropdown-menu>
-			                <li ng-repeat="type in types">
-			                    <a ng-click="selectType(type)">{{type.name}}</a>
-			                </li>
-		                </ul>
-	                </div>
-				</div>
-				<div class="col-sm-3"><p class="help-block">{{selected_desc}}</p></div>
-			</div>-->
-		
 			<div class="panel-footer">
 				<div class="row">
 					<div class="col-sm-6 col-sm-offset-3">

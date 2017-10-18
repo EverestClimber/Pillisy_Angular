@@ -123,7 +123,7 @@ app.controller('groupController', function ($scope, $filter, $http, $location, $
 
         $scope.callPatientMsg = 'Please wait while a call is being placed to '+$scope.patient_to_call;
 
-        /*apiService.post(api, payload).then(function(result){
+        apiService.post(api, payload).then(function(result){
 
             if (result){
                 var msg = result.msg;
@@ -141,7 +141,7 @@ app.controller('groupController', function ($scope, $filter, $http, $location, $
             else{
                 console.log('apiService.post - error');
             }
-        });*/
+        });
     }
 
     $rootScope.$on("send_message_to_patient", function (event, data) {

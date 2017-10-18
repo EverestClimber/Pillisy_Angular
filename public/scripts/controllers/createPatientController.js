@@ -4,7 +4,7 @@
 *  @package CreatePatientController AngularJS module  
 */
 
-var app = angular.module('CreatePatientController', []);     //instantiates CreatePatientController module
+var app = angular.module('CreatePatientController', ['checklist-model']);     //instantiates CreatePatientController module
 app.controller('createPatientController', function ($scope, $filter, $location, apiService, stateService) {
 	'use strict';
 
@@ -28,6 +28,9 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
         toggleForm(true);
     }
 
+    var pillsy = stateService.getPillsy();
+    $scope.organizationGroups = getOrganizationGroups();   //doesnt include master group
+
     //https://www.timeanddate.com/time/zone/usa
     $scope.timeZones = [
         {tz: "America/New_York",    description: 'Eastern Time Zone'},
@@ -42,7 +45,56 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
     $scope.dateOptions = { 
         dateFormat: 'mm-dd-yy',
         minDate:    new Date() 
-    } 
+    };
+
+    $scope.selectedGroups = [];
+
+    var masterGroup = getMasterOrganizationGroup();
+    if (masterGroup){
+        $scope.selectedGroups.push(masterGroup);
+    }
+
+    function getOrganizationGroups(){
+
+        var groups = [];
+        var pillsy = stateService.getPillsy();
+
+        if (pillsy){
+            groups = pillsy.organizationGroups;
+
+            //don't show the master group on the list
+            if (groups.length > 0){
+                groups = groups.filter(function(group){
+                    return group.type != 'master';
+                });
+            }
+        }
+
+        return groups;
+    }
+
+    function getMasterOrganizationGroup(){
+
+        var group  = null;
+        var pillsy = stateService.getPillsy();
+
+        if (pillsy){
+            var groups = pillsy.organizationGroups;
+
+            if (groups.length > 0){
+
+                groups.some(function(iGroup){
+                    if (iGroup.type == 'master'){
+                        group = iGroup;
+
+                        return true;
+                    }
+                });
+            }
+        }
+
+        return group;
+    }
 
     $scope.createPatient = function(patient){
 
@@ -77,9 +129,10 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
                 'zip':  	    patient.zip,
                 'email':        patient.email,
                 'phone':        stateService.formatUSPhone(patient.phone),
-                'homeTimeZone': patient.homeTimeZone.title
+                'homeTimeZone': patient.homeTimeZone.title,
+                'groups':       $scope.selectedGroups
             };  
-                
+         
             if (dataObj.dob){
                 dataObj.dob = moment(dataObj.dob).valueOf();
             }

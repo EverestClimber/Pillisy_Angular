@@ -1,348 +1,276 @@
 /** Pillsy
 *  @author  Chuks Onwuneme
 *  @version 1.0
-*  @package GroupPatientsController AngularJS module
-*  @Copyright 2016 Pillsy, Inc.  
+*  @package OrganizationPatientsController AngularJS module - this is the group list
+*  @Copyright 2017 Pillsy, Inc.  
 */
-var app = angular.module('GroupPatientsController', ['ngGrid','GroupDetails']);     //instantiates GroupPatientsController module
-app.controller('groupPatientsController', function ($scope, $filter, $http, $location, $rootScope, apiService, groupDetails, stateService) {
+
+var app = angular.module('GroupPatientsController', ['ngGrid','GroupDetails']);     //instantiates OrganizationPatientsController module
+app.controller('groupPatientsController', function ($scope, $filter, $http, $location, $rootScope, apiService, groupDetails, stateService, lodash) {
     'use strict';
 
-    console.log('groupPatientsController');
+    var user = stateService.getUser();
 
-    var activeGroup = stateService.getActiveGroup();
+    init();
 
-    if (!activeGroup) {
-        $location.path('/');
-    }
-    else{
-        initVars();
-    }
-   
-    function initVars(){
-        $scope.groupId        = activeGroup.id;
-        $scope.groupName      = activeGroup.name;
-        $scope.groupExtName   = activeGroup.identifier;
+    function init(){
+
+        var pillsy                        = stateService.getPillsy();
+        var organizationGroups            = pillsy.organizationGroups;
+        $scope.group                      = stateService.getActiveGroup();
+        $scope.call_panel_visible         = false;
+        $scope.sms_panel_visible          = false;
+        $scope.org_patients_panel_visible = true;
+        $scope.patients_tab_visible       = true;
+
+        checkSuperUser();
+
+        $scope.pagingOptions = {
+            pageSizes: ['25', '50', '100'],
+            pageSize:  '100',
+            currentPage: 1
+        };
 
         $scope.filterOptions = {
             filterText: '',
             useExternalFilter: true
         };
 
-        $scope.totalServerItems = 0;
-        $scope.pagingOptions = {
-            pageSizes: [25, 50, 100],
-            pageSize:  25,
-            currentPage: 1
-        };
+        $scope.totalServerPatientsReportItems = 0;
+
+        displayDataFromCache();
+        fetchPatients($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     }
-
-    function getInterval(){
-        var now = new Date();
-
-        var interval = {
-            intervalStartTime: moment(now.getTime()).subtract(7,'days').startOf('day').valueOf(),  //7 day ago
-            intervalEndTime:   now.getTime(),
-            now:               now.getTime(),
-            timeZoneOffset:    now.getTimezoneOffset()
-        };
-
-        return encodeURIComponent( JSON.stringify(interval) );
-    }
-
-    $scope.setPagingData = function(data, page, pageSize) {
-        var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
-        $scope.myData = pagedData;
-        $scope.totalServerItems = data.length;
-        if (!$scope.$$phase) {
-            $scope.$apply();
-        }
-    };
-
-    $scope.refreshPatients = function(){
-        getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
-    };
-
-    function getFormattedPhone(phone){
-
-        if ( phone.charAt(0) === '+'){
-            phone = phone.slice(1);
-        }
-
-        if ( phone.charAt(0) === '1'){
-            phone = phone.slice(1);
-        }
-
-        String.prototype.insert = function (index, string) {
-            if (index > 0)
-                return this.substring(0, index) + string + this.substring(index, this.length);
-            else
-                return string + this;
-        };
-
-        phone = phone.insert(0, '(');
-        phone = phone.insert(4, ') ');
-        phone = phone.insert(9, '-');
-
-        return phone;
-    }
-
-    /*function fireoffGroupDetailsFetch(pageSize, page, searchText){
-        var groupId = $scope.groupId;
-
-        if (groupId){
-            var request = 'fetch_group_patients';
-            var api     = '/v1/a/organization/group/'+groupId+'/patients?interval='+getInterval()+'&request='+request;
-            var data;
-
-            $scope.loadingPatients = true;
-            apiService.get(api).then(function(result){
-                $scope.loadingPatients = false;
-
-                if (result){
-                    if (result.msg == 'success'){
-                        console.log('groupPatientsController - apiService.get - successfully retrieved group patients: '+result);
-
-                        var largeLoad = [];
-                        result.data.forEach(function(patient){
-
-                            var drugsStr = '';
-                            if (patient.drugs){
-                                if (patient.drugs.length > 0){
-                                
-                                    patient.drugs.forEach(function(drug){
-                                        if (drugsStr == ''){
-                                            drugsStr = drug;
-                                        }
-                                        else{
-                                            drugsStr = drugsStr + ', '+drug;
-                                        }
-                                    });
-                                }
-                                else{
-                                    drugsStr = 'N/A';
-                                }
-                            }
-
-                            var obj = {
-                                "id":               patient.id,
-                                "name":             patient.name,
-                                "status":           patient.status,
-                                "today":            patient.adherence_today,
-                                "interval":         patient.adherence_interval,
-                                "all_time":         patient.adherence_all,
-                                "address1":         patient.address1,
-                                "address2":         patient.address2,
-                                "city":             patient.city,
-                                "state":            patient.state,
-                                "zip":              patient.zip,
-                                "phone":            patient.phone,
-                                "phone_formatted":  getFormattedPhone(patient.phone),
-                                "phone2":           patient.phone2,
-                                "email":            patient.email,
-                                "drugs":            drugsStr,
-                            };
-
-                            largeLoad.push(obj);
-                        });
-
-                        if (searchText) {
-                            console.log('groupsController - using searchText...');
-
-                            var ft = searchText.toLowerCase();
-                            largeLoad = largeLoad.filter(function(item) {
-                                return JSON.stringify(item).toLowerCase().indexOf(ft) !== -1;
-                            });
-                        }
-
-                        stateService.setGroupDetails($scope.groupId, largeLoad);
-                        $scope.setPagingData(largeLoad, page, pageSize);
-                    }
-                    else{
-                        console.log('groupPatientsController - apiService.get - error creating group: '+result.msg);
-
-                        alert(result.msg);
-                    }
-                }
-                else{
-                    console.log('groupPatientsController - apiService.get - error - no result from server');
-                }
-            });
-        }
-        else{
-            $scope.setPagingData([], page, pageSize);
-        }
-    }*/
-    
-    function getPagedDataAsync(pageSize, page, searchText) {
-        fireoffGroupDetailsFetch(pageSize, page, searchText);
-    };
-
-    function setDataFromCache(){
-        //get from cache
-        var cachedData = stateService.getGroupDetails($scope.groupId)
-        if (cachedData){
-            cachedData = fixData(cachedData);
-            $scope.setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
-        }
-    }
-
-    setDataFromCache();
 
     $scope.$watch('pagingOptions', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-            
-            var data = {
-                pageSize:    $scope.pagingOptions.pageSize,
-                currentPage: $scope.pagingOptions.currentPage,
-                filterText:  $scope.filterOptions.filterText
-            };
-
-            $rootScope.$broadcast('paging_options', data);
-
-            //getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+            fetchPatients($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
         }
     }, true);
 
     $scope.$watch('filterOptions', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-
-            var data = {
-                pageSize:    $scope.pagingOptions.pageSize,
-                currentPage: $scope.pagingOptions.currentPage,
-                filterText:  $scope.filterOptions.filterText
-            };
-
-            $rootScope.$broadcast('filter_options', data);
-
-            //getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+            fetchPatients($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
         }
     }, true);
 
-    $scope.$on('received_report_data', function (event, data) {
-        setDataFromCache();
-    });
-
-    function fixData(data){
-
-        var seen = {};
-        data = data.filter(function(entry) {
-
-            var previous;
-
-            // Have we seen this id before?
-            if (seen.hasOwnProperty(entry.id)) {
-                // Yes, grab it and add this drug to it
-                previous = seen[entry.id];
-                previous.drug.push(entry.drug);
-
-                // Don't keep this entry, we've merged it into the previous one
-                return false;
-            }
-
-            // entry.data probably isn't an array; make it one for consistency
-            if (!Array.isArray(entry.drug)) {
-                entry.drug = [entry.drug];
-            }
-
-            // Remember that we've seen it
-            seen[entry.id] = entry;
-
-            // Keep this one, we'll merge any others that match into it
-            return true;
-        });
-
-        data.forEach(function(entry) {
-            var drugs   = entry.drug.toString().replace(/\,/g, ', ');
-            entry.drugs = drugs;
-
-            delete entry.drug;
-        });
-        
-        return data;
-    }
-
-    $scope.openPatientRecord = function(rowItem) {
-        console.log("openPatientRecord");
-
-        var patient = rowItem.entity;
-
-        var nameArr = patient.name.split(', ');
-
-        if (nameArr.length > 0){
-            patient.lastname = nameArr[0];
-
-            if (nameArr.length == 2){
-                patient.firstname = nameArr[1];
-            }
+    $scope.onTabSelect = function(tab){
+        switch(tab){
+            case 'patients':
+                $scope.patients_tab_visible = true;
+                break;
+            case 'reports':
+                $scope.patients_tab_visible = false;
+                break;
         }
 
-        if (stateService.setActivePatient(patient)){
-            $location.path('/group/patient/data');
+        checkSuperUser();
+    };
+
+    function checkSuperUser(){
+        var user = stateService.getUser();
+        if ( (user.role == 'super_user') && ($scope.patients_tab_visible) ){
+            $scope.patients_tab_visible_is_super_user = true;
         }
         else{
-            //could not set group
+            $scope.patients_tab_visible_is_super_user = false;
+        }
+    }
+
+    function displayDataFromCache(){
+        //get from cache
+        var cachedData = stateService.getGroupPatients( stateService.getActiveGroup().id );
+        
+        if (cachedData){
+            setPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
+        }
+    }
+
+    function formatCachedData(cachedData){
+
+        cachedData.forEach(function(patient){
+            var drugs = patient.drugs;
+
+            var drugsArr = [];
+            drugs.forEach(function(drug){
+                drugsArr.push(drug.name);
+            });
+
+            patient.drugNames = drugsArr.join(', ');
+        });
+
+        return cachedData;
+    }
+
+    function setPagingData(cachedData, page, pageSize) {
+
+        //for list
+        var listData = formatCachedData(cachedData);
+        var patients = listData.slice((page - 1) * pageSize, page * pageSize);
+
+        $scope.organizationPatients = lodash.sortBy(patients, 'fullname');
+
+        $scope.totalServerPatientsListItems = listData.length;
+
+        //for reports
+        var reportData  = [];
+        var tempListData = cachedData.slice((page - 1) * pageSize, page * pageSize);
+
+        tempListData.forEach(function(item){
+            var drugs = item.drugs;
+            if (drugs.length > 0){
+
+                drugs.forEach(function(drug){
+
+                    var obj = getItemObject(item);
+
+                    obj.drugId            = drug.id;
+                    obj.drugName          = drug.name;
+                    obj.drugRemaining     = drug.remaining;
+                    obj.drugLastConnected = drug.lastConnected;
+                    obj.drugLastOpened    = drug.lastOpened; 
+                    obj.drugStatus        = drug.status;
+                    obj.drugDoseTimes     = drug.doseTimes;
+                    obj.drugTodayTaken    = drug.todayTaken;
+                    obj.drugStartTime     = drug.startTime;
+                    obj.lastWeekAdherence = drug.lastWeekAdherence;
+                    obj.averageAdherence  = drug.averageAdherence;
+
+                    reportData.push(obj);
+                });
+            }
+            else{
+                var obj = getItemObject(item);
+                obj.drugId            = 'N/A';
+                obj.drugName          = 'N/A';
+                obj.drugRemaining     = 'N/A';
+                obj.drugLastConnected = 'N/A';
+                obj.drugLastOpened    = 'N/A'; 
+                obj.drugStatus        = 'N/A';
+                obj.drugDoseTimes     = 'N/A';
+                obj.drugTodayTaken    = 'N/A';
+                obj.drugStartTime     = 'N/A';
+                obj.lastWeekAdherence = 'N/A';
+                obj.averageAdherence  = 'N/A';
+
+                reportData.push(obj);
+            }
+        });
+
+        //reports tab
+        $scope.reportData = lodash.sortBy(reportData, 'fullname');
+        $scope.totalServerPatientsReportItems = listData.length;
+        $scope.currentPage = page;
+
+        if (!$scope.$$phase) {
+            $scope.$apply();
         }
     };
 
-    $scope.mySelections = [];
+    function getItemObject(item){
+        var obj = {};
+        for (var key in item) {
+            if (item.hasOwnProperty(key)) {
+                if ( (key != 'drugNames') && (key != 'drugs') ){
+                    obj[key] = item[key];
+                }
+            }
+        }
 
-    var nameTemplate    = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click="openPatientRecord(row)"/></div>'; 
-    var removeTemplate  = '<div><input type="button" style="color: #2685ee" value="Remove" ng-click="removeRow($event, row.entity)" />';
-    var messageTemplate = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
-
-    $scope.gridOptions = {
-        data:             'myData',
-        columnDefs: [
-            { field:'name',       displayName: 'Name',    cellTemplate: nameTemplate },
-            { field:'drugs',      displayName: 'Drugs' },
-            { field:'phone',      displayName: 'Mobile#', cellTemplate: messageTemplate },
-            { field:'remove',     displayName: '',        cellTemplate: removeTemplate },
-        ],
-        multiSelect:                false,
-        enablePaging:               true,
-        showFooter:                 true,
-        enableRowSelection:         false, 
-        enableSelectAll:            false,
-        enableRowHeaderSelection:   false,
-        noUnselect:                 false,
-        enableGridMenu:             true,
-        enableColumnResize:         true,
-        totalServerItems:           'totalServerItems',
-        pagingOptions:              $scope.pagingOptions,
-        filterOptions:              $scope.filterOptions,
-        enableCellSelection:        false
-    };
-
-    $scope.messagePatient = function($event, patient) {
-        $event.stopPropagation();
-
-        var data = {
-            patient: patient,
-            groupId: $scope.groupId
-        };
-
-        $rootScope.$broadcast("send_message_to_patient", data);
+        return obj;
     }
 
-    $scope.callPatient = function($event, patient) {
-        $event.stopPropagation();
+    function fetchOrganizationPatients(pageSize, page){
 
-        var data = {
-            patient: patient,
-            groupId: $scope.groupId
-        };
+        var request = 'fetch_organization_patients';
+        var api     = '/v1/a/organization/group/'+ stateService.getActiveGroup().id +'/patients';
+        var data;
 
-        $rootScope.$broadcast("call_patient", data);
+        $scope.loadingPatients = true;
+        
+        apiService.get(api).then(function(result){
+            $scope.loadingPatients = false;
+
+            if (result){
+                if (result.msg == 'success'){
+                    console.log('groupPatientsController - fetchPatients - successfully retrieved group patients');
+
+                    /*
+                    var obj = {
+                        organizationGroup: organizationGroup,
+                        patients:          patients
+                    };*/
+
+                    var data = result.data;
+
+                    //set the data to cache
+                    stateService.setGroupPatientsData(data);
+
+                    //display data from cache
+                    displayDataFromCache();
+                }
+                else{
+                    console.log('groupPatientsController - fetchPatients - error creating group: '+result.msg);
+
+                    alert(result.msg);
+                }
+            }
+            else{
+                console.log('groupPatientsController - fetchPatients - error - no result from server');
+            }
+        });
+    }
+
+    function fetchPatients(pageSize, page){
+
+        var request = 'fetch_organization_patients';
+        var api     = '/v1/a/organization/group/'+ stateService.getActiveGroup().id +'/patients';
+        var data;
+
+        $scope.loadingPatients = true;
+        
+        apiService.get(api).then(function(result){
+            $scope.loadingPatients = false;
+
+            if (result){
+                if (result.msg == 'success'){
+                    console.log('groupPatientsController - fetchPatients - successfully retrieved group patients');
+
+                    /*
+                    var obj = {
+                        organizationGroup: organizationGroup,
+                        patients:          patients
+                    };*/
+
+                    var data = result.data;
+
+                    //set the data to cache
+                    stateService.setGroupPatientsData(data);
+
+                    //display data from cache
+                    displayDataFromCache();
+                }
+                else{
+                    console.log('groupPatientsController - fetchPatients - error creating group: '+result.msg);
+
+                    alert(result.msg);
+                }
+            }
+            else{
+                console.log('groupPatientsController - fetchPatients - error - no result from server');
+            }
+        });
     }
 
     $scope.removeRow = function($event, patient) {
+
         $event.stopPropagation();
-        var answer = confirm('Are you sure you want to remove '+patient.name+' from this group?');
+        var activeGroup = stateService.getCachedGroup( stateService.getActiveGroup().id );
+        var answer = confirm('You are about to remove '+patient.fullname+' from this organization. Are you sure?');
         
         if (answer){
             var request = 'remove_patient_from_group';
-            var api     = '/v1/a/organization/group/'+ $scope.groupId +'/patient/'+patient.id;
+            var api     = '/v1/a/organization/group/'+ activeGroup.id +'/patient/'+patient.id;
             
             $scope.loadingPatients = true;
 
@@ -352,41 +280,8 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
                 if (result){
                     if (result.msg == 'success'){
 
-                        var groupDetails = stateService.getGroupDetails($scope.groupId);
-
-                        if (groupDetails){
-                            if (groupDetails.length > 0){
-                                for (var i = groupDetails.length -1; i >= 0 ; i--){
-                                    if (groupDetails[i].id == patient.id){
-                                        groupDetails.splice(i, 1);
-
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                       
-                        var data = result.data;
-
-                        if (data.numPatients){
-                            var userGroups = stateService.getUserGroups();
-
-                            if (userGroups){
-                                if (userGroups.length > 0){
-                                    userGroups.some(function(group){
-                                        if (group.id == $scope.groupId){
-                                            group.patients = data.numPatients;
-                                            return true;
-                                        }
-                                    });
-
-                                    stateService.setUserGroups(userGroups);
-                                }
-                            }
-                        }
-
-                        stateService.setGroupDetails($scope.groupId, groupDetails);
-                        $scope.myData.splice($scope.myData.indexOf(patient), 1);
+                        stateService.removePatientFromGroup(patient, activeGroup);
+                        displayDataFromCache();
                     }
                     else{
                         console.log('groupPatientsController - apiService.get - error deleting patient from group: '+result.msg);
@@ -405,10 +300,232 @@ app.controller('groupPatientsController', function ($scope, $filter, $http, $loc
         }
     };
 
-});
+    $scope.refreshPatients = function(){
+        fetchPatients($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+    };
+    
+    $scope.messagePatient = function($event, patient) {
+        $event.stopPropagation();
 
-app.filter('fromNow', function() {
-    return function(dateString) {
-        return moment(dateString).fromNow()
+        if (patient){
+            $scope.sendPatient         = patient;
+            $scope.patient_to_send_sms =  patient.firstname +' '+ patient.lastname;
+        }
+
+        $scope.org_patients_panel_visible = false;
+        $scope.call_panel_visible         = false;
+        $scope.sms_panel_visible          = true;
+        $scope.sendButtonText             = 'Send';
+        $scope.message_patient_form       = true;
+    }
+
+    $scope.sendMessage = function(message){
+
+        if (message){
+            
+            var request   = 'send_sms_to_patient';
+            var patientId = $scope.sendPatient.id;
+            var groupId   = stateService.getActiveGroup().id;
+            var api       = '/v1/a/organization/group/'+ groupId +'/patient/'+ patientId +'/sms';
+            var payload = {
+                message: message,
+                request: request
+            };
+
+            $scope.sendButtonText = 'Sending';
+            apiService.post(api, payload).then(function(result){
+                $scope.message_patient_form = false;
+                $scope.sendButtonText       = 'Send';
+
+                if (result){
+                    var msg = result.msg;
+
+                    if (msg == 'success'){
+
+                        var data = result.data;
+                        var output;
+
+                        if (data.found){
+                            if (data.hasPhone){
+                                if (data.smsSent){
+                                    output = 'Your SMS message was successfully sent to '+ $scope.sendPatient.firstname;
+                                }
+                                else{
+                                    output = 'Your SMS could not be sent. Please try again later';
+                                }
+                            }
+                            else{
+                                output = 'The patient, '+ $scope.sendPatient.firstname +', does not have a phone number associated with their account. Your SMS message was not sent.'
+                            }
+                        }
+                        else{
+                            output = 'This patient was not found.';
+                        }
+
+                        $scope.serverMsg = output
+                    }
+                    else{
+                        console.log('apiService.post - error');
+
+                        $scope.serverMsg = 'There was an error while sending the SMS message to '+ $scope.sendPatient.name +'. Please try again later.';
+                    }
+                }
+                else{
+                    console.log('apiService.post - error');
+                }
+            });
+        }
+        else{
+            alert('Please enter a message to send');
+        }
+    }
+
+    $scope.callPatient = function($event, patient){
+        console.log('organizationGroupController - callPatient');
+
+        $event.stopPropagation();
+
+        if (patient){
+            $scope.patient_to_call = patient.firstname +' '+ patient.lastname;
+
+            $scope.org_patients_panel_visible = false;
+            $scope.call_panel_visible         = true;
+            $scope.sms_panel_visible          = false;
+
+            var request     = 'call_patient';
+            var activeGroup = stateService.getCachedGroup( stateService.getActiveGroup().id );
+            var api     = '/v1/a/organization/group/'+ activeGroup.id +'/patient/'+ patient.id +'/call';
+            var payload = {
+                message: message,
+                request: request
+            };
+
+            console.log('organizationGroupController - callPatient - api: '+api);
+
+            $scope.callPatientMsg = 'Please wait while a call is being placed to '+patient.firstname;
+
+            apiService.post(api, payload).then(function(result){
+
+                if (result){
+                    var msg = result.msg;
+
+                    if (msg == 'success'){
+
+                        var data = result.data;
+                    }
+                    else{
+                        console.log('apiService.post - error');
+
+                        $scope.callPatientMsg = 'Pillsy encountered an error while trying to call '+ patient.firstname +'. Please try again later.';
+                    }
+                }
+                else{
+                    console.log('apiService.post - error');
+                }
+            });
+        }
+        else{
+            $scope.callPatientMsg = 'Pillsy encountered an error while trying to call '+ patient.firstname +'. Please try again later.';
+        }
+    }
+
+    $scope.openPatientRecord = function(rowItem) {
+        console.log("openPatientRecord");
+
+        var patient = rowItem.entity;
+
+        if (stateService.setActivePatient(patient)){  //has drugNames
+            $location.path('/patients/patient/data');
+        }
+        else{
+            //could not set group
+        }
+    };
+
+    $scope.getAdherenceClassName = function(value) {
+
+        if (value === 'N/A'){
+            return;
+        }
+
+        value = value.replace(/\%/g,'');
+        value = parseFloat(value);
+
+        if (value >= 85){
+            return 'label label-success';
+        }
+        else if ( (value >= 75) && (value < 85)){
+            return 'label label-warning';
+        }
+        else{
+            return 'label label-danger'
+        }
+    }
+
+    //Grid For patients list
+    var removeTemplate  = '<div><input type="button" style="color: #2685ee" value="Remove" ng-click="removeRow($event, row.entity)" />';
+    var messageTemplate = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
+    var nameTemplate    = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.fullname }}" ng-click="openPatientRecord(row)"/></div>'; 
+
+    var listColumnDefs = [
+        { field:'fullname',        displayName: 'Name',     cellTemplate: nameTemplate },
+        { field:'drugNames',       displayName: 'Drugs' },
+        { field:'phone_formatted', displayName: 'Mobile#' , cellTemplate: messageTemplate },
+    ];
+
+    if (user.role != 'org_user'){
+        listColumnDefs.push( { field:'remove', displayName: '', cellTemplate: removeTemplate } );
+    }
+
+    $scope.organizationPatientsGridOptions = {
+        data:                     'organizationPatients',
+        columnDefs:               listColumnDefs,
+        multiSelect:              false,
+        enablePaging:             true,
+        showFooter:               true,
+        enableRowSelection:       false, 
+        enableSelectAll:          false,
+        enableRowHeaderSelection: false,
+        noUnselect:               false,
+        enableGridMenu:           true,
+        enableColumnResize:       true,
+        totalServerItems:         'totalServerPatientsListItems',
+        pagingOptions:            $scope.pagingOptions,
+        filterOptions:            $scope.filterOptions,
+        enableCellSelection:      false
+    };
+
+
+    //REPORTS---------
+    var adherenceTemplate = '<div class="ngCellText"><span style="font-size: 12px; font-weight:normal" ng-class="getAdherenceClassName(row.getProperty(\'lastWeekAdherence\'))">{{ row.getProperty(col.field) }}</span></div>';
+    var phoneTemplate     = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
+    var iNameTemplate     = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.fullname }}" ng-click="openPatientRecord(row)"/></div>'; 
+
+    //Grid For Adherence report
+    $scope.reportGridOptions = {
+        data:             'reportData',
+        columnDefs: [
+            { field:'fullname',          displayName: 'Name',          cellTemplate: iNameTemplate },
+            { field:'drugName',          displayName: 'Drugs' },
+            { field:'lastWeekAdherence', displayName: 'Last Week',     cellTemplate: adherenceTemplate },
+            { field:'averageAdherence',  displayName: 'Average' },
+            { field:'drugLastConnected', displayName: 'Last connected' },
+            { field:'drugLastOpened',    displayName: 'Last opened' },
+            { field:'drugStartTime',     displayName: 'Start date' },
+            { field:'phone',             displayName: 'Mobile#',       cellTemplate: phoneTemplate }
+        ],
+        multiSelect:                false,
+        enablePaging:               true,
+        showFooter:                 true,
+        enableRowSelection:         false, 
+        enableSelectAll:            false,
+        enableRowHeaderSelection:   false,
+        noUnselect:                 false,
+        enableGridMenu:             true,
+        enableColumnResize:         true,
+        totalServerItems:           'totalServerPatientsReportItems',
+        pagingOptions:              $scope.pagingOptions,
+        filterOptions:              $scope.filterOptions,
+        enableCellSelection:        false
     };
 });

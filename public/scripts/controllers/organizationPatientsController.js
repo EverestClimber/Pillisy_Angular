@@ -20,7 +20,7 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
 
     function init(){
 
-        var pillsy = stateService.getPillsy();
+        var pillsy              = stateService.getPillsy();
         var organizationGroups  = pillsy.organizationGroups;
 
         if (organizationGroups){
@@ -193,47 +193,6 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
         }
 
         return obj;
-    }
-
-    function fetchOrganizationPatients(pageSize, page){
-
-        var request = 'fetch_organization_patients';
-        var api     = '/v1/a/organization/group/'+ stateService.getActiveGroup().id +'/patients';
-        var data;
-
-        $scope.loadingPatients = true;
-        
-        apiService.get(api).then(function(result){
-            $scope.loadingPatients = false;
-
-            if (result){
-                if (result.msg == 'success'){
-                    console.log('groupPatientsController - fetchPatients - successfully retrieved group patients');
-
-                    /*
-                    var obj = {
-                        organizationGroup: organizationGroup,
-                        patients:          patients
-                    };*/
-
-                    var data = result.data;
-
-                    //set the data to cache
-                    stateService.setGroupPatientsData(data);
-
-                    //display data from cache
-                    displayDataFromCache();
-                }
-                else{
-                    console.log('groupPatientsController - fetchPatients - error creating group: '+result.msg);
-
-                    alert(result.msg);
-                }
-            }
-            else{
-                console.log('groupPatientsController - fetchPatients - error - no result from server');
-            }
-        });
     }
 
     function fetchPatients(pageSize, page){

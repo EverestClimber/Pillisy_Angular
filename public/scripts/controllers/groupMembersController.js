@@ -99,15 +99,18 @@ app.controller('groupMembersController', function ($window, $scope, $filter, $ht
                         result.data.forEach(function(member){
 
                             var obj = {
-                                "id":               member.id,
-                                "name":             member.name,
-                                "title":            member.title,
-                                "phone":            member.phone,
-                                "formatted_phone":  getFormattedPhone(member.phone),
-                                "email":            member.email,
-                                "status":           member.status,
-                                "role":             member.role
-                            }
+                                'id':               member.id,
+                                'firstname':        member.firstname,
+                                'lastname':         member.lastname,
+                                'name':             member.lastname +', '+member.firstname,
+                                'title':            member.title,
+                                'phone':            member.phone,
+                                'formatted_phone':  getFormattedPhone(member.phone),
+                                'email':            member.email,
+                                'status':           member.status,
+                                'role':             member.role,
+                                'groups':           member.groups
+                            };
 
                             members.push(obj);
                         });
@@ -157,39 +160,46 @@ app.controller('groupMembersController', function ($window, $scope, $filter, $ht
         }
     }, true);
 
-    $scope.handleEditMemberStatus = function(member){
-    
-        var user = stateService.getUser();
+    $scope.deleteMember = function($event, memberToDelete) {
+        $event.stopPropagation();
+        var answer = confirm('Are you sure you want to delete '+memberToDelete.name+'\'s account?');
 
-        if (user.id == member.id){
-            //alert('Cannot change your account');       
-        }
-        else{
-            var dataObj = {
-                'status':  member.status,
-                'groupId': $scope.groupId
-            };  
+        if (answer){
+            var api = '/v1/a/organization/user/'+memberToDelete.id;
 
-            callUpdate(dataObj, member.id);
-        }
-    }
+            apiService.delete(api, {}).then(function(result){
+                console.log('groupMembersController - apiService.put - result is: '+JSON.stringify(result));
 
-    $scope.handleEditMemberRole = function(member){
+                if (result.msg == 'success'){
+                    console.log('groupMembersController - apiService.put - success');
 
-        var user = stateService.getUser();
+                    var members = stateService.getActiveGroupMembers();
+                    members = members.filter(function(member){
+                        return member.id != memberToDelete.id;
+                    });
 
-        if (user.id == member.id){
-            //alert('Cannot change your account');       
-        }
-        else{
-            var dataObj = {
-                'type':    member.role,
-                'groupId': $scope.groupId
-            };  
-
-            callUpdate(dataObj, member.id);
+                    stateService.setActiveGroupMembers(members);
+                    $scope.setPagingData(members, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
+                }
+                else{
+                    console.log('groupMembersController - apiService.put - error: '+result.msg);
+                }
+            });
         }
     }
+
+    var removeTemplate   = '<div ng-show="row.entity.role == \'member\'"><input type="button" style="color: #2685ee" value="Delete" ng-click="deleteMember($event, row.entity)" />';
+    var nameCellTemplate = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click="openTeamMemberDetails(row)"/></div>';
+
+    var statusCellTemplate = '<div style="display: flex; align-items: center;">'+
+        '&nbsp;&nbsp;<a href="#" onaftersave="handleEditMemberStatus(myData[ row.rowIndex ])" '+
+        'editable-select="myData[ row.rowIndex ].status" e-ng-options="s.value as s.text for s in statuses">{{ myData[ row.rowIndex ].status }} </a>'+
+        '</div>';
+
+    var roleCellTemplate = '<div style="display: flex; align-items: center;">'+
+        '&nbsp;&nbsp;<a href="#" onaftersave="handleEditMemberRole(myData[ row.rowIndex ])" editable-select="myData[ row.rowIndex ].role" '+
+        'e-ng-options="s.value as s.text for s in roles">{{ myData[ row.rowIndex ].role }} </a>'+
+        '</div>';    
 
     function callUpdate(dataObj, memberId){
         console.log('orgUserProfileController - callUpdate');
@@ -210,23 +220,32 @@ app.controller('groupMembersController', function ($window, $scope, $filter, $ht
         });
     }
 
+    $scope.openTeamMemberDetails = function(row) {
+        console.log("openTeamMemberDetails");
+
+        $scope.activeMember = row.entity;
+        stateService.setActiveMember($scope.activeMember);
+        $location.path('/team/member/data');
+    };
+
     function getColumnDefs(){
         var columnDefs = [];
         var user = stateService.getUser();
 
         if ((user.role == 'org_admin') || (user.role == 'super_user')){
             columnDefs = [
-                { field: 'name',            displayName: 'Name' },
+                { field: 'name',            displayName: 'Name',   cellTemplate: nameCellTemplate },
                 { field: 'title',           displayName: 'Title' },
                 { field: 'formatted_phone', displayName: 'Phone' },
-                { field: 'email',           displayName: 'Email'},
-                { field: 'status',          displayName: 'Status', cellTemplate: statusCellTemplate },
-                { field: 'role',            displayName: 'Role',   cellTemplate: roleCellTemplate }
+                { field: 'email',           displayName: 'Email' },
+                { field: 'status',          displayName: 'Status' },
+                { field: 'role',            displayName: 'Role' },
+                { field: 'delete',          displayName: '',        cellTemplate: removeTemplate },
             ];
         }
         else{
             columnDefs = [
-                { field: 'name',            displayName: 'Name' },
+                { field: 'name',            displayName: 'Name'  },
                 { field: 'title',           displayName: 'Title' },
                 { field: 'formatted_phone', displayName: 'Phone' },
                 { field: 'email',           displayName: 'Email'},
@@ -253,16 +272,6 @@ app.controller('groupMembersController', function ($window, $scope, $filter, $ht
         {value: 'admin',  text: 'admin'}
     ];
 
-    var statusCellTemplate = '<div style="display: flex; align-items: center;">'+
-        '&nbsp;&nbsp;<a href="#" onaftersave="handleEditMemberStatus(myData[ row.rowIndex ])" '+
-        'editable-select="myData[ row.rowIndex ].status" e-ng-options="s.value as s.text for s in statuses">{{ myData[ row.rowIndex ].status }} </a>'+
-        '</div>';
-
-    var roleCellTemplate = '<div style="display: flex; align-items: center;">'+
-        '&nbsp;&nbsp;<a href="#" onaftersave="handleEditMemberRole(myData[ row.rowIndex ])" editable-select="myData[ row.rowIndex ].role" '+
-        'e-ng-options="s.value as s.text for s in roles">{{ myData[ row.rowIndex ].role }} </a>'+
-        '</div>';    
-
     $scope.membersGridOptions = {
         data:                       'myData',
         columnDefs:                 getColumnDefs(),
@@ -281,5 +290,5 @@ app.controller('groupMembersController', function ($window, $scope, $filter, $ht
         enableCellSelection:        false,
         cellEditableCondition:      'row.getProperty(\'id\') == stateService.getUser().id'
     };
-
 });
+

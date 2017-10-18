@@ -148,6 +148,16 @@
 							</div>
 						</div>
 
+						<p>
+						Add patient to the following groups:</p>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<label ng-repeat="group in organizationGroups">
+									<input type="checkbox" checklist-model="selectedGroups" checklist-value="group"> {{group.name}} &nbsp;&nbsp;&nbsp;</input>
+								</label>
+							</div>
+						</div>
+
 						<div class="panel-footer">
 					<div class="pull-right">
 						<a href="/patients/data" class="btn btn-default">Cancel</a>

@@ -44,6 +44,49 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
         return members;
     }
 
+    this.setActiveMember = function(member){
+        var activeGroup = this.getActiveGroup();
+
+        if (activeGroup){
+            if (activeGroup.members){
+                var members = activeGroup.members
+
+                members.forEach(function(iMember){
+                    if (iMember.id == member.id){
+                        iMember.active = true;
+                    }
+                    else{
+                        iMember.active = false;
+                    }
+                });
+
+                activeGroup.members = members;
+                this.setActiveGroup(activeGroup);
+            }
+        }
+    }
+
+    this.getActiveMember = function(){
+        var member = null;
+        
+        var activeGroup = this.getActiveGroup();
+
+        if (activeGroup){
+            if (activeGroup.members){
+                var members = activeGroup.members
+
+                members.some(function(iMember){
+                    if (iMember.active == true){
+                        member = iMember;
+                        return true;
+                    }
+                });
+            }
+        }
+
+        return member;
+    }
+
     this.getActivePatientDrugs = function(){
         console.log('stateService - getPatientDrugs');
 
@@ -129,6 +172,63 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
         }
         else{
             return false;
+        }
+    }
+
+    this.getOrganizationGroups = function(){
+
+        var groups = [];
+        var pillsy = this.getPillsy();
+
+        if (pillsy){
+            groups = pillsy.organizationGroups;
+        }
+
+        return groups;
+    }
+
+    this.getMasterOrganizationGroup = function(){
+
+        var group  = null;
+        var pillsy = this.getPillsy();
+
+        if (pillsy){
+            var groups = pillsy.organizationGroups;
+
+            if (groups.length > 0){
+
+                groups.some(function(iGroup){
+                    if (iGroup.type == 'master'){
+                        group = iGroup;
+
+                        return true;
+                    }
+                });
+            }
+        }
+
+        return group;
+    }
+
+    this.setOrganizationGroups = function(groups){
+
+        var pillsy = this.getPillsy();
+
+        if (pillsy){
+            console.log('stateService - setOrganizationGroups, got pillsy, set groupData');
+        
+            var organizationGroups = groups.map(function(group){
+                var obj = {
+                    id:   group.id,
+                    name: group.name,
+                    type: group.type
+                };
+
+                return obj;
+            });
+
+            pillsy.organizationGroups = organizationGroups;
+            $window.sessionStorage.pillsy = JSON.stringify(pillsy);
         }
     }
 
@@ -554,6 +654,42 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
         }
         
         return groupDetails;
+    }
+
+    this.setPatientGroups = function(patientId, groups){
+        var pillsy = this.getPillsy();
+
+        if (pillsy){
+            var organization = pillsy.organization;
+
+            if (organization){
+                var patients = organization.patients;
+
+                if (patients){
+
+                    var exists = false;
+                    var index  = 0;
+                    patients.some(function(iPatient){
+                        if (iPatient.id == patientId){
+                            exists = true;
+                            return true;
+                        }
+
+                        index++;
+                    });
+
+                    if (exists){
+                        var patient           = patients[index];
+                        patient.groups        = groups; 
+                        patients[index]       = patient;
+                        organization.patients = patients;
+                    }
+                }
+                else{
+                    
+                }
+            }
+        }
     }
 
     //for caching patients

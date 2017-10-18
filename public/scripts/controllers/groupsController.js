@@ -24,8 +24,8 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
 
     $scope.totalServerItems = 0;
     $scope.pagingOptions = {
-        pageSizes: [25, 50, 100],
-        pageSize: 25,
+        pageSizes: ['25', '50', '100'],
+        pageSize: '25',
         currentPage: 1
     };
 
@@ -132,13 +132,18 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
 
     var nameTemplate = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.name }}" ng-click="openGroupDetails(row)"/></div>'; 
 
+    var columnDefs = [
+        { field:'name',         displayName: 'Name',    cellTemplate: nameTemplate },
+        { field:'patients',     displayName: 'Number of Patients' },
+    ];
+
+    if ($scope.is_group_admin){
+        columnDefs.push({ field:'members', displayName: 'Number of team members' });
+    }
+
     $scope.gridOptions = {
         data:                      'myData',
-        columnDefs: [
-          	{ field:'name',         displayName: 'Name',    cellTemplate: nameTemplate },
-          	{ field:'patients', 	displayName: 'Number of Patients' },
-          	{ field:'members',		displayName: 'Number of team members' },
-        ],
+        columnDefs:                 columnDefs,
         selectedItems:      		$scope.mySelections,
         multiSelect:                false,
         enablePaging:               true,
@@ -169,7 +174,7 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
     $scope.cancelCreate = function(){
         console.log('groupsController - cancelCreate()');
 
-        $location.path('/groups/mygroups');
+        $location.path('/groups/data');
     };
 
     $scope.group = {
@@ -234,10 +239,7 @@ app.controller('groupsController', function ($scope, $theme, $location, $rootSco
                         }
 
                         $rootScope.$emit("my_groups_callback", {groups: userGroups});
-                        
-                        if (stateService.setActiveGroup(obj)){
-                            $location.path('/group/data');
-                        }
+                        $location.path('/groups/data');
                     }
                     else{
                         console.log('groupsController - apiService.post - error creating group: '+result.msg);

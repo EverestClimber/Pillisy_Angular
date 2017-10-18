@@ -67,14 +67,6 @@
 
             <div style="float:left; height: 120px;" class="col-xs-3">
             </div>
-
-            <!--<div class="custom_panel">
-                    <div heading="Adherence" panel-class="panel-default" style="height: 80px;">
-                        <nvd3-sparkline-chart data="sparklineChartData" id="sparklineChartExampleId" height="120" margin="{left:30, top:20, bottom:20, right:50}" x="sparklineXFunction()" y="sparklineYFunction()">
-                            <svg></svg>
-                        </nvd3-sparkline-chart>
-                    </div>
-            </div>-->
         </div>
         
         <div class="options">
@@ -107,7 +99,7 @@
                 </div>   
             </tab> 
 
-            <tab heading="Profile">
+            <tab heading="Profile" ng-show="is_admin">
                 <div class="row">
                     <div class="col-xs-12">
                         <panel panel-class="panel-primary">
@@ -178,7 +170,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Groups</label>
                                     <div class="col-sm-6 form-control-static">
-                                        <a href="#" editable-select="activePatient.groups" onaftersave="updatePatientGroup(activePatient.groups)" e-multiple e-ng-options="s.id as s.name for s in groups">{{ showGroups() }}</a>
+                                        <a href="#" editable-select="activePatient.groups" onaftersave="updatePatientGroup(activePatient.groups)" e-multiple e-ng-options="s.id as s.name for s in organizationGroups">{{ showGroups() }}</a>
                                     </div>
                                 </div>
 

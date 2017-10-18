@@ -126,8 +126,12 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
 
     $scope.select = function(item) {
 
-        if (item.id == 'patients'){
-            
+        if ((item.id == 'patients') || (item.id == 'team')){
+            var masterGroup = stateService.getMasterOrganizationGroup();
+
+            if (masterGroup){
+                stateService.setActiveGroup(masterGroup);
+            }
         }
 
         if (item.id == 'groups'){
@@ -287,6 +291,18 @@ app.controller('navigationController', function ($scope, $filter, $location, $ti
 
     function updateMyGroupsMenu(groups){
         console.log('groupsController - updateMyGroupsMenu');
+
+        var groupObjs = groups.map(function(group){
+            var obj = {
+                id:   group.id,
+                name: group.name,
+                type: group.group_type
+            };
+
+            return obj;
+        });
+
+        stateService.setOrganizationGroups(groupObjs);
 
         groups = groups.filter(function(group){
             return group.group_type != 'master';

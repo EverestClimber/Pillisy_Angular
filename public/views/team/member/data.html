@@ -1,0 +1,92 @@
+<div ng-controller="groupMemberController">
+    <div id="page-heading">
+        <ol class="breadcrumb">
+            <li><a href="/team/data">Team</a></li>
+            <li class="active">Member</li>
+        </ol>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">           
+                <panel panel-class="panel-primary">
+                    <div action="" class="form-horizontal row-border">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">First Name:</label>
+                            <div class="col-sm-6 form-control-static" name="editableForm">
+                                <a editable-text="activeMember.firstname" onaftersave="updateMember('firstname', activeMember)">{{ activeMember.firstname || 'empty' }}</a>
+                            </div>
+                        </div>
+                                    
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Last Name:</label>
+                            <div class="col-sm-6 form-control-static">
+                                <a href="#" editable-text="activeMember.lastname" onaftersave="updateMember('lastname', activeMember)">{{ activeMember.lastname || 'empty' }}</a>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Title:</label>
+                            <div class="col-sm-6 form-control-static">
+                                <a href="#" editable-text="activeMember.title" onaftersave="updateMember('title', activeMember)">{{ activeMember.title || 'empty' }}</a>
+                            </div>
+                        </div>
+                                    
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Email:</label>
+                            <div class="col-sm-6 form-control-static" name="editableForm">
+                                <a editable-text="activeMember.email" onaftersave="updateMember('email', activeMember)">{{ activeMember.email || 'empty' }}</a>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Phone:</label>
+                            <div class="col-sm-6 form-control-static">
+                                <a href="#" editable-text="activeMember.phone" onaftersave="updateMember('phone', activeMember)">{{ activeMember.phone || 'empty' }}</a>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Status:</label>
+                            <div class="col-sm-6 form-control-static" name="editableForm">
+                                <div ng-if="activeMember.role == 'member'">
+                                    <a href="#" editable-select="activeMember.status" onaftersave="updateMember('status', activeMember)" e-ng-options="s.value as s.text for s in statuses">{{ showStatus() }}</a>
+                                </div>
+                                <div ng-if="activeMember.role == 'admin'">
+                                    {{ showStatus() }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Role:</label>
+                            <div class="col-sm-6 form-control-static" name="editableForm">
+                                <div ng-if="activeMember.role == 'member'">
+                                    <a href="#" editable-select="activeMember.role" onaftersave="updateMember('role', activeMember)" e-ng-options="s.value as s.text for s in roles">{{ showRole() }}</a>
+                                </div>
+                                <div ng-if="activeMember.role == 'admin'">
+                                    {{ showRole() }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Member of (Groups):</label>
+                            <div class="col-sm-6 form-control-static">
+                                <div ng-if="activeMember.role == 'member'">
+                                    <a href="#" editable-select="activeMember.groups" onaftersave="updateMemberGroups(activeMember.groups)" e-multiple e-ng-options="s.id as s.name for s in organizationGroups">{{ showGroups() }}</a>
+                                </div>
+
+                                <div ng-if="activeMember.role == 'admin'">
+                                    {{ showGroups() }}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </panel>
+            </div>
+        </div>
+    </div> 
+</div>
+
