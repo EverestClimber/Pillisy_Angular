@@ -5,7 +5,6 @@
 *  @Copyright Pillsy, Inc. 
 */
 
-
 var app = angular.module('GroupPatientDrugLogsController', ['ngGrid','daterangepicker']);     //instantiates GroupPatientDrugLogsController module
 app.controller('groupPatientDrugLogsController', function ($scope, $filter, $http, $location, apiService, stateService) {
 	'use strict';
@@ -51,17 +50,18 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
             endDate:   last7[1]
         };
 
+        $scope.pagingOptions = {
+            pageSizes: ['25', '50', '100'],
+            pageSize:  '100',
+            currentPage: 1
+        };
+
         $scope.filterOptions = {
             filterText: '',
             useExternalFilter: true
         };
 
         $scope.totalServerItems = 0;
-        $scope.pagingOptions = {
-            pageSizes:   [25, 50, 100],
-            pageSize:    25,
-            currentPage: 1
-        };
     }
 
     var refresh = function(){
@@ -116,24 +116,18 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
                         console.log('groupMembersController - callPillsySerice - apiService.get - successfully retrieved drugEvents: '+result);
 
                         var drugEvents = result.data;
-                        var objs       = [];
+                        
+                        drugEvents = result.data.map(function(obj){
+                            obj['method'] = obj.method === 'AUTO' ? 'DEVICE' : 'MOBILE APP';
 
-                        drugEvents.forEach(function(drugEvent){
-                            var obj      = {};
-                            obj.date     = moment(drugEvent.eventTime).format('YYYY-MM-DD');
-                            obj.time     = moment(drugEvent.eventTime).format("h:mm:ss A");
-                            obj.event    = drugEvent.eventValue; 
-                            obj.platform = drugEvent.platform;
-                            obj.method   = drugEvent.method === 'AUTO' ? 'DEVICE' : 'MOBILE APP';
-                            
-                            objs.push(obj);
+                            return obj;
                         });
 
                         if ( ($scope.logsDatePicker.date.startDate == last7[0]) && ($scope.logsDatePicker.date.endDate == last7[1]) ){
-                            stateService.setPatientDrugDefaultIntervalCache($scope.activePatient.id, $scope.activeDrug.id, objs, 'logs');
+                            stateService.setPatientDrugDefaultIntervalCache($scope.activePatient.id, $scope.activeDrug.id, drugEvents, 'logs');
                         }
 
-                        $scope.setPagingData(objs, page, pageSize);
+                        $scope.setPagingData(drugEvents, page, pageSize);
                     }
                     else{
                         console.log('groupMembersController - callPillsySerice - apiService.get - error creating group: '+result.msg);
@@ -158,6 +152,7 @@ app.controller('groupPatientDrugLogsController', function ($scope, $filter, $htt
     //load from cache
     var logs = stateService.getPatientDrugDefaultIntervalCache($scope.activePatient.id, $scope.activeDrug.id, 'logs');
     if (logs){
+
         $scope.setPagingData(logs, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
     }
 

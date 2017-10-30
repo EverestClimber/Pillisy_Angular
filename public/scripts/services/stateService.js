@@ -120,6 +120,132 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
         return drugs;
     }
 
+    this.updatePatientDrugReminders = function(patientId, drugId, drugReminders, startTime){
+        console.log('stateService - updatePatientDrugReminders...');
+
+        var pillsy = this.getPillsy();
+        var patient = null;
+
+        if (pillsy){
+            console.log('stateService - setActiveGroup, got pillsy, set groupData');
+
+            var organization = pillsy.organization;
+
+            if (organization){
+                var patients = organization.patients;
+
+                if (patients){
+                    var index   = 0;
+                    var exists  = false;
+        
+                    patients.some(function(iPatient){
+                        if (iPatient.id == patientId){
+                            patient = iPatient;
+                            return true;
+                        }
+
+                        index++;
+                    });
+
+                    if (patient){
+                        var drugs = patient.drugs;
+                        
+                        drugs.some(function(drug){
+                            if (drug.id == drugId){
+                                
+                                if (startTime){
+                                    drug.startTime = startTime;
+                                }
+
+                                //check for reminders and update...
+                                var iDrugReminders = drug.drugReminders;
+
+                                drugReminders.forEach(function(drugReminder){
+
+                                    iDrugReminders = iDrugReminders.map(function(iDrugReminder){
+                                        if (drugReminder.id == iDrugReminder.id){
+                                            return drugReminder;
+                                        }
+                                        else{
+                                            return iDrugReminder;
+                                        }
+                                    });
+
+                                });
+
+                                drug.drugReminders = iDrugReminders;
+
+                                return true;
+                            }
+                        });
+
+                        patient.drugs         = drugs;
+                        patients[index]       = patient;
+                        organization.patients = patients;
+
+                        pillsy.organization = organization;
+                        $window.sessionStorage.pillsy = JSON.stringify(pillsy);
+                    }
+                }
+            }
+        }
+    }
+
+    this.updatePatientDrug = function(patientId, updatedDrug){
+        console.log('stateService - updatePatientDrug...');
+
+        var pillsy = this.getPillsy();
+        var patient = null;
+
+        if (pillsy){
+            console.log('stateService - setActiveGroup, got pillsy, set groupData');
+
+            var organization = pillsy.organization;
+
+            if (organization){
+                var patients = organization.patients;
+
+                if (patients){
+                    var index   = 0;
+                    var exists  = false;
+        
+                    patients.some(function(iPatient){
+                        if (iPatient.id == patientId){
+                            patient = iPatient;
+                            return true;
+                        }
+
+                        index++;
+                    });
+
+                    if (patient){
+                        var drugs = patient.drugs;
+                        
+                        drugs.some(function(drug){
+                            if (drug.id == updatedDrug.id){
+                                for (var property in updatedDrug){
+                                    if ( Object.prototype.hasOwnProperty.call(updatedDrug, property) ) {
+
+                                        drug[property] = updatedDrug[property];
+                                    }
+                                }
+
+                                return true;
+                            }
+                        });
+
+                        patient.drugs         = drugs;
+                        patients[index]       = patient;
+                        organization.patients = patients;
+
+                        pillsy.organization = organization;
+                        $window.sessionStorage.pillsy = JSON.stringify(pillsy);
+                    }
+                }
+            }
+        }
+    }
+
     this.addNewDrugToPatient = function(drug, patientId){
         console.log('stateService - addNewDrugToPatient...');
 

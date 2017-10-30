@@ -49,17 +49,18 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
             endDate:   last7[1] 
         };
 
+        $scope.pagingOptions = {
+            pageSizes: ['25', '50', '100'],
+            pageSize:  '100',
+            currentPage: 1
+        };
+
         $scope.filterOptions = {
             filterText: '',
             useExternalFilter: true
         };
 
         $scope.totalServerItems = 0;
-        $scope.pagingOptions = {
-            pageSizes:   [25, 50, 100],
-            pageSize:    25,
-            currentPage: 1
-        };
     }
 
     var refresh = function(){
@@ -119,14 +120,6 @@ app.controller('groupPatientDrugScheduleController', function ($scope, $http, $l
                         var scheduleEvents = result.data;
                         scheduleEvents.forEach(function(scheduleEvent){
                             scheduleEvent.date = moment(scheduleEvent.date).format('YYYY-MM-DD');
-                            
-                            if (scheduleEvent.reminder_time != 'N/A'){
-                                scheduleEvent.reminder_time = moment(scheduleEvent.reminder_time).format("h:mm A");
-                            }
-
-                            if ( (scheduleEvent.open_time != 'N/A') && (scheduleEvent.open_time != '--') ){
-                                scheduleEvent.open_time = moment(scheduleEvent.open_time).format("h:mm:ss A");
-                            }
                         });
 
                         if ( ($scope.datePicker.date.startDate == last7[0]) && ($scope.datePicker.date.endDate == last7[1]) ){

@@ -25,161 +25,59 @@ app.controller('patientMedController', function ($scope, $filter, $http, $locati
     //patient cache data
     $scope.activeGroup   = stateService.getActiveGroup();
     $scope.activePatient = stateService.getActivePatient();
-    var activeDrug       = stateService.getActivePatientDrug();
-
-    var numDoses  = 0;
-    var drugReminders = activeDrug.drugReminders;
-
-    if (drugReminders){
-        activeDrug['numDoses'] = drugReminders.length;
-
-        var i = 1;
-        drugReminders.forEach(function(drugReminder){
-            activeDrug['reminder'+i] = drugReminder; 
-            i++;
-        });
-
-    }
-    else{
-        activeDrug['numDoses'] = 0;
-    }
-
-    $scope.activeDrug = activeDrug;
-
-    //alert('active drug: '+JSON.stringify($scope.activeDrug));
+    $scope.activeDrug    = processActiveDrug();
 
     if (!$scope.activeGroup){
         $location.path('/');
     }
     else{
-        /*try{
-
-            var groups = stateService.getUserGroups();
-            $rootScope.$emit("my_groups_callback", {groups: groups});
-
-            $scope.activePatient       = $scope.activeGroup.active_patient;
-            $scope.activeDrug          = $scope.activeGroup.active_patient.active_drug;
-            $scope.activeDrug.numDoses = $scope.activeDrug.reminders.length;
-
-            if ($scope.activeDrug.numDoses > 0){
-                
-                var reminder = $scope.activeDrug.reminders[0];
-                $scope.activeDrug.startTime = moment(reminder.startTime).format("MM-DD-YYYY");
-
-                var index = 1;
-                $scope.activeDrug.reminders.forEach(function(reminder){
-                    switch(index){
-                        case 1:
-                            $scope.activeDrug.reminder1 = reminder;
-                            $scope.activeDrug.reminder1.initScheduleTime = moment(reminder.initScheduleTime).format("h:mm A");
-                            break;
-                        case 2:
-                            $scope.activeDrug.reminder2 = reminder;
-                            $scope.activeDrug.reminder2.initScheduleTime = moment(reminder.initScheduleTime).format("h:mm A");
-                            break;
-                        case 3:
-                            $scope.activeDrug.reminder3 = reminder;
-                            $scope.activeDrug.reminder3.initScheduleTime = moment(reminder.initScheduleTime).format("h:mm A");
-                            break;
-                        case 4:
-                            $scope.activeDrug.reminder4 = reminder;
-                            $scope.activeDrug.reminder4.initScheduleTime = rmoment(eminder.initScheduleTime).format("h:mm A");
-                            break;
-                    }
-                });
-            }
-
-            $scope.integerval  = /^\d*$/; 
-        }
-        catch(e){
-            alert('error: '+e);
-
-            $location.path('/');
-        }*/
+    
     } 
 
-    $scope.postReminder = function(id, value){
+    function processActiveDrug(){
 
-        alert('id: '+id+" , value: "+value);
+        var activeDrug       = stateService.getActivePatientDrug();
+        var numDoses         = 0;
+        var drugReminders    = activeDrug.drugReminders;
+        activeDrug.startTime = moment(activeDrug.startTime).format('YYYY-MM-DD');
 
-        /*var activeDrug    = $scope.activeDrug;
-        var drugReminders = activeDrug.drugReminders;
-        var drugReminder  = null;
-
-        var index = 0;
-        drugReminders.some(function(iDrugReminder){
-            if (iDrugReminder.id == id){
-                drugReminder = iDrugReminder
-                return true;
-            }
-
-            index++;
-        }); 
-
-        if (drugReminder){
-
-            //in moment
-            var drugReminderTodayLocalTime = nowLocalTimeTmp.set({
-                'hours':        drugReminderLocalTime.get('hours'),
-                'minutes':      drugReminderLocalTime.get('minutes'), 
-                'seconds':      drugReminderLocalTime.get('seconds'),
-                'milliseconds': drugReminderLocalTime.get('milliseconds')
-            });
-        }*/
+        return activeDrug;
     }
 
-    //$scope.postDrug = function(key, value){
-    $scope.postDrug = function(value){
+    $scope.getDoseIndex = function(index){
+        //gets the dose index
+
+        return index + 1;
+    }
+
+    $scope.postDrug = function(key, value){
+
         var groupId   = $scope.activeGroup.id;
         var patientId = $scope.activePatient.id;
         var drugId    = $scope.activeDrug.id;
 
-        alert(value);
-
-        /*var obj = {};
+        var obj = {
+            timeZone: $scope.activePatient.timeZone
+        };
 
         switch(key){
-            case 'reminder1_time':
-                var reminder = $scope.activeDrug.reminders[0];
-                obj.reminder = {};
-                obj.reminder.id = reminder.id;
-                obj.reminder.initScheduleTime = value;
-
-                break;
-            case 'reminder2_time':
-                var reminder = $scope.activeDrug.reminders[1];
-                obj.reminder = {};
-                obj.reminder.id = reminder.id;
-                obj.reminder.initScheduleTime = value;
-
-                break;
-            case 'reminder3_time':
-                var reminder = $scope.activeDrug.reminders[2];
-                obj.reminder = {};
-                obj.reminder.id = reminder.id;
-                obj.reminder.initScheduleTime = value;
-
-                break;
-            case 'reminder4_time':
-                var reminder = $scope.activeDrug.reminders[3];
-                obj.reminder = {};
-                obj.reminder.id = reminder.id;
-                obj.reminder.initScheduleTime = value;
-
+            case 'drugReminder':
+                var drugReminder = $scope.activeDrug.drugReminders[value];   //value == index
+                obj[key]         = drugReminder;
+                $scope.activeDrug.drugReminders[value].localTime = moment(drugReminder.initScheduleTime).format("h:mm A") + ' '+ drugReminder.timeZoneStr;
                 break;
 
-            case 'quantity_pills_dose':
-                obj.quantity_pills_dose = value;
-                break;
-
+            case 'enableSMSReminders':
+            case 'enableIVRReminders':
             case 'name':
-                obj.name = value;
+            case 'remaining':
+                obj[key] = value;
                 break;
 
-            case 'quantity':
-                obj.quantity = value;
-                break;
-        }*/
+            case 'startTime':  //this is actually startDate...
+                obj[key] = value;
+                $scope.activeDrug.startTime = moment(value).format('YYYY-MM-DD');
+        }
 
         var api = '/v1/a/organization/group/'+groupId+'/patient/'+ patientId +'/drug/'+drugId;
         
@@ -189,7 +87,20 @@ app.controller('patientMedController', function ($scope, $filter, $http, $locati
 
             if (result){
                 if (result.msg == 'success'){
+                    var data = result.data;
 
+                    if (data.type == 'drug'){
+                        var updatedDrug = data.drug;
+                        
+                        stateService.updatePatientDrug(patientId, updatedDrug);
+                    }
+                    else if (data.type == 'drugReminders'){
+                        var drugReminders = data.drugReminders;
+                        var drugId        = data.drugId;
+                        var startTime     = data.startTime;
+
+                        stateService.updatePatientDrugReminders(patientId, drugId, drugReminders, startTime);
+                    }
                 }
                 else{
                     alert(result.msg);

@@ -120,11 +120,11 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	    		if (drugReminders.length > 0){
 
 	    			drugReminders.forEach(function(drugReminder){
-						doseTimes.push( drugReminder.doseTimeStr );	    				
+						doseTimes.push( drugReminder.localTime );	    				
 	    			});
 	    		}
 
-	    		data['doseTimes'] = doseTimes.join(';');
+	    		data['doseTimes'] = doseTimes.join('; ');
 	    	});
 
 	        setMedsPagingData(cachedData, $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize);
@@ -159,7 +159,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 	   	data: 'meds',
 	    columnDefs: [
 	    	{ field: 'name',              displayName: 'Name', cellTemplate: nameTemplate }, 
-	    	{ field: 'status',            displayName: 'Status' }, 
+	    	//{ field: 'status',            displayName: 'Status' }, 
 	    	{ field: 'doseTimes',         displayName: 'Dose Time(s)' }, 
 	    	{ field: 'todayTaken',        displayName: 'Time(s) taken today' }, 
 	    	{ field: 'intervalAdherence', displayName: 'Last 3 days' },
