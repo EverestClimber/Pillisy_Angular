@@ -119,6 +119,7 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
             var dataObj = {
                 'firstname':    patient.firstname,
                 'lastname':     patient.lastname,
+                'customId':     patient.customId,
                 'dob':   	    patient.dob,
                 'gender':       patient.gender,
                 'address1':     patient.address1,

@@ -84,18 +84,6 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
         else if (!$scope.drug.start_date){
             alert('Start date required');
         }
-        /*else if (!$scope.drug.pills_dose){
-            alert('Number of pills per dose required');
-        }
-        else if (!$scope.drug.doses_day){
-            alert('Doses per day required');
-        }
-        else if (!$scope.drug.days_therapy){
-            alert('Days of therapy required');
-        }
-        else if (!$scope.drug.end_date){
-            alert('End date required');
-        }*/
         else if (!$scope.drug.deviceId){
             alert('PillsyCap identifier required');
         }
@@ -103,12 +91,6 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
             console.log('Got fields, proceed - $scope.drug.doses_day: '+ $scope.drug.doses_day);
 
             if ($scope.drug.doses_day == 1){
-                /*if (!$scope.drug.reminder1_time){
-                    alert('Reminder 1 time required');
-                }
-                else{
-                    processAddDrug();
-                }*/
                 processAddDrug();
             }
             else if ($scope.drug.doses_day == 2){
@@ -234,7 +216,7 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
                     console.log('apiService.post - success');
 
                     var drug          = result.data;
-                    var activePatient = stateService.getActivePatient();
+                    var activePatient = stateService.getActivePatient();  
                     var drugs         = activePatient.drugs;
                     drugs.push(drug);
 

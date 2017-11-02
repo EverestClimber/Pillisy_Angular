@@ -114,7 +114,7 @@
 	                                            <div class="form-group" ng-show="activeDrug.drugReminders.length >= 0">
 	                                                <label class="col-sm-3 control-label">Dose {{ getDoseIndex($index) }} - Number of pills</label>
 	                                                <div class="col-sm-6 form-control-static">
-	                                                    <a href="#" editable-number="activeDrug.drugReminders[$index].quantity" step="1" e-min="1" e-max="1000" ng-pattern="integerval" onaftersave="postDrug('quantity_pills_dose', activeDrug.reminder1.quantity)">{{ activeDrug.drugReminders[$index].quantity || 'empty' }}</a>
+	                                                    <a href="#" editable-number="activeDrug.drugReminders[$index].quantity" step="1" e-min="1" e-max="100" ng-pattern="integerval" onaftersave="postDrug('drugReminder', $index)">{{ activeDrug.drugReminders[$index].quantity || 'empty' }}</a>
 	                                                </div>
 	                                            </div>
 
