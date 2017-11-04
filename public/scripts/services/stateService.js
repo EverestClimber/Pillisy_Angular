@@ -5,7 +5,7 @@
  */
 
 var app = angular.module('StateService', []);     //instantiates StateService module
-app.service('stateService', function($window, $rootScope, $location, $cookies, $http, apiService){
+app.service('stateService', function($window, $rootScope, $location, $cookies, $http, apiService, lodash){
 	console.log('stateService...');
 
     //---------CACHING------------
@@ -234,7 +234,10 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
                             }
                         });
 
-                        patient.drugs         = drugs;
+                        patient.drugs = lodash.orderBy(drugs, function(drug){
+                            return drug.name.toLowerCase();
+                        });
+
                         patients[index]       = patient;
                         organization.patients = patients;
 
@@ -282,7 +285,10 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
                             drugs = [drug];
                         }
 
-                        patient.drugs         = drugs;
+                        patient.drugs = lodash.orderBy(drugs, function(drug){
+                            return drug.name.toLowerCase();
+                        });
+
                         patients[index]       = patient;
                         organization.patients = patients;
 
@@ -353,7 +359,10 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
                 return obj;
             });
 
-            pillsy.organizationGroups = organizationGroups;
+            pillsy.organizationGroups = lodash.orderBy(organizationGroups, function(group){
+                return group.name.toLowerCase();
+            });
+
             $window.sessionStorage.pillsy = JSON.stringify(pillsy);
         }
     }
@@ -394,7 +403,9 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
                         patients[index] = patient;
                     }
 
-                    organization.patients = patients;
+                    organization.patients = lodash.orderBy(patients, function(patient){
+                        return patient.fullname.toLowerCase();
+                    });
                 }
                 else{
                     organization.patients = [patient];
@@ -453,7 +464,9 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
                         groups.push(group);
                     }
 
-                    organization['groups'] = groups;
+                    organization['groups'] = lodash.orderBy(groups, function(group){
+                        return group.name.toLowerCase();
+                    });
                 }
                 else{
                     //there was no organization object, so this is new...
@@ -488,7 +501,9 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
                         groups.push(group);
                     }
 
-                    organization['groups'] = groups;
+                    organization['groups'] = lodash.orderBy(groups, function(group){
+                        return group.name.toLowerCase();
+                    });
 
                     //patients
                     var iPatients = organization.iPatients;
@@ -579,7 +594,9 @@ app.service('stateService', function($window, $rootScope, $location, $cookies, $
                                         });
                                     });
 
-                                    return iPatients;
+                                    return lodash.orderBy(iPatients, function(patient){
+                                        return patient.fullname.toLowerCase();
+                                    });
                                 }
                                 else{
                                     return [];
