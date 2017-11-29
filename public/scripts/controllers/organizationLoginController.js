@@ -55,7 +55,7 @@ app.controller('organizationLoginController', function ($scope, $http, $theme, $
         var subdomain = null;
         var host      = $location.host();
 
-        if (host == 'localhost'){
+        if (host === 'localhost'){
             subdomain = 'localhost';
         }
         else{

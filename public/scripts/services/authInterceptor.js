@@ -5,7 +5,7 @@
  */
 
 var app = angular.module('AuthInterceptor', []);     //instantiates AuthInterceptor module
-app.factory('authInterceptor', function ($rootScope, $q, $window, $cookies) {
+app.factory('authInterceptor', function ($rootScope, $q, $window, $cookies, $location) {
 	return {
 		request: function (config) {
 			console.log('authInterceptor - I have intercepted http request...');
@@ -27,8 +27,24 @@ app.factory('authInterceptor', function ($rootScope, $q, $window, $cookies) {
 						if (token && user){
 							console.log('authInterceptor - successfully retrieved token and user');
 
+							var subdomain = null;
+					        var host      = $location.host();
+
+					        if (host === 'localhost'){
+					            subdomain = 'localhost';
+					        }
+					        else{
+					            var parts = host.split('.');
+					            // more than domain.com, will always return the first
+					            if (parts.length > 2){
+					                subdomain = parts[0];
+					                subdomain = subdomain.toLowerCase();
+					            }
+					        }
+					        
 							config.headers['x-access-token'] = token;
 							config.headers['x-key']          = user.id;
+							config.headers['x-subdomain']    = subdomain;
 						}
 						else{
 							console.log('authInterceptor - missing token and user');
