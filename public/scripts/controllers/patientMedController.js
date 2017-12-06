@@ -50,7 +50,7 @@ app.controller('patientMedController', function ($scope, $filter, $http, $locati
         return index + 1;
     }
 
-    $scope.postDrug = function(key, value){
+    $scope.postDrug = function(key, value, flag){
 
         var groupId   = $scope.activeGroup.id;
         var patientId = $scope.activePatient.id;
@@ -63,8 +63,24 @@ app.controller('patientMedController', function ($scope, $filter, $http, $locati
         switch(key){
             case 'drugReminder':
                 var drugReminder = $scope.activeDrug.drugReminders[value];   //value == index
-                obj[key]         = drugReminder;
-                $scope.activeDrug.drugReminders[value].localTime = moment(drugReminder.initScheduleTime).format("h:mm A") + ' '+ drugReminder.timeZoneStr;
+
+                if (flag === 'newTime'){
+                    //to know what to set on the backend
+                    let newTime = {
+                        hours:    moment(drugReminder.initScheduleTime).get("hours"),
+                        minutes:  moment(drugReminder.initScheduleTime).get("minutes"),
+                        timeZone: drugReminder.timeZoneStr
+                    };
+                    drugReminder['newTime'] = newTime;
+                    obj[key]                = drugReminder;
+
+                    //this is just to display preperly
+                    $scope.activeDrug.drugReminders[value].localTime = moment(drugReminder.initScheduleTime).format("h:mm A") + ' '+ drugReminder.timeZoneStr;
+                } 
+                else {  //this is for quantity
+                    obj[key] = drugReminder;
+                }
+
                 break;
 
             case 'enableSMSReminders':
@@ -74,8 +90,19 @@ app.controller('patientMedController', function ($scope, $filter, $http, $locati
                 obj[key] = value;
                 break;
 
-            case 'startTime':  //this is actually startDate...
-                obj[key] = value;
+            case 'startTime':  //this is actually startDate...  //value == startTime
+                let newStartTime = {
+                    year:         moment(value).get('year'),
+                    month:        moment(value).get('month'),
+                    date:         moment(value).get('date'),  //day
+                    hours:        moment(value).get("hours"),
+                    minutes:      moment(value).get("minutes"),
+                    seconds:      moment(value).get("seconds"),
+                    milliseconds: moment(value).get("milliseconds"),
+                    timeZone:     drugReminder.timeZoneStr
+                };
+
+                obj[key] = newStartTime;
                 $scope.activeDrug.startTime = moment(value).format('YYYY-MM-DD');
         }
 

@@ -43,32 +43,43 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
 
         var startDateMoment    = moment($scope.drug.start_date);
         var reminderTimeMoment = moment(reminderTime);
-        var reminder           = moment(startDateMoment);
-        reminder.hour( reminderTimeMoment.hour() );
-        reminder.minute( reminderTimeMoment.minute() );
-        reminder.second( 0 );
-        reminder.millisecond(0);
+
+        let reminder = {
+            'hours':   reminderTimeMoment.get('hours'),
+            'minutes': reminderTimeMoment.get('minutes')
+        };
 
         return reminder;
     }
 
     function getStartTime(startTime){
 
-        var now = moment();
-        var momentStart = moment(startTime);
+        let startTimeMoment = moment(startTime);
+        var now             = moment();
 
-        if ( momentStart.isAfter(now) ){
-            return momentStart.valueOf();
+        if (startTimeMoment.isSameOrBefore(now, 'day')){
+            //use current time if now, time will be the start of a future day 00:00:00
+            startTimeMoment = moment(startTimeMoment).set({
+                'hours':        now.get('hours'),
+                'minutes':      now.get('minutes'),
+                'seconds':      now.get('seconds'),
+                'milliseconds': now.get('milliseconds')
+            });
         }
-        else{
-            var start = moment(momentStart);
-            start.hour( now.hour() );
-            start.minute( now.minute() );
-            start.second( now.second() );
-            start.millisecond( now.millisecond() );
 
-            return start;
-        }
+        startTime = {
+            'year':         startTimeMoment.get('year'),
+            'month':        startTimeMoment.get('month'),
+            'date':         startTimeMoment.get('date'),
+            'hours':        startTimeMoment.get('hours'),
+            'minutes':      startTimeMoment.get('minutes'),
+            'seconds':      startTimeMoment.get('seconds'),
+            'milliseconds': startTimeMoment.get('milliseconds')
+        };
+
+        alert('startTime: '+JSON.stringify(startTime));
+        
+        return startTime
     }
 
     //$scope.submit = function(drug){
@@ -90,10 +101,10 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
         else{
             console.log('Got fields, proceed - $scope.drug.doses_day: '+ $scope.drug.doses_day);
 
-            if ($scope.drug.doses_day == 1){
+            if ($scope.drug.doses_day === 1){
                 processAddDrug();
             }
-            else if ($scope.drug.doses_day == 2){
+            else if ($scope.drug.doses_day === 2){
                 if (!$scope.drug.reminder1_time){
                     alert('Reminder 1 time required');
                 }
@@ -104,7 +115,7 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
                     processAddDrug();
                 }
             }
-            else if ($scope.drug.doses_day == 3){
+            else if ($scope.drug.doses_day === 3){
                 if (!$scope.drug.reminder1_time){
                     alert('Reminder 1 time required');
                 }
@@ -118,7 +129,7 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
                     processAddDrug();
                 }
             }
-            else if ($scope.drug.doses_day == 4){
+            else if ($scope.drug.doses_day === 4){
                 if (!$scope.drug.reminder1_time){
                     alert('Reminder 1 time required');
                 }
