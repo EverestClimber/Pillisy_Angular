@@ -44,7 +44,7 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
 
     $scope.dateOptions = { 
         dateFormat: 'mm-dd-yy',
-        minDate:    new Date() 
+        minDate:    null 
     };
 
     $scope.selectedGroups = [];
@@ -107,7 +107,7 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
         else if (!patient.email){
             alert('Email required');
         }
-        else if (!patient.homeTimeZone){
+        else if (!patient.timeZone){
             alert('Timezone required');
         }
         else{
@@ -117,21 +117,21 @@ app.controller('createPatientController', function ($scope, $filter, $location, 
             $scope.submitted = true;
 
             var dataObj = {
-                'firstname':    patient.firstname,
-                'lastname':     patient.lastname,
-                'customId':     patient.customId,
-                'dob':   	    patient.dob,
-                'gender':       patient.gender,
-                'address1':     patient.address1,
-                'address2':     patient.address2,
-                'city':         patient.city,
-                'state':        patient.state,
-                'country':      patient.country,
-                'zip':  	    patient.zip,
-                'email':        patient.email,
-                'phone':        stateService.formatUSPhone(patient.phone),
-                'homeTimeZone': patient.homeTimeZone.title,
-                'groups':       $scope.selectedGroups
+                'firstname': patient.firstname,
+                'lastname':  patient.lastname,
+                'customId':  patient.customId,
+                'dob':   	 patient.dob,
+                'gender':    patient.gender,
+                'address1':  patient.address1,
+                'address2':  patient.address2,
+                'city':      patient.city,
+                'state':     patient.state,
+                'country':   patient.country,
+                'zip':  	 patient.zip,
+                'email':     patient.email,
+                'phone':     stateService.formatUSPhone(patient.phone),
+                'timeZone':  patient.timeZone.title,
+                'groups':    $scope.selectedGroups
             };  
          
             if (dataObj.dob){

@@ -24,7 +24,7 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
     
     $scope.dateOptions = { 
         dateFormat: 'mm-dd-yy',
-        minDate:    new Date() 
+        minDate:    null 
     } 
 
     $scope.drug = {
@@ -76,9 +76,7 @@ app.controller('addPatientMedController', function ($scope, $filter, $location, 
             'seconds':      startTimeMoment.get('seconds'),
             'milliseconds': startTimeMoment.get('milliseconds')
         };
-
-        alert('startTime: '+JSON.stringify(startTime));
-        
+   
         return startTime
     }
 
