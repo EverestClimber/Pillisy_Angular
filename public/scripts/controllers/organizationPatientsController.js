@@ -9,13 +9,19 @@ var app = angular.module('OrganizationPatientsController', ['ngGrid','GroupDetai
 app.controller('organizationPatientsController', function ($scope, $filter, $http, $location, $rootScope, apiService, groupDetails, stateService, lodash) {
     'use strict';
 
-    var user = stateService.getUser();
+    let user;
 
-    if (user.role == 'org_user'){
-        $location.path('/groups/data');
-    }
-    else{ //org_admin or super_user
-        init();
+    begin();
+
+    function begin(){
+        user = stateService.getUser();
+
+        if (user.role === 'org_user'){
+            $location.path('/groups/data');
+        }
+        else{ //org_admin or super_user
+            init();
+        }
     }
 
     function init(){
@@ -406,13 +412,72 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
     $scope.openPatientRecord = function(rowItem) {
         console.log("openPatientRecord");
 
-        var patient = rowItem.entity;
+        let organizationGroups = stateService.getOrganizationGroups();
+        let masterGroupId      = null;
 
-        if (stateService.setActivePatient(patient)){  //has drugNames
-            $location.path('/patients/patient/data');
+        organizationGroups.some(function(group){
+            if (group.type === 'master'){
+                masterGroupId = group.id;
+
+                return true;
+            }
+        });
+
+        if (masterGroupId){
+            console.log("openPatientRecord - got the master group, check for patients...");
+
+            let patients = stateService.getGroupPatients(masterGroupId);
+            let patient  = null;
+
+            if (patients){
+                if (patients.length > 0){
+
+                    patients.some(function(iPatient){
+                        if (iPatient.id === rowItem.entity.id){
+                            patient = iPatient;
+                            return true;
+                        }
+                    });
+
+                    if (patient){
+                        let drugs = patient.drugs;
+
+                        if (drugs.length > 0){
+                            let drugNames = [];
+
+                            drugs.forEach(function(drug){
+                                drugNames.push(drug.name)
+                            });
+
+                            drugNames = drugNames.join(', ');
+                            patient.drugNames = drugNames;
+                        }    
+                        else{
+                            patient.drugNames = 'N/A';
+                        }
+
+                        if (stateService.setActivePatient(patient)){  //has drugNames...
+                            $location.path('/patients/patient/data');
+                        }
+                        else{
+                            //could not set group
+                            begin();
+                        }
+                    }
+                    else{
+                        begin();
+                    }
+                }
+                else{
+                    begin();
+                }
+            }
+            else{
+                begin();
+            }
         }
         else{
-            //could not set group
+            begin();
         }
     };
 

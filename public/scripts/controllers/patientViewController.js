@@ -54,13 +54,6 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 			$scope.activePatientLocation = 'N/A';
 		}
 
-		if ($scope.activePatient.timeZone){
-			$scope.activePatientTimeZone = $scope.activePatient.timeZone;
-		}
-		else{
-			$scope.activePatientLocation = 'N/A';
-		}
-
 		$scope.pagingOptions = {
             pageSizes: ['25', '50', '100'],
             pageSize:  '100',
@@ -85,7 +78,7 @@ app.controller('patientViewController', function ($scope, $timeout, $theme, $win
 		if (pillsy){
 			groups = pillsy.organizationGroups;
 
-			//don't show the master group on the list
+			//don't show the master group on the list...
 			if (groups.length > 0){
 				groups = groups.filter(function(group){
 					return group.type != 'master';
