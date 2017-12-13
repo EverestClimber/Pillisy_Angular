@@ -145,34 +145,36 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
 
                     var obj = getItemObject(item);
 
-                    obj.drugId            = drug.id;
-                    obj.drugName          = drug.name;
-                    obj.drugRemaining     = drug.remaining;
-                    obj.drugLastConnected = drug.lastConnected;
-                    obj.drugLastOpened    = drug.lastOpened; 
-                    obj.drugStatus        = drug.status;
-                    obj.drugDoseTimes     = drug.doseTimes;
-                    obj.drugTodayTaken    = drug.todayTaken;
-                    obj.drugStartTime     = drug.startTime;
-                    obj.lastWeekAdherence = drug.lastWeekAdherence;
-                    obj.averageAdherence  = drug.averageAdherence;
+                    obj.drugId             = drug.id;
+                    obj.drugName           = drug.name;
+                    obj.drugRemaining      = drug.remaining;
+                    obj.drugLastConnected  = drug.lastConnected;
+                    obj.drugLastOpened     = drug.lastOpened; 
+                    obj.drugStatus         = drug.status;
+                    obj.drugDoseTimes      = drug.doseTimes;
+                    obj.drugTodayTaken     = drug.todayTaken;
+                    obj.drugStartTime      = drug.startTime;
+                    obj.lastWeekAdherence  = drug.lastWeekAdherence;
+                    obj.yesterdayAdherence = drug.yesterdayAdherence;
+                    obj.averageAdherence   = drug.averageAdherence;
 
                     reportData.push(obj);
                 });
             }
             else{
                 var obj = getItemObject(item);
-                obj.drugId            = 'N/A';
-                obj.drugName          = 'N/A';
-                obj.drugRemaining     = 'N/A';
-                obj.drugLastConnected = 'N/A';
-                obj.drugLastOpened    = 'N/A'; 
-                obj.drugStatus        = 'N/A';
-                obj.drugDoseTimes     = 'N/A';
-                obj.drugTodayTaken    = 'N/A';
-                obj.drugStartTime     = 'N/A';
-                obj.lastWeekAdherence = 'N/A';
-                obj.averageAdherence  = 'N/A';
+                obj.drugId             = 'N/A';
+                obj.drugName           = 'N/A';
+                obj.drugRemaining      = 'N/A';
+                obj.drugLastConnected  = 'N/A';
+                obj.drugLastOpened     = 'N/A'; 
+                obj.drugStatus         = 'N/A';
+                obj.drugDoseTimes      = 'N/A';
+                obj.drugTodayTaken     = 'N/A';
+                obj.drugStartTime      = 'N/A';
+                obj.lastWeekAdherence  = 'N/A';
+                obj.averageAdherence   = 'N/A';
+                obj.yesterdayAdherence = 'N/A';
 
                 reportData.push(obj);
             }
@@ -533,22 +535,24 @@ app.controller('organizationPatientsController', function ($scope, $filter, $htt
 
     //REPORTS---------
     var adherenceTemplate = '<div class="ngCellText"><span style="font-size: 12px; font-weight:normal" ng-class="getAdherenceClassName(row.getProperty(\'lastWeekAdherence\'))">{{ row.getProperty(col.field) }}</span></div>';
-    var phoneTemplate     = '<div class="ngCellText">{{ row.entity.phone_formatted }}<a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
+    var phoneTemplate     = '<div class="ngCellText">{{ row.entity.phone_formatted }}<br><a style="color: #2685ee" ng-click="messagePatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;SMS</a><a style="color: #2685ee" ng-click="callPatient($event, row.entity)">&nbsp;&nbsp;&nbsp;&nbsp;Call</a></div>';
     var iNameTemplate     = '<div><input type="button" style="color: #2685ee" value="{{ row.entity.fullname }}" ng-click="openPatientRecord(row)"/></div>'; 
 
     //Grid For Adherence report
     $scope.reportGridOptions = {
         data:             'reportData',
         columnDefs: [
-            { field:'fullname',          displayName: 'Name',          cellTemplate: iNameTemplate },
-            { field:'drugName',          displayName: 'Drugs' },
-            { field:'lastWeekAdherence', displayName: 'Last Week',     cellTemplate: adherenceTemplate },
-            { field:'averageAdherence',  displayName: 'Average' },
-            { field:'drugLastConnected', displayName: 'Last connected' },
-            { field:'drugLastOpened',    displayName: 'Last opened' },
-            { field:'drugStartTime',     displayName: 'Start date' },
-            { field:'phone',             displayName: 'Mobile#',       cellTemplate: phoneTemplate }
+            { field:'fullname',           displayName: 'Name',          cellTemplate: iNameTemplate },
+            { field:'drugName',           displayName: 'Drugs' },
+            { field:'lastWeekAdherence',  displayName: 'Last Week',     cellTemplate: adherenceTemplate },
+            { field:'yesterdayAdherence', displayName: 'Yesterday' },
+            { field:'averageAdherence',   displayName: 'Average' },
+            { field:'drugLastConnected',  displayName: 'Last connected' },
+            { field:'drugLastOpened',     displayName: 'Last opened' },
+            { field:'drugStartTime',      displayName: 'Start date' },
+            { field:'phone',              displayName: 'Mobile#',       cellTemplate: phoneTemplate, rowHeight: 100 }
         ],
+        rowHeight:                  45,
         multiSelect:                false,
         enablePaging:               true,
         showFooter:                 true,

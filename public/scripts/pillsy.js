@@ -36,7 +36,6 @@ var app = angular
     'PatientMedController',
     'GroupsController',
     'GroupPatientsController',
-    'GroupPatientsReportsController',
     'OrganizationPatientsController',
     'ManageOrganizationsController',
     'CreatePatientController',
